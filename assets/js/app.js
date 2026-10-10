@@ -170,9 +170,9 @@
 
   /* ---------- Тема и размер текста (применяем сразу) ---------- */
   const root = document.documentElement;
-  const applyTheme = (t) => { if (t === 'auto') root.removeAttribute('data-theme'); else root.setAttribute('data-theme', t); };
+  const applyTheme = (t) => root.setAttribute('data-theme', t); /* без атрибута — светлая, «auto» следует за системой */
   const applyScale = (s) => root.style.setProperty('--fs-scale', s);
-  applyTheme(store.get('urfu-theme', 'auto'));
+  applyTheme(store.get('urfu-theme', 'light'));
   applyScale(store.get('urfu-scale', '1'));
 
   /* ---------- Версия для слабовидящих: размер, цвета, картинки, интервал ---------- */
@@ -352,7 +352,7 @@
     // Сегменты: размер текста, тема
     const syncSeg = () => {
       document.querySelectorAll('[data-seg="scale"] button').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.v === store.get('urfu-scale', '1'))));
-      document.querySelectorAll('[data-seg="theme"] button').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.v === store.get('urfu-theme', 'auto'))));
+      document.querySelectorAll('[data-seg="theme"] button').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.v === store.get('urfu-theme', 'light'))));
     };
     document.querySelectorAll('[data-seg="scale"] button').forEach((b) => b.addEventListener('click', () => { store.set('urfu-scale', b.dataset.v); applyScale(b.dataset.v); syncSeg(); }));
     document.querySelectorAll('[data-seg="theme"] button').forEach((b) => b.addEventListener('click', () => { store.set('urfu-theme', b.dataset.v); applyTheme(b.dataset.v); syncSeg(); }));

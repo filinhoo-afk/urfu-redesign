@@ -73,7 +73,7 @@
 @media (min-width: 768px) { :root { --gutter: 32px; } }
 
 @media (prefers-color-scheme: dark) {
-  :root:not([data-theme="light"]) {
+  :root[data-theme="auto"] {
     --brand: #7b8cff; --brand-strong: #a3afff; --brand-soft: #23284d;
     --accent: #ff7a5c; --accent-strong: #ff9b82; --accent-soft: #3d2219;
     --lime-soft: #2d3312; --ink: #f3eee3; --shade: #000000;
