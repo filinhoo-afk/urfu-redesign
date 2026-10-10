@@ -1,0 +1,125 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Структура сайта: было и стало — УрФУ</title>
+  <link rel="icon" href="assets/logo/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="assets/css/tokens.css">
+  <link rel="stylesheet" href="assets/css/components.css">
+  <style>
+    .compare-ia { display: grid; gap: 24px; grid-template-columns: 1fr; }
+    @media (min-width: 1024px) { .compare-ia { grid-template-columns: 1fr 1.6fr; } }
+    .old { background: var(--surface-2); border-radius: var(--r-lg); padding: 24px; }
+    .old h3 { font-size: var(--fs-sm); margin: 16px 0 8px; color: var(--text-2); }
+    .old .cluster span { font-size: var(--fs-xs); padding: 5px 10px; border-radius: var(--r-sm); background: var(--surface); border: 1px dashed var(--border); color: var(--text-2); }
+    .old .cluster span.dup { border-color: var(--danger); color: var(--danger); }
+    .old .cluster span.jar { border-color: var(--warn); color: var(--warn); }
+    .legend { display: flex; flex-wrap: wrap; gap: 16px; font-size: var(--fs-xs); color: var(--text-3); margin-top: 16px; }
+    .legend span::before { content: ""; display: inline-block; width: 10px; height: 10px; border-radius: 3px; border: 1.5px dashed currentColor; margin-right: 6px; vertical-align: -1px; }
+    .tree { background: var(--surface); border: 1px solid var(--border); border-radius: var(--r-lg); padding: 24px; }
+    .tree__root { display: flex; align-items: center; gap: 12px; padding-bottom: 16px; border-bottom: 1px solid var(--border); margin-bottom: 16px; flex-wrap: wrap; }
+    .tree__root svg { height: 32px; width: auto; color: var(--text); }
+    .tree__util { display: flex; gap: 6px; flex-wrap: wrap; }
+    .branches { display: grid; gap: 12px; grid-template-columns: repeat(auto-fit, minmax(min(100%, 180px), 1fr)); }
+    .branch { border-radius: var(--r-md); background: var(--brand-soft); padding: 14px; }
+    .branch > a { font-weight: 750; display: flex; justify-content: space-between; align-items: center; color: var(--brand); }
+    .branch h4 { font-size: 11px; text-transform: uppercase; letter-spacing: .06em; color: var(--text-3); margin: 12px 0 4px; }
+    .branch li a { display: block; font-size: var(--fs-xs); padding: 3px 0; color: var(--text); }
+    .branch li a:hover { color: var(--brand); }
+    .op { font-size: var(--fs-xs); font-weight: 700; }
+    .op--merge { color: var(--role-staff); } .op--rename { color: var(--role-partner); } .op--remove { color: var(--danger); } .op--new { color: var(--ok); }
+  </style>
+</head>
+<body data-page="about">
+  <div id="site-header"></div>
+  <main id="main">
+    <section class="page-hero page-hero--tinted">
+      <div class="container">
+        <nav class="crumbs" aria-label="Хлебные крошки"><a href="index.html">Главная</a><i data-icon="chevron-right"></i><a href="concept.html">Концепция</a><i data-icon="chevron-right"></i><span>Структура</span></nav>
+        <h1 class="h1">Структура сайта: было → стало</h1>
+        <p class="lead">22 пункта в двух меню и 200+ ссылок превращаются в 5 понятных разделов, ролевой переключатель, поиск и единый Центр помощи.</p>
+        <div class="cluster" style="margin-top:24px">
+          <span class="tag"><b>22 → 5</b>&nbsp;пунктов верхнего уровня</span>
+          <span class="tag"><b>18 → 7</b>&nbsp;блоков на главной</span>
+          <span class="tag"><b>41 → 8</b>&nbsp;фильтров в лентах</span>
+          <span class="tag"><b>3 → 1</b>&nbsp;место для контактов</span>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <h2 class="sr-only">Сравнение структуры</h2>
+      <div class="container compare-ia">
+        <div class="old">
+          <span class="eyebrow" style="color:var(--text-3)">Было · urfu.ru</span>
+          <h3>Меню «Все разделы» (по аудиториям)</h3>
+          <div class="cluster"><span>Студентам (60+)</span><span>Абитуриентам (65+)</span><span class="dup">Школьникам</span><span>Сотрудникам</span><span>Партнёрам</span><span>Выпускникам</span><span>Работодателям</span><span class="dup">СМИ</span></div>
+          <h3>Меню «Меню» (по темам)</h3>
+          <div class="cluster"><span>Об университете</span><span>Новый кампус</span><span>Наука</span><span>Образование</span><span>Международная деятельность</span><span>Инновации</span><span>Эндаумент</span><span>Творчество</span><span>Спорт</span><span>Устойчивое развитие</span><span>Институты</span><span>Филиалы</span><span class="dup">Контакты</span><span class="dup">Обратная связь</span></div>
+          <h3>Плитки главной</h3>
+          <div class="cluster"><span class="dup">Школам</span><span class="dup">Прессе</span><span class="jar">Университет — это мы</span><span class="jar">Круглый год</span><span class="jar">Скажи спасибо университету</span><span class="dup">Пилотный проект ×2</span><span class="jar">Кадры для БАС</span><span class="jar">Видео (пусто)</span></div>
+          <div class="legend"><span style="color:var(--danger)">дубль</span><span style="color:var(--warn)">жаргон / пусто</span></div>
+        </div>
+
+        <div class="tree">
+          <span class="eyebrow">Стало · новая архитектура</span>
+          <div class="tree__root" style="margin-top:12px">
+            <span data-logo-slot></span>
+            <div class="tree__util">
+              <span class="tag tag--brand"><i data-icon="search"></i>Поиск Ctrl K</span>
+              <span class="tag tag--accent"><i data-icon="users"></i>Я — роль</span>
+              <span class="tag"><i data-icon="globe"></i>7 языков</span>
+              <span class="tag"><i data-icon="eye"></i>Крупный текст / тема</span>
+              <span class="tag tag--ok"><i data-icon="help"></i>Центр помощи</span>
+              <span class="tag"><i data-icon="log-in"></i>Личный кабинет</span>
+            </div>
+          </div>
+          <div class="branches" id="branches"></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section section--surface">
+      <div class="container">
+        <div class="section-head"><div><span class="eyebrow">Решения</span><h2 class="h2" style="margin-top:8px">Что куда переехало</h2></div></div>
+        <div class="table-wrap">
+          <table class="table">
+            <thead><tr><th>Было</th><th>Стало</th><th>Что сделали</th></tr></thead>
+            <tbody>
+              <tr><td>«Все разделы» + «Меню»</td><td>5 разделов: Поступление, Обучение, Наука, Кампус, Об УрФУ</td><td><span class="op op--merge">Объединили</span> — одна навигация по смыслу</td></tr>
+              <tr><td>8 аудиторий в меню</td><td>Переключатель «Я —» в шапке</td><td><span class="op op--new">Новое</span> — роль меняет главную и быстрые действия</td></tr>
+              <tr><td>«Абитуриентам» (65 ссылок)</td><td>Поступление: Выбрать → Подать → После подачи</td><td><span class="op op--merge">Сгруппировали</span> по шагам пути</td></tr>
+              <tr><td>«Школам» и «Школьникам»</td><td>Поступление → Школьникам: олимпиады и курсы</td><td><span class="op op--merge">Объединили</span> дубли</td></tr>
+              <tr><td>«Прессе» и «СМИ»</td><td>Об УрФУ → Пресс-центр</td><td><span class="op op--merge">Объединили</span> дубли</td></tr>
+              <tr><td>«Круглый год»</td><td>Обучение → Перевод и восстановление</td><td><span class="op op--rename">Переименовали</span> понятным языком</td></tr>
+              <tr><td>«БРС»</td><td>Кабинет студента → Оценки и рейтинг</td><td><span class="op op--rename">Расшифровали</span></td></tr>
+              <tr><td>«Скажи спасибо университету»</td><td>Об УрФУ → Эндаумент-фонд</td><td><span class="op op--rename">Переименовали</span></td></tr>
+              <tr><td>Контакты в 3+ местах, «Обратная связь»</td><td>Центр помощи: FAQ, справочник, чат</td><td><span class="op op--new">Новое</span> — единый вход для вопросов</td></tr>
+              <tr><td>«Университет — это мы» (10 плиток)</td><td>Распределено по разделам + поиск</td><td><span class="op op--remove">Убрали</span> блок-свалку</td></tr>
+              <tr><td>«Пилотный проект» ×2, пустой «Видео»</td><td>—</td><td><span class="op op--remove">Убрали</span> повторы и пустые блоки</td></tr>
+              <tr><td>24 фильтра новостей, 17 — событий</td><td>5 тем + 3 аудитории + поиск</td><td><span class="op op--merge">Сократили</span></td></tr>
+              <tr><td>«Версия для слабовидящих» — отдельная упрощённая копия</td><td>Кнопка-«глаз» в шапке: размер, 6 цветовых схем, картинки, интервал</td><td><span class="op op--new">Встроили</span> — режим той же страницы, навигация не меняется</td></tr>
+              <tr><td>Флаги языков без подписей</td><td>Меню языков с названиями</td><td><span class="op op--rename">Подписали</span></td></tr>
+              <tr><td>—</td><td>Подбор программ по баллам, сравнение, карта кампуса</td><td><span class="op op--new">Новое</span> — сервисы вместо списков ссылок</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+  </main>
+  <div id="site-footer"></div>
+  <script src="assets/js/app.js"></script>
+  <script>
+    document.getElementById('branches').innerHTML = UI.NAV.map((n) => `
+      <div class="branch">
+        <a href="${n.href}">${n.label}${UI.icon('arrow-up-right')}</a>
+        ${n.cols.map((c) => `<h4>${c.h}</h4><ul>${c.links.map(([t, u]) => `<li><a href="${u}">${t}</a></li>`).join('')}</ul>`).join('')}
+      </div>`).join('');
+    document.addEventListener('appready', () => {
+      const cur = UI.store.get(UI.LOGO_KEY, 'gem');
+      document.querySelectorAll('.tree [data-logo-slot]').forEach((s) => { s.innerHTML = UI.LOGOS[cur](); });
+    });
+  </script>
+</body>
+</html>

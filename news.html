@@ -1,0 +1,655 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Новости и события — УрФУ</title>
+  <meta name="description" content="Новости УрФУ, календарь событий и пресс-центр для СМИ.">
+  <link rel="icon" href="assets/logo/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="assets/css/tokens.css">
+  <link rel="stylesheet" href="assets/css/components.css">
+  <style>
+    /* ---------- Герой ---------- */
+    .news-hero { padding-bottom: 0; position: relative; overflow: hidden; }
+    .news-hero__grid { display: grid; gap: 24px; grid-template-columns: 1fr; align-items: end; }
+    @media (min-width: 1024px) { .news-hero__grid { grid-template-columns: 1fr 340px; } }
+    .news-hero h1 { margin-bottom: 14px; }
+    .news-hero .hand { display: inline-block; transform: rotate(-3deg); }
+    .news-hero__pin { position: relative; height: 230px; display: none; }
+    @media (min-width: 1024px) { .news-hero__pin { display: block; } }
+    .news-hero__pin .photo { position: absolute; right: 24px; top: 0; width: 240px; height: 210px; --rot: 4deg; }
+    .news-hero__pin .photo img { height: calc(100% - 34px); }
+    .news-hero__pin .sticker { position: absolute; left: 0; bottom: 4px; z-index: 3; --rot: -8deg; }
+    .news-tabs { margin-top: 28px; }
+    .news-tabs .tab { display: inline-flex; align-items: center; gap: 8px; font-size: var(--fs-md); }
+    .news-tabs .tab .i { width: 18px; height: 18px; }
+    @media (max-width: 480px) { .news-tabs { gap: 18px; } .news-tabs .tab { font-size: var(--fs-sm); gap: 6px; } }
+
+    /* ---------- Лента: фильтры ---------- */
+    .feed-tools { display: flex; flex-wrap: wrap; gap: 16px; align-items: center; justify-content: space-between; margin-bottom: 28px; }
+    .feed-tools .input-icon { flex: 1 1 280px; max-width: 380px; }
+    .feed-count { margin-bottom: 16px; }
+
+    /* ---------- Журнал: главная история + список ---------- */
+    .mag { display: grid; gap: 28px; grid-template-columns: 1fr; margin-bottom: 48px; }
+    @media (min-width: 1024px) { .mag { grid-template-columns: 1.4fr 1fr; gap: 40px; } }
+    .lead-story { display: block; position: relative; }
+    .lead-story .photo { --rot: -1deg; height: clamp(240px, 34vw, 400px); }
+    .lead-story .photo img { height: 100%; }
+    .lead-story .sticker { position: absolute; top: -12px; right: 18px; z-index: 3; --rot: 6deg; }
+    .lead-story h2 { font-size: calc(clamp(22px, 2.4vw, 34px) * var(--fs-scale)); margin: 18px 0 10px; line-height: 1.12; }
+    .lead-story:hover h2 { text-decoration: underline; text-decoration-color: var(--accent); text-decoration-thickness: 3px; }
+    .mag__side > .hand { display: block; margin-bottom: 14px; transform: rotate(-2deg); }
+    .story { display: grid; grid-template-columns: 96px 1fr; gap: 16px; padding: 18px 0; border-bottom: var(--line) solid var(--ink); align-items: center; }
+    .story:first-of-type { padding-top: 0; }
+    .story img { width: 96px; height: 96px; object-fit: cover; border: var(--line) solid var(--ink); border-radius: 12px; }
+    .story strong { font-size: var(--fs-md); line-height: 1.3; display: block; margin: 6px 0 4px; }
+    .story:hover strong { color: var(--brand); }
+
+    /* ---------- Лента: неровная сетка, каждая 5-я карточка широкая ---------- */
+    .news-grid { display: grid; gap: 28px 24px; grid-template-columns: repeat(auto-fill, minmax(min(100%, 260px), 1fr)); }
+    .np { display: flex; flex-direction: column; gap: 10px; }
+    .np .photo { height: 190px; }
+    .np .photo img { height: 100%; }
+    .np h3 { font-family: var(--font); font-size: var(--fs-md); font-weight: 700; line-height: 1.3; }
+    .np:hover h3 { text-decoration: underline; text-decoration-color: var(--accent); text-decoration-thickness: 2px; }
+    .np p { display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+    .np__meta { display: flex; flex-wrap: wrap; gap: 6px 12px; align-items: center; font-size: var(--fs-xs); color: var(--text-3); }
+    @media (min-width: 900px) {
+      .np:nth-child(5n+1) { grid-column: span 2; display: grid; grid-template-columns: 1.1fr 1fr; gap: 10px 22px; align-content: start; padding: 18px; border: var(--line) solid var(--ink); border-radius: var(--r-lg); background: var(--surface); }
+      .np:nth-child(5n+1) .photo { grid-row: span 3; height: 100%; min-height: 220px; }
+      .np:nth-child(5n+1) h3 { font: 700 var(--fs-xl)/1.15 var(--font-display); }
+      .np:nth-child(5n+3) { margin-top: 26px; }
+    }
+    .more-wrap { display: flex; flex-direction: column; align-items: center; gap: 8px; margin-top: 40px; }
+    .empty { display: flex; flex-direction: column; align-items: center; gap: 12px; text-align: center; padding: 56px 24px; border-radius: var(--r-lg); background: var(--surface); border: var(--line) dashed var(--ink); color: var(--text); }
+
+    /* ---------- События: отрывной календарь + афиша ---------- */
+    .events-layout { display: grid; gap: 32px; grid-template-columns: 1fr; align-items: start; }
+    @media (min-width: 1024px) { .events-layout { grid-template-columns: 360px 1fr; } }
+    .cal { padding: 0; overflow: hidden; background: var(--surface); box-shadow: var(--shadow-md); transform: rotate(-1deg); }
+    @media (min-width: 1024px) { .cal { position: sticky; top: calc(var(--header-h) + 76px); } }
+    .cal__head { display: flex; justify-content: space-between; align-items: center; gap: 10px; padding: 14px 20px; background: #ff5a36; color: #fff; border-bottom: var(--line) solid var(--ink); }
+    .cal__head h2 { color: #fff; font-family: var(--font-display); text-transform: uppercase; letter-spacing: .02em; }
+    .cal__head .sticker { --rot: 4deg; }
+    .cal__body { padding: 16px 20px 20px; }
+    .cal__grid { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 4px; text-align: center; }
+    .cal__wd { font-size: var(--fs-xs); font-weight: 700; color: var(--text-3); padding: 6px 0; }
+    .cal__day { position: relative; aspect-ratio: 1; display: grid; place-items: center; border-radius: 10px; font-size: var(--fs-sm); color: var(--text-3); border: var(--line) solid transparent; background: none; }
+    button.cal__day { color: var(--text); font-weight: 800; background: var(--lime-soft); border-color: var(--ink); }
+    button.cal__day:hover { background: var(--lime); color: #14141a; }
+    button.cal__day[aria-pressed="true"] { background: var(--ink); color: var(--bg); }
+    .cal__day .dots { position: absolute; bottom: 4px; left: 0; right: 0; display: flex; justify-content: center; gap: 3px; }
+    .cal__day .dots span { width: 5px; height: 5px; border-radius: 50%; background: var(--accent); }
+    button.cal__day[aria-pressed="true"] .dots span { background: var(--lime); }
+    .cal__legend { display: flex; gap: 8px; align-items: center; margin-top: 14px; font-size: var(--fs-xs); color: var(--text-3); }
+    .cal__legend span { width: 6px; height: 6px; border-radius: 50%; background: var(--accent); display: inline-block; flex: none; }
+
+    .ev-tools { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; justify-content: space-between; margin-bottom: 16px; }
+    .afisha { background: #14141a; color: #f3eee3; border-radius: var(--r-xl); padding: clamp(18px, 3vw, 36px); border: var(--line) solid var(--ink); box-shadow: var(--shadow-lg); }
+    .afisha__head { display: flex; flex-wrap: wrap; gap: 6px 14px; align-items: baseline; margin-bottom: 8px; }
+    .afisha__head h2 { color: #d7ff3d; }
+    .afisha__head .hand { color: #f3eee3; display: inline-block; transform: rotate(-3deg); }
+    .ev-list { display: flex; flex-direction: column; }
+    .ev { display: grid; grid-template-columns: 76px 1fr; gap: 16px; align-items: start; padding: 18px 0; border-top: 1px solid rgba(255, 255, 255, .18); }
+    @media (min-width: 640px) { .ev { grid-template-columns: 96px 1fr auto; align-items: center; } }
+    .ev__date { line-height: 1; }
+    .ev__date b { display: block; font: 800 calc(48px * var(--fs-scale))/1 var(--font-display); color: #fff; letter-spacing: -.03em; }
+    .ev__date span { display: block; margin-top: 4px; font: 700 var(--fs-xs)/1 var(--font-display); color: #d7ff3d; text-transform: uppercase; }
+    .ev__body { display: flex; flex-direction: column; gap: 6px; min-width: 0; }
+    .ev__body h3 { font-family: var(--font); font-size: var(--fs-md); font-weight: 700; line-height: 1.3; color: #fff; }
+    .ev:hover h3 { color: #d7ff3d; }
+    .ev__meta { display: flex; flex-wrap: wrap; gap: 6px 14px; font-size: var(--fs-xs); color: #b8b1a4; align-items: center; }
+    .ev__meta span, .ev__meta a { display: inline-flex; align-items: center; gap: 4px; }
+    .ev__meta .i { width: 14px; height: 14px; }
+    .ev__meta a { color: #f3eee3; font-weight: 600; text-decoration: underline; text-decoration-color: #ff5a36; text-underline-offset: 3px; }
+    .afisha .tag { color: #d7ff3d; background: transparent; }
+    .ev__actions { grid-column: 2; }
+    @media (min-width: 640px) { .ev__actions { grid-column: auto; } }
+    .afisha .remind { background: #fffdf8; color: #14141a; border-color: #fffdf8; box-shadow: 3px 3px 0 #45434d; }
+    .afisha .remind[aria-pressed="true"] { background: #d7ff3d; border-color: #d7ff3d; }
+    .afisha .empty { background: transparent; color: #f3eee3; border-color: rgba(255, 255, 255, .4); }
+    .afisha .demo-note { color: #b8b1a4; margin-top: 16px; }
+
+    /* ---------- Пресс-центр ---------- */
+    .press-head { display: flex; flex-wrap: wrap; align-items: flex-end; gap: 8px 18px; margin-bottom: 32px; }
+    .press-head p { flex: 1 1 100%; max-width: 620px; color: var(--text-2); }
+    .press-head .hand { display: inline-block; transform: rotate(-3deg); }
+    .press-grid { display: grid; gap: 28px var(--gap); grid-template-columns: 1fr; align-items: start; }
+    @media (min-width: 1024px) { .press-grid { grid-template-columns: 1.25fr 1fr 1fr; } .press-grid .span-2 { grid-column: span 2; } }
+    .press-card { position: relative; }
+    .press-card > .sticker { position: absolute; top: -16px; right: 16px; --rot: 5deg; }
+    .press-phone { display: block; font: 800 calc(clamp(22px, 2.2vw, 30px) * var(--fs-scale))/1.1 var(--font-display); letter-spacing: -.02em; color: var(--text); margin: 2px 0 6px; }
+    .contact-line { display: flex; gap: 12px; align-items: center; padding: 12px 0; border-bottom: var(--line) solid var(--ink); }
+    .contact-line:last-child { border-bottom: none; }
+    .contact-line .icon-tile { width: 40px; height: 40px; border-radius: 12px; flex: none; }
+    .contact-line .icon-tile .i { width: 20px; height: 20px; }
+    .contact-line a { font-weight: 700; color: var(--brand); }
+    .photo-strip { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; padding: 10px 4px 4px; }
+    .photo-strip .photo { padding: 5px 5px 8px; height: 104px; }
+    .photo-strip .photo img { height: 100%; }
+    .photo-strip .photo:nth-child(1) { --rot: -4deg; } .photo-strip .photo:nth-child(2) { --rot: 3deg; margin-top: 10px; } .photo-strip .photo:nth-child(3) { --rot: -2deg; }
+    .tips { background: var(--lime-soft); border: var(--line) solid var(--ink); border-radius: var(--r-md); padding: 22px; transform: rotate(1.2deg); box-shadow: var(--shadow-sm); }
+    .tips .hand { font-size: calc(30px * var(--fs-scale)); color: var(--text); display: block; margin-bottom: 10px; }
+    .tips ol { display: flex; flex-direction: column; gap: 10px; counter-reset: t; list-style: none; padding: 0; margin: 0; }
+    .tips li { counter-increment: t; display: grid; grid-template-columns: 30px 1fr; gap: 8px; font-size: var(--fs-sm); }
+    .tips li::before { content: counter(t); font: 800 var(--fs-lg)/1 var(--font-display); color: var(--accent); }
+    .form-grid { display: grid; gap: 14px; grid-template-columns: 1fr; }
+    @media (min-width: 640px) { .form-grid { grid-template-columns: 1fr 1fr; } .form-grid .full { grid-column: 1 / -1; } }
+    .experts { display: grid; gap: 0 32px; grid-template-columns: repeat(auto-fill, minmax(min(100%, 300px), 1fr)); border-top: var(--line) solid var(--ink); }
+    .expert { display: flex; gap: 14px; align-items: flex-start; padding: 18px 0; border-bottom: var(--line) solid var(--ink); }
+    .expert .avatar { width: 52px; height: 52px; border: var(--line) solid var(--ink); font-family: var(--font-display); flex: none; }
+    .expert__body { display: flex; flex-direction: column; gap: 6px; min-width: 0; }
+    .experts .empty { grid-column: 1 / -1; margin-top: 18px; }
+    .av-1 { background: var(--brand); } .av-2 { background: var(--role-student); } .av-3 { background: var(--role-staff); } .av-4 { background: var(--accent); } .av-5 { background: var(--role-intl); } .av-6 { background: var(--role-partner); }
+
+    /* ---------- Подписка: синяя плашка + белая карточка ---------- */
+    .digest { position: relative; border: var(--line) solid var(--ink); border-radius: var(--r-xl); box-shadow: var(--shadow-lg); background: #2747ff; color: #fff; padding: clamp(24px, 4vw, 52px); display: grid; gap: 32px; grid-template-columns: 1fr; align-items: center; }
+    @media (min-width: 900px) { .digest { grid-template-columns: 1fr 1fr; } }
+    .digest h2 { color: #fff; max-width: 16ch; }
+    .digest .lead { color: #e3e8ff; margin-top: 14px; }
+    .digest .hand { color: #d7ff3d; display: inline-block; margin-top: 14px; transform: rotate(-2deg); }
+    .digest .sticker { margin-bottom: 16px; --rot: -4deg; }
+    .digest form { position: relative; display: flex; flex-direction: column; gap: 12px; background: var(--surface); color: var(--text); border: var(--line) solid var(--ink); border-radius: var(--r-lg); padding: 24px; transform: rotate(1.2deg); box-shadow: var(--shadow-md); }
+    .digest__row { display: flex; gap: 8px; flex-wrap: wrap; }
+    .digest__row .input { flex: 1 1 200px; }
+
+    /* ---------- Версия для слабовидящих ---------- */
+    html[data-a11y] :is(.cal, .tips, .digest form, .news-hero .hand, .mag__side > .hand, .press-head .hand, .afisha__head .hand, .digest .hand) { transform: none !important; }
+    html[data-a11y] :is(.lead-story .sticker, .press-card > .sticker) { position: static; display: inline-flex; margin-bottom: 10px; }
+    html[data-a11y] .lead-story .photo { height: auto; }
+    html[data-a11y] .lead-story .photo img { height: 260px; }
+    html[data-a11y] .np:nth-child(5n+3) { margin-top: 0; }
+    html[data-a11y] .np:nth-child(5n+1) { grid-column: auto; display: flex; padding: 0; border: 0; background: none; }
+    html[data-a11y] .np .photo { height: auto; min-height: 0; }
+    html[data-a11y] .np .photo img { height: 180px; }
+    html[data-a11y] .ev { grid-template-columns: 1fr; }
+    html[data-a11y] .ev__date b { font-size: var(--fs-2xl); }
+    html[data-a11y] .ev__actions { grid-column: auto; }
+    html[data-a11y] .photo-strip .photo { height: auto; margin-top: 0; }
+    html[data-a11y] .photo-strip .photo img { height: 90px; }
+    html[data-a11y] .story { grid-template-columns: 1fr; }
+  </style>
+</head>
+<body data-page="about">
+  <div id="site-header"></div>
+
+  <main id="main">
+    <section class="page-hero page-hero--tinted news-hero">
+      <div class="container">
+        <nav class="crumbs" aria-label="Хлебные крошки"><a href="index.html">Главная</a><i data-icon="chevron-right"></i><a href="institutes.html">Об УрФУ</a><i data-icon="chevron-right"></i><span>Новости и события</span></nav>
+        <div class="news-hero__grid">
+          <div>
+            <h1 class="h1">Новости и <span class="u-hand">события</span></h1>
+            <p class="lead">Что происходит в университете: открытия учёных, жизнь студентов, поступление и кампус. Выбери тему — лишнее спрячем.</p>
+            <span class="hand" aria-hidden="true">свежее — сверху ↓</span>
+          </div>
+          <div class="news-hero__pin" aria-hidden="true">
+            <figure class="photo tape"><img src="assets/img/concert.jpg" alt="" loading="eager"><figcaption>День УрФУ, сентябрь</figcaption></figure>
+            <span class="sticker sticker--coral"><i data-icon="calendar"></i>15 событий в октябре</span>
+          </div>
+        </div>
+        <div class="tabs-line news-tabs" role="tablist" aria-label="Разделы">
+          <button class="tab" role="tab" id="tab-feed" aria-controls="feed" aria-selected="true"><i data-icon="file"></i>Новости</button>
+          <button class="tab" role="tab" id="tab-events" aria-controls="events" aria-selected="false"><i data-icon="calendar"></i>События</button>
+          <button class="tab" role="tab" id="tab-press" aria-controls="press" aria-selected="false"><i data-icon="message"></i>Пресс-центр</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== Новости ===== -->
+    <section class="section--tight tabpanel" role="tabpanel" id="feed" aria-labelledby="tab-feed">
+      <div class="container">
+        <div class="feed-tools">
+          <div class="cluster" data-chip-group id="cat-chips" aria-label="Темы новостей">
+            <button class="chip" aria-pressed="true" data-cat="all">Все</button>
+            <button class="chip" aria-pressed="false" data-cat="science">Наука</button>
+            <button class="chip" aria-pressed="false" data-cat="students">Студентам</button>
+            <button class="chip" aria-pressed="false" data-cat="admission">Поступление</button>
+            <button class="chip" aria-pressed="false" data-cat="campus">Кампус</button>
+            <button class="chip" aria-pressed="false" data-cat="uni">Университет</button>
+          </div>
+          <div class="input-icon">
+            <i data-icon="search"></i>
+            <label for="news-q" class="sr-only">Поиск по новостям</label>
+            <input class="input" id="news-q" type="search" placeholder="Поиск по новостям" autocomplete="off">
+          </div>
+        </div>
+        <p class="small muted feed-count" id="feed-count" aria-live="polite"></p>
+        <div id="featured"></div>
+        <div class="news-grid" id="news-grid"></div>
+        <div class="more-wrap" id="more-wrap">
+          <button class="btn btn--soft" id="more-btn" type="button"><i data-icon="refresh"></i> Показать ещё</button>
+          <span class="xs muted" id="more-note"></span>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== События ===== -->
+    <section class="section--tight tabpanel" role="tabpanel" id="events" aria-labelledby="tab-events" hidden>
+      <div class="container">
+        <div class="events-layout">
+          <aside class="card cal" aria-label="Календарь событий">
+            <div class="cal__head"><h2 class="h4">Октябрь 2026</h2><span class="sticker sticker--paper" id="cal-total"></span></div>
+            <div class="cal__body">
+              <div class="cal__grid" id="cal-grid"></div>
+              <div class="cal__legend"><span aria-hidden="true"></span>есть события — нажми на день, чтобы отфильтровать</div>
+            </div>
+          </aside>
+          <div>
+            <div class="ev-tools">
+              <div class="cluster" data-chip-group id="aud-chips" aria-label="Для кого">
+                <button class="chip" aria-pressed="true" data-aud="all">Всем</button>
+                <button class="chip" aria-pressed="false" data-aud="applicant">Абитуриентам</button>
+                <button class="chip" aria-pressed="false" data-aud="student">Студентам</button>
+              </div>
+              <div class="cluster"><span class="small muted" id="ev-count" aria-live="polite"></span><button class="btn btn--ghost btn--sm" id="ev-reset" type="button" hidden><i data-icon="x"></i> Сбросить день</button></div>
+            </div>
+            <div class="afisha">
+              <div class="afisha__head"><h2 class="h3">Афиша</h2><span class="hand" aria-hidden="true">жми «напомнить» — не забудешь</span></div>
+              <div class="ev-list" id="ev-list"></div>
+              <p class="demo-note">События и даты — демонстрационные.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== Пресс-центр ===== -->
+    <section class="section--tight tabpanel" role="tabpanel" id="press" aria-labelledby="tab-press" hidden>
+      <div class="container">
+        <div class="press-head">
+          <h2 class="h2">Пресс-центр</h2>
+          <span class="hand" aria-hidden="true">журналистам и блогерам →</span>
+          <p>Комментарий эксперта, фото или аккредитация — ответим в течение рабочего дня.</p>
+        </div>
+        <div class="press-grid">
+          <div class="card press-card">
+            <span class="sticker" aria-hidden="true">ответим за день</span>
+            <h3 class="card__title">Пресс-служба</h3>
+            <div>
+              <span class="xs muted">Телефон, пн–пт 9:00–18:00</span>
+              <a class="press-phone" href="tel:+73433754636">+7 (343) 375-46-36</a>
+              <div class="contact-line"><span class="icon-tile"><i data-icon="mail"></i></span><div><span class="xs muted">Почта для запросов СМИ</span><br><a href="mailto:press@urfu.ru">press@urfu.ru</a></div></div>
+              <div class="contact-line"><span class="icon-tile"><i data-icon="clock"></i></span><div><span class="xs muted">Дежурный пресс-секретарь</span><br><strong>ежедневно 9:00–21:00</strong></div></div>
+            </div>
+            <a class="arrow-link small" href="help.html#contacts">Все контакты университета <i data-icon="arrow-right"></i></a>
+          </div>
+
+          <div class="card">
+            <h3 class="card__title">Фотобанк</h3>
+            <p class="small muted">2 000+ фото кампуса, лабораторий и событий в высоком разрешении. Можно использовать со ссылкой на УрФУ.</p>
+            <div class="photo-strip">
+              <figure class="photo"><img src="assets/img/lab.jpg" alt="Исследователь у микроскопа в лаборатории" loading="lazy"></figure>
+              <figure class="photo"><img src="assets/img/graduation.jpg" alt="Выпускник подбрасывает шапочку" loading="lazy"></figure>
+              <figure class="photo"><img src="assets/img/city.jpg" alt="Заснеженный Екатеринбург с высоты" loading="lazy"></figure>
+            </div>
+            <div class="card__footer" style="justify-content:flex-start;flex-wrap:wrap">
+              <button class="btn btn--sm" type="button" data-toast="Фотобанк откроется в новой вкладке (демо)"><i data-icon="external"></i> Открыть фотобанк</button>
+              <a class="btn btn--ghost btn--sm" href="logo.html"><i data-icon="download"></i> Логотипы</a>
+            </div>
+          </div>
+
+          <div class="card">
+            <h3 class="card__title">Свежие пресс-релизы</h3>
+            <ul class="stack-sm" id="releases"></ul>
+            <a class="arrow-link small" href="news.html#feed">Все новости <i data-icon="arrow-right"></i></a>
+          </div>
+
+          <form class="card span-2" id="accr-form" novalidate aria-labelledby="accr-title">
+            <h3 class="card__title" id="accr-title">Аккредитация на событие</h3>
+            <p class="small muted">Заполните форму — пришлём подтверждение и пропуск на почту за сутки до события.</p>
+            <div class="form-grid">
+              <div class="field"><label for="ac-name">Имя и фамилия</label><input class="input" id="ac-name" name="name" required autocomplete="name"></div>
+              <div class="field"><label for="ac-media">Издание или канал</label><input class="input" id="ac-media" name="media" required></div>
+              <div class="field"><label for="ac-mail">Рабочая почта</label><input class="input" id="ac-mail" name="mail" type="email" required autocomplete="email"></div>
+              <div class="field"><label for="ac-event">Событие</label><select class="select" id="ac-event" name="event"></select></div>
+              <label class="check full"><input type="checkbox" name="crew"> Приеду со съёмочной группой</label>
+            </div>
+            <p class="small" id="accr-error" role="alert" style="color:var(--danger)" hidden></p>
+            <div class="card__footer" style="justify-content:flex-start"><button class="btn btn--accent" type="submit"><i data-icon="send"></i> Отправить заявку</button><span class="demo-note">Форма демонстрационная, данные никуда не отправляются</span></div>
+          </form>
+
+          <div class="tips">
+            <span class="hand">Как быстрее получить комментарий</span>
+            <ol>
+              <li>Напишите тему и дедлайн в первой строке письма.</li>
+              <li>Укажите формат: текст, видео, прямой эфир.</li>
+              <li>Выберите эксперта ниже — мы свяжем вас напрямую.</li>
+            </ol>
+          </div>
+        </div>
+
+        <div class="section-head" style="margin:56px 0 20px">
+          <div><h2 class="h3">Эксперты УрФУ</h2><p>Учёные, которые готовы комментировать для СМИ. Найдите по теме.</p></div>
+          <div class="input-icon" style="flex:1 1 260px;max-width:360px">
+            <i data-icon="search"></i>
+            <label for="exp-q" class="sr-only">Тема для комментария</label>
+            <input class="input" id="exp-q" type="search" placeholder="Например: батареи, ИИ, экономика" autocomplete="off">
+          </div>
+        </div>
+        <div class="experts" id="experts"></div>
+        <p class="demo-note" style="margin-top:12px">Имена экспертов вымышлены для демонстрации концепта.</p>
+      </div>
+    </section>
+
+    <!-- ===== Подписка ===== -->
+    <section class="section">
+      <div class="container">
+        <div class="digest">
+          <div>
+            <span class="sticker" aria-hidden="true"><i data-icon="mail"></i>каждую пятницу</span>
+            <h2 class="h2">Главное за неделю — одним письмом</h2>
+            <p class="lead">5 новостей, ближайшие события и одна история про науку. Без спама, отписка в один клик.</p>
+            <span class="hand" aria-hidden="true">читается за 3 минуты</span>
+          </div>
+          <form id="digest-form" novalidate>
+            <div class="field">
+              <label for="digest-mail">Твоя почта</label>
+              <div class="digest__row">
+                <input class="input" id="digest-mail" type="email" placeholder="name@example.ru" autocomplete="email" required>
+                <button class="btn btn--accent" type="submit">Подписаться</button>
+              </div>
+            </div>
+            <label class="check"><input type="checkbox" id="digest-events" checked> Присылать напоминания о событиях</label>
+            <span class="xs" id="digest-msg" aria-live="polite"></span>
+          </form>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <div id="site-footer"></div>
+
+  <script src="assets/js/app.js"></script>
+  <script>
+  (function () {
+    'use strict';
+    const $ = (s, r = document) => r.querySelector(s);
+    const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+    const plural = (n, f) => f[(n % 10 === 1 && n % 100 !== 11) ? 0 : (n % 10 >= 2 && n % 10 <= 4 && (n % 100 < 10 || n % 100 >= 20)) ? 1 : 2];
+    const ic = (n) => UI.icon(n);
+
+    /* ============ Новости ============ */
+    const CATS = {
+      science: ['Наука', 'tag--brand'], students: ['Студентам', 'tag--student'], admission: ['Поступление', 'tag--applicant'],
+      campus: ['Кампус', 'tag--accent'], uni: ['Университет', '']
+    };
+    // [категория, дата, заголовок, лид, цвет медиа, иконка, минут чтения]
+    const NEWS = [
+      ['science', '7 октября', 'Учёные УрФУ создали материал для твердотельных батарей, работающих при −40 °C', 'Разработка лаборатории электрохимии может удвоить запас хода электротранспорта в уральскую зиму.', 'lilac', 'zap', 4],
+      ['students', '6 октября', 'Открыт приём заявок на весенний семестр обмена', '40 вузов-партнёров в 15 странах. Рассказываем, как подать заявку и получить грант на поездку.', 'sky', 'globe', 4],
+      ['campus', '5 октября', 'Новый кампус: как будет выглядеть общественное пространство', 'Коворкинги, библиотека 24/7 и зелёный двор — показываем проект и сроки.', 'coral', 'building', 5],
+      ['uni', '3 октября', 'УрФУ вошёл в топ-10 вузов страны по востребованности выпускников', '87% выпускников находят работу в первые полгода после диплома.', 'sand', 'trophy', 3],
+      ['admission', '2 октября', 'Олимпиада «Изумруд»: регистрация открыта до 15 ноября', 'Победители и призёры получают 100 баллов или дополнительные баллы при поступлении.', 'sky', 'award', 3],
+      ['science', '1 октября', 'Нейросеть ИРИТ-РтФ находит дефекты в трубах по ультразвуку в пять раз быстрее', 'Система уже тестируется на двух уральских заводах трубной промышленности.', 'mint', 'cpu', 4],
+      ['students', '30 сентября', 'Повышенная стипендия: как подать документы до 20 октября', 'Пошагово: какие достижения учитываются и где загрузить подтверждения.', 'mint', 'coins', 3],
+      ['campus', '29 сентября', 'В общежитии № 7 открылся коворкинг с переговорными', 'Бронировать места можно в личном кабинете студента — бесплатно.', 'sand', 'users', 2],
+      ['admission', '28 сентября', 'Дни открытых дверей институтов: расписание на осень', 'Приходи с родителями: экскурсии по лабораториям и разговор с приёмной комиссией.', 'coral', 'calendar', 3],
+      ['uni', '27 сентября', 'УрФУ и уральские заводы запустили 12 совместных магистерских программ', 'Учёба по реальным задачам предприятий и гарантированная стажировка.', 'sky', 'briefcase', 4],
+      ['science', '25 сентября', 'Химики ХТИ предложили перерабатывать металлургические шлаки в стройматериалы', 'Технология снижает объём отходов и стоимость бетона для дорожного строительства.', 'lilac', 'flask', 5],
+      ['students', '24 сентября', 'Команда ИРИТ-РтФ вышла в финал международного чемпионата по программированию', 'Трое студентов решили 9 задач из 12 и обошли 120 команд региона.', 'rose', 'trophy', 3],
+      ['campus', '22 сентября', 'Спорткомплекс УрФУ теперь работает до 23:00', 'Бассейн, тренажёрный зал и игровые залы — по студенческому без доплат.', 'mint', 'activity', 2],
+      ['admission', '20 сентября', 'Подготовительные курсы к ЕГЭ стартуют в онлайн-формате', 'Математика, физика, информатика и русский — занятия по вечерам и в выходные.', 'sky', 'book', 3],
+      ['uni', '18 сентября', 'УрФУ подписал соглашения о сотрудничестве с тремя университетами Индии', 'Совместные исследования, обмен студентами и программы двух дипломов.', 'sand', 'globe', 3],
+      ['science', '16 сентября', 'Астрономы Коуровской обсерватории обнаружили новую переменную звезду', 'Наблюдения вели студенты-магистранты в рамках летней практики.', 'lilac', 'star', 4],
+      ['students', '15 сентября', 'Психологическая служба запустила онлайн-запись без очередей', 'Первая консультация — в течение трёх дней, можно выбрать формат видеозвонка.', 'rose', 'heart', 2],
+      ['campus', '12 сентября', 'В столовых кампуса можно платить студенческим билетом', 'Привязать карту к студенческому можно в личном кабинете за минуту.', 'coral', 'utensils', 2],
+      ['uni', '10 сентября', 'Университету 107 лет: как прошёл День УрФУ', 'Концерт, экскурсии по историческому корпусу и выставка архивных фото.', 'rose', 'sparkles', 3],
+      ['admission', '8 сентября', 'Магистратура для выпускников других вузов: как выбрать программу', 'Сравнили форматы, вступительные испытания и бюджетные места.', 'mint', 'graduation', 5],
+      ['science', '5 сентября', 'Студенческое конструкторское бюро собрало дрон для мониторинга лесов', 'Аппарат держится в воздухе 3 часа и передаёт тепловую карту в реальном времени.', 'sky', 'rocket', 3]
+    ].map((a, i) => ({ i, cat: a[0], date: a[1], title: a[2], lead: a[3], icon: a[5], min: a[6] }));
+    // Фото к новостям (assets/img) — по порядку NEWS
+    const IMG = ['lab', 'selfie', 'city', 'graduation', 'applicant', 'laptop', 'library', 'dorm', 'bench', 'robotics', 'lab',
+      'friends', 'sport', 'lecture', 'library', 'winter', 'bench', 'selfie', 'concert', 'applicant', 'robotics'];
+    const ALT = {
+      lab: 'Исследователь у микроскопа в лаборатории', selfie: 'Селфи студентов в аудитории', city: 'Заснеженный Екатеринбург с высоты',
+      graduation: 'Выпускник подбрасывает шапочку', applicant: 'Абитуриентка с книгой', laptop: 'Студенты обсуждают проект за ноутбуком в библиотеке',
+      library: 'Студенты в библиотеке', dorm: 'Комната в общежитии', bench: 'Студенты отдыхают у корпуса', robotics: 'Студенты собирают устройство в лаборатории',
+      friends: 'Студенты смеются за столом', sport: 'Студенты играют в баскетбол', lecture: 'Студенты в лекционной аудитории',
+      winter: 'Екатеринбург на закате, вид на замёрзший пруд', concert: 'Студенческий концерт'
+    };
+    NEWS.forEach((n) => { n.img = IMG[n.i]; });
+    const pic = (n) => `assets/img/${n.img}.jpg`;
+
+    const PAGE = 12;
+    const SIDE = 3; // истории в колонке рядом с главной
+    const fState = { cat: 'all', q: '', shown: PAGE };
+    const catTag = (c) => `<span class="tag ${CATS[c][1]}">${CATS[c][0]}</span>`;
+    const card = (n) => `<a class="np" href="article.html">
+        <figure class="photo photo--flat"><img src="${pic(n)}" alt="" loading="lazy"></figure>
+        <div class="np__meta">${catTag(n.cat)}<span>${n.date}</span><span>· ${n.min} мин</span></div>
+        <h3>${esc(n.title)}</h3>
+        <p class="muted small">${esc(n.lead)}</p>
+      </a>`;
+    const story = (n) => `<a class="story" href="article.html"><img src="${pic(n)}" alt="" loading="lazy"><span>${catTag(n.cat)}<strong>${esc(n.title)}</strong><span class="xs muted">${n.date} · ${n.min} мин</span></span></a>`;
+    const featured = (n, side) => `<div class="mag">
+        <a class="lead-story" href="article.html">
+          <figure class="photo tape"><img src="${pic(n)}" alt="${ALT[n.img]}" loading="eager"></figure>
+          <span class="sticker sticker--blue" aria-hidden="true">${ic('star')}главное</span>
+          <div class="cluster" style="margin-top:22px">${catTag(n.cat)}<span class="xs muted">${n.date} · ${n.min} мин чтения</span></div>
+          <h2>${esc(n.title)}</h2>
+          <p class="muted">${esc(n.lead)}</p>
+        </a>
+        ${side.length ? `<div class="mag__side"><span class="hand" aria-hidden="true">ещё обсуждают →</span>${side.map(story).join('')}</div>` : ''}
+      </div>`;
+
+    function renderFeed() {
+      const q = fState.q.trim().toLowerCase().replace(/ё/g, 'е');
+      const list = NEWS.filter((n) => (fState.cat === 'all' || n.cat === fState.cat) && (!q || (n.title + ' ' + n.lead).toLowerCase().replace(/ё/g, 'е').includes(q)));
+      const cnt = $('#feed-count');
+      if (!list.length) {
+        cnt.textContent = 'Ничего не нашли';
+        $('#featured').innerHTML = `<div class="empty"><span class="icon-tile">${ic('search')}</span><h2 class="h4">По запросу «${esc(fState.q)}» новостей нет</h2><p class="small muted">Попробуй другое слово или посмотри все темы.</p><button class="btn btn--soft btn--sm" type="button" id="feed-reset">Сбросить фильтры</button></div>`;
+        $('#news-grid').innerHTML = ''; $('#more-wrap').hidden = true; return;
+      }
+      cnt.textContent = `${fState.cat === 'all' ? 'Все темы' : CATS[fState.cat][0]} · ${list.length} ${plural(list.length, ['новость', 'новости', 'новостей'])}${q ? ` по запросу «${fState.q.trim()}»` : ''}`;
+      $('#featured').innerHTML = featured(list[0], list.slice(1, 1 + SIDE));
+      const rest = list.slice(1 + SIDE);
+      $('#news-grid').innerHTML = rest.slice(0, fState.shown).map(card).join('');
+      const left = rest.length - fState.shown;
+      $('#more-wrap').hidden = left <= 0;
+      $('#more-note').textContent = left > 0 ? `Показано ${Math.min(fState.shown, rest.length) + 1 + SIDE} из ${list.length}` : '';
+    }
+    $('#cat-chips').addEventListener('chipchange', () => {
+      fState.cat = $('#cat-chips [aria-pressed="true"]').dataset.cat; fState.shown = PAGE; renderFeed();
+    });
+    let qTimer;
+    $('#news-q').addEventListener('input', (e) => { clearTimeout(qTimer); qTimer = setTimeout(() => { fState.q = e.target.value; fState.shown = PAGE; renderFeed(); }, 120); });
+    $('#more-btn').addEventListener('click', () => {
+      const before = fState.shown; fState.shown += 6; renderFeed();
+      const next = $('#news-grid').children[before]; if (next) next.focus();
+    });
+    document.addEventListener('click', (e) => {
+      if (e.target.closest('#feed-reset')) {
+        fState.cat = 'all'; fState.q = ''; fState.shown = PAGE; $('#news-q').value = '';
+        document.querySelectorAll('#cat-chips .chip').forEach((c) => c.setAttribute('aria-pressed', String(c.dataset.cat === 'all')));
+        renderFeed();
+      }
+    });
+    // ?cat=science — прямая ссылка на тему
+    (function () {
+      const c = new URLSearchParams(location.search).get('cat');
+      if (c && CATS[c]) { fState.cat = c; document.querySelectorAll('#cat-chips .chip').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.cat === c))); }
+    })();
+    renderFeed();
+
+    /* ============ События ============ */
+    const AUD = { applicant: ['Абитуриентам', 'tag--applicant'], student: ['Студентам', 'tag--student'], all: ['Для всех', 'tag--brand'] };
+    // [день октября 2026, название, место, время, аудитория, онлайн]
+    const EVENTS = [
+      [2, 'Фестиваль первокурсников «Посвящение»', 'Главный корпус, Мира, 19', '15:00', 'student'],
+      [5, 'Открытая лекция «Как устроены твердотельные батареи»', 'Онлайн', '18:30', 'all', 1],
+      [9, 'День открытых дверей УралЭНИН', 'Софьи Ковалевской, 5', '11:00', 'applicant'],
+      [12, 'День открытых дверей ИРИТ-РтФ', 'Новый кампус, Новокольцовский', '12:00', 'applicant'],
+      [12, 'Открытая лекция «Город для людей: урбанистика Екатеринбурга»', 'Главный корпус, ауд. 404', '18:00', 'all'],
+      [14, 'Хакатон «Цифровой Урал»: 48 часов на решение задач заводов', 'Новый кампус, коворкинг ИРИТ-РтФ', '10:00', 'student'],
+      [15, 'Ярмарка вакансий «Карьера-2027»', 'Главный корпус, Мира, 19', '10:00', 'student'],
+      [16, 'Олимпиада «Изумруд»: отборочный тур по физике', 'Онлайн', '10:00', 'applicant', 1],
+      [19, 'Лекция: как ИИ меняет инженерию', 'Онлайн', '18:30', 'all', 1],
+      [21, 'Мастер-класс по робототехнике для школьников', 'ФТИ, Мира, 21', '15:00', 'applicant'],
+      [22, 'Концерт студенческого симфонического оркестра', 'Актовый зал, Мира, 19', '19:00', 'all'],
+      [24, 'Турнир по киберспорту УрФУ Cup', 'Студенческий центр', '16:00', 'student'],
+      [26, 'Встреча с работодателями: стажировки в энергетике', 'Софьи Ковалевской, 5', '14:00', 'student'],
+      [28, 'Научное кафе «Климат Урала: что нас ждёт»', 'Библиотека УрФУ', '18:00', 'all'],
+      [30, 'Собрание для родителей будущих абитуриентов', 'Онлайн', '12:00', 'applicant', 1]
+    ].map((a, i) => ({ i, day: a[0], title: a[1], place: a[2], time: a[3], aud: a[4], online: !!a[5] }));
+    const WD = ['Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб', 'Вс'];
+    const WD_FULL = ['понедельник', 'вторник', 'среда', 'четверг', 'пятница', 'суббота', 'воскресенье'];
+    const eState = { aud: 'all', day: null };
+    const reminders = new Set();
+    const firstWd = (new Date(2026, 9, 1).getDay() + 6) % 7; // 1 октября 2026 — четверг
+    const wdOf = (d) => (firstWd + d - 1) % 7;
+    const audOk = (e) => eState.aud === 'all' || e.aud === eState.aud || e.aud === 'all';
+
+    function renderCal() {
+      let html = WD.map((w) => `<div class="cal__wd" aria-hidden="true">${w}</div>`).join('');
+      html += '<div></div>'.repeat(firstWd);
+      for (let d = 1; d <= 31; d++) {
+        const n = EVENTS.filter((e) => e.day === d && audOk(e)).length;
+        const we = wdOf(d) >= 5 ? ' is-weekend' : '';
+        html += n
+          ? `<button type="button" class="cal__day${we}" data-day="${d}" aria-pressed="${eState.day === d}" aria-label="${d} октября, ${WD_FULL[wdOf(d)]}: ${n} ${plural(n, ['событие', 'события', 'событий'])}">${d}<span class="dots" aria-hidden="true">${'<span></span>'.repeat(Math.min(n, 3))}</span></button>`
+          : `<span class="cal__day${we}">${d}</span>`;
+      }
+      $('#cal-grid').innerHTML = html;
+      const total = EVENTS.filter(audOk).length;
+      $('#cal-total').textContent = `${total} ${plural(total, ['событие', 'события', 'событий'])}`;
+    }
+    function renderEvents() {
+      const list = EVENTS.filter((e) => audOk(e) && (eState.day === null || e.day === eState.day));
+      $('#ev-count').textContent = (eState.day ? `${eState.day} октября · ` : 'Весь октябрь · ') + `${list.length} ${plural(list.length, ['событие', 'события', 'событий'])}`;
+      $('#ev-reset').hidden = eState.day === null;
+      $('#ev-list').innerHTML = list.length ? list.map((e) => `
+        <article class="ev">
+          <div class="ev__date" aria-hidden="true"><b>${e.day}</b><span>окт · ${WD[wdOf(e.day)]}</span></div>
+          <div class="ev__body">
+            <h3>${esc(e.title)}</h3>
+            <div class="ev__meta">
+              <span class="sr-only">${e.day} октября,</span>
+              <span>${ic('clock')}${WD[wdOf(e.day)]}, ${e.time}</span>
+              ${e.online ? `<span>${ic('wifi')}Онлайн</span>` : `<a href="campus.html">${ic('map-pin')}${esc(e.place)}</a>`}
+              <span class="tag ${AUD[e.aud][1]}">${AUD[e.aud][0]}</span>
+            </div>
+          </div>
+          <div class="ev__actions"><button type="button" class="btn btn--ghost btn--sm remind" data-remind="${e.i}" aria-pressed="${reminders.has(e.i)}">${ic(reminders.has(e.i) ? 'check' : 'bell')}${reminders.has(e.i) ? 'Напомним' : 'Напомнить'}</button></div>
+        </article>`).join('')
+        : `<div class="empty"><span class="icon-tile">${ic('calendar')}</span><h3 class="h4">В этот день событий для выбранной аудитории нет</h3><button type="button" class="btn btn--soft btn--sm" data-day-reset>Показать весь месяц</button></div>`;
+    }
+    $('#aud-chips').addEventListener('chipchange', () => {
+      eState.aud = $('#aud-chips [aria-pressed="true"]').dataset.aud;
+      if (eState.day && !EVENTS.some((e) => e.day === eState.day && audOk(e))) eState.day = null;
+      renderCal(); renderEvents();
+    });
+    $('#cal-grid').addEventListener('click', (e) => {
+      const b = e.target.closest('[data-day]'); if (!b) return;
+      const d = +b.dataset.day; eState.day = eState.day === d ? null : d;
+      renderCal(); renderEvents();
+      const again = $(`#cal-grid [data-day="${d}"]`); if (again) again.focus();
+    });
+    const resetDay = () => { eState.day = null; renderCal(); renderEvents(); };
+    $('#ev-reset').addEventListener('click', resetDay);
+    $('#ev-list').addEventListener('click', (e) => {
+      if (e.target.closest('[data-day-reset]')) { resetDay(); return; }
+      const b = e.target.closest('[data-remind]'); if (!b) return;
+      const id = +b.dataset.remind; const ev = EVENTS[id];
+      if (reminders.has(id)) { reminders.delete(id); UI.toast('Напоминание отменено'); }
+      else { reminders.add(id); UI.toast(`Напомним за день до «${ev.title}» (демо)`); }
+      renderEvents();
+      const again = $(`#ev-list [data-remind="${id}"]`); if (again) again.focus();
+    });
+    renderCal(); renderEvents();
+
+    /* ============ Пресс-центр ============ */
+    $('#releases').innerHTML = NEWS.slice(0, 4).map((n) => `<li><a class="small" href="article.html" style="font-weight:600">${esc(n.title)}</a><div class="xs muted">${n.date}</div></li>`).join('');
+    $('#ac-event').innerHTML = EVENTS.map((e) => `<option value="${e.i}">${e.day} окт · ${esc(e.title)}</option>`).join('');
+    $('#accr-form').addEventListener('submit', (e) => {
+      e.preventDefault();
+      const f = e.currentTarget; const err = $('#accr-error');
+      const bad = [...f.querySelectorAll('[required]')].filter((x) => !x.value.trim() || (x.type === 'email' && !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(x.value)));
+      f.querySelectorAll('[required]').forEach((x) => x.setAttribute('aria-invalid', String(bad.includes(x))));
+      if (bad.length) { err.hidden = false; err.textContent = 'Проверьте поля: ' + bad.map((x) => f.querySelector(`label[for="${x.id}"]`).textContent.toLowerCase()).join(', ') + '.'; bad[0].focus(); return; }
+      err.hidden = true;
+      UI.toast('Заявка на аккредитацию принята — ответим на почту (демо)');
+      f.reset();
+    });
+
+    const EXPERTS = [
+      ['Анна Ветлугина', 'Электрохимия, аккумуляторы и водородная энергетика', 'ИЕНиМ', ['батареи', 'энергетика', 'химия'], 1],
+      ['Максим Карпов', 'Искусственный интеллект и компьютерное зрение в промышленности', 'ИРИТ-РтФ', ['ИИ', 'нейросети', 'IT'], 2],
+      ['Ирина Соколова', 'Региональная экономика, рынок труда и зарплаты', 'ИнЭУ', ['экономика', 'рынок труда', 'зарплаты'], 3],
+      ['Олег Лазарев', 'Металлургия, новые сплавы и переработка отходов', 'ИНМиТ', ['металлургия', 'материалы', 'экология'], 4],
+      ['Елена Мухина', 'История Урала, краеведение и городская среда', 'УГИ', ['история', 'урбанистика', 'культура'], 5],
+      ['Тимур Галиев', 'Ядерные технологии и радиационная безопасность', 'ФТИ', ['атом', 'физика', 'безопасность'], 6],
+      ['Дарья Пономарёва', 'Психология студентов и образование', 'УГИ', ['психология', 'образование', 'студенты'], 2],
+      ['Сергей Вяткин', 'Энергосистемы, тарифы и умные сети', 'УралЭНИН', ['энергетика', 'электричество', 'тарифы'], 1],
+      ['Наталья Крылова', 'Климат и экология Урала', 'ХТИ', ['климат', 'экология', 'вода'], 4],
+      ['Павел Широков', 'Спортивная наука и здоровье молодёжи', 'ИФКСиМП', ['спорт', 'здоровье', 'молодёжь'], 3]
+    ];
+    const initials = (n) => n.split(' ').map((x) => x[0]).join('');
+    function renderExperts(q = '') {
+      const nq = q.trim().toLowerCase().replace(/ё/g, 'е');
+      const list = EXPERTS.filter((x) => !nq || (x[0] + ' ' + x[1] + ' ' + x[2] + ' ' + x[3].join(' ')).toLowerCase().replace(/ё/g, 'е').includes(nq));
+      $('#experts').innerHTML = list.length ? list.map((x) => `
+        <article class="expert">
+          <span class="avatar av-${x[4]}" aria-hidden="true">${initials(x[0])}</span>
+          <div class="expert__body">
+            <h3 class="h4" style="font-size:var(--fs-md)">${esc(x[0])}</h3>
+            <span class="small muted">${esc(x[1])} · ${esc(x[2])}</span>
+            <span class="cluster">${x[3].map((t) => `<span class="tag">${esc(t)}</span>`).join('')}</span>
+            <button type="button" class="btn btn--soft btn--sm" style="align-self:flex-start;margin-top:4px" data-expert="${esc(x[0])}">${ic('message')} Запросить комментарий</button>
+          </div>
+        </article>`).join('')
+        : `<div class="empty" style="grid-column:1/-1"><span class="icon-tile">${ic('search')}</span><h3 class="h4">Эксперта по теме «${esc(q)}» пока нет в списке</h3><p class="small muted">Напишите на <a href="mailto:press@urfu.ru">press@urfu.ru</a> — подберём специалиста.</p></div>`;
+    }
+    $('#exp-q').addEventListener('input', (e) => renderExperts(e.target.value));
+    $('#experts').addEventListener('click', (e) => { const b = e.target.closest('[data-expert]'); if (b) UI.toast(`Запрос эксперту ${b.dataset.expert} отправлен (демо)`); });
+    renderExperts();
+
+    /* ============ Подписка ============ */
+    $('#digest-form').addEventListener('submit', (e) => {
+      e.preventDefault();
+      const inp = $('#digest-mail'); const msg = $('#digest-msg');
+      if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(inp.value.trim())) {
+        inp.setAttribute('aria-invalid', 'true'); msg.textContent = 'Кажется, в адресе опечатка — проверь, пожалуйста.'; inp.focus(); return;
+      }
+      inp.setAttribute('aria-invalid', 'false'); msg.textContent = '';
+      UI.toast(`Готово! Первый дайджест придёт в пятницу на ${inp.value.trim()} (демо)`);
+      e.currentTarget.reset(); $('#digest-events').checked = true;
+    });
+
+    /* ============ Вкладки ↔ адрес (#events, #press) ============ */
+    const TAB_BY_HASH = { '#feed': 'tab-feed', '#news': 'tab-feed', '#events': 'tab-events', '#press': 'tab-press' };
+    function selectTab(tabId, scroll) {
+      document.querySelectorAll('.news-tabs [role="tab"]').forEach((t) => {
+        const on = t.id === tabId;
+        t.setAttribute('aria-selected', String(on));
+        t.tabIndex = on ? 0 : -1;
+        document.getElementById(t.getAttribute('aria-controls')).hidden = !on;
+      });
+      if (scroll) document.querySelector('.news-tabs').scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+    function fromHash(scroll) { const id = TAB_BY_HASH[location.hash]; if (id) selectTab(id, scroll); }
+    const tabs = [...document.querySelectorAll('.news-tabs [role="tab"]')];
+    tabs.forEach((t, i) => {
+      t.tabIndex = t.getAttribute('aria-selected') === 'true' ? 0 : -1;
+      t.addEventListener('click', () => {
+        selectTab(t.id, false);
+        const hash = '#' + t.getAttribute('aria-controls');
+        try { history.replaceState(null, '', hash === '#feed' ? location.pathname + location.search : hash); } catch (e) { /* file:// */ }
+      });
+      t.addEventListener('keydown', (e) => {
+        if (e.key !== 'ArrowRight' && e.key !== 'ArrowLeft') return;
+        const n = tabs[(i + (e.key === 'ArrowRight' ? 1 : -1) + tabs.length) % tabs.length];
+        n.focus(); n.click();
+      });
+    });
+    window.addEventListener('hashchange', () => fromHash(true));
+    fromHash(false);
+    if (TAB_BY_HASH[location.hash] && location.hash !== '#feed') {
+      window.addEventListener('load', () => setTimeout(() => document.querySelector('.news-tabs').scrollIntoView({ block: 'start' }), 50));
+    }
+  })();
+  </script>
+</body>
+</html>

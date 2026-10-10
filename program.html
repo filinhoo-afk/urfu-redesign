@@ -1,0 +1,509 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Программная инженерия — УрФУ</title>
+  <meta name="description" content="Программная инженерия (09.03.04), бакалавриат ИРИТ-РтФ УрФУ: учебный план, экзамены, проходной балл, карьера и отзывы студентов.">
+  <link rel="icon" href="assets/logo/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="assets/css/tokens.css">
+  <link rel="stylesheet" href="assets/css/components.css">
+  <style>
+    :root { --stick: 124px; }
+    main [id] { scroll-margin-top: calc(var(--stick) + 72px); }
+    .prog-hero__grid > *, .layout-aside > *, .reviews > * { min-width: 0; }
+
+    /* ---------- Герой: фото + стикеры баллов ---------- */
+    .prog-hero__grid { display: grid; gap: 40px; grid-template-columns: 1fr; align-items: center; }
+    @media (min-width: 1024px) { .prog-hero__grid { grid-template-columns: 1.35fr 1fr; gap: 56px; } }
+    .prog-hero h1 { margin: 16px 0 6px; }
+    .prog-hero__note { display: inline-block; transform: rotate(var(--rot)); --rot: -2deg; margin-bottom: 10px; }
+    .prog-hero .inst { font-size: var(--fs-sm); color: var(--text-2); }
+    .prog-hero .inst a { color: var(--brand); font-weight: 600; }
+    .prog-hero .inst a:hover { text-decoration: underline; }
+    .keyfacts { display: grid; gap: 0 24px; grid-template-columns: repeat(auto-fit, minmax(min(100%, 130px), 1fr)); margin: 28px 0; }
+    .keyfacts div { border-top: var(--line) solid var(--ink); padding-top: 10px; }
+    .keyfacts b { display: block; font: 800 var(--fs-xl)/1.1 var(--font-display); letter-spacing: -.02em; }
+    .keyfacts span { font-size: var(--fs-xs); color: var(--text-2); }
+    .keyfacts .is-key b { color: var(--brand); }
+    .hero-pic { position: relative; padding: 24px 10px 10px; }
+    .hero-pic .photo { height: 360px; --rot: 2.5deg; }
+    .hero-pic .photo img { height: calc(100% - 36px); }
+    .hero-pic .s-pass { position: absolute; left: -6px; top: 0; z-index: 3; --rot: -10deg; }
+    .hero-pic .s-seats { position: absolute; right: -4px; bottom: 64px; z-index: 3; --rot: 6deg; }
+    .hero-pic .s-job { position: absolute; left: 14px; bottom: -4px; z-index: 3; --rot: -3deg; }
+    @media (max-width: 1023px) { .hero-pic { max-width: 460px; } .hero-pic .photo { height: 260px; } }
+    @media (max-width: 599px) { .hero-pic .photo { height: auto; } .hero-pic .photo img { height: 220px; } .hero-pic .s-seats { bottom: auto; top: 128px; } .hero-pic .s-job { bottom: auto; top: 200px; } }
+    @media (min-width: 1024px) { .only-narrow { display: none !important; } }
+    .cmp-toggle[aria-pressed="true"] { background: var(--ink); color: var(--bg); border-color: var(--ink); }
+
+    /* ---------- Липкая навигация по разделам ---------- */
+    .subnav { position: sticky; top: var(--stick); z-index: 50; background: var(--bg); border-bottom: var(--line) solid var(--ink); }
+    .subnav .tabs-line { gap: 24px; border-bottom: none; }
+    .subnav a.tab { display: inline-block; }
+    .subnav a.tab:hover { color: var(--text); }
+    .subnav a.tab[aria-current="true"] { color: var(--text); border-color: var(--accent); }
+
+    /* ---------- Контент ---------- */
+    .prog-layout { padding-top: 40px; padding-bottom: clamp(48px, 7vw, 96px); }
+    .block { padding: clamp(32px, 4vw, 52px) 0; border-bottom: var(--line) dashed var(--border); }
+    .block:first-child { padding-top: 0; }
+    .block:last-child { border-bottom: none; }
+    .block > .h2 { margin: 0 0 24px; }
+    .block-note { display: inline-block; margin: -16px 0 22px; transform: rotate(var(--rot)); --rot: -2deg; }
+    .block-intro { color: var(--text-2); margin: -12px 0 24px; max-width: 640px; }
+
+    /* Навыки — нумерованный список в две колонки, без карточек */
+    .skills { display: grid; gap: 0 36px; grid-template-columns: 1fr; counter-reset: sk; list-style: none; margin: 0; padding: 0; }
+    @media (min-width: 700px) { .skills { grid-template-columns: 1fr 1fr; } .skills li:nth-child(even) { transform: translateY(26px); } }
+    .skills li { counter-increment: sk; display: grid; grid-template-columns: auto 1fr; gap: 4px 16px; padding: 18px 0; border-top: var(--line) solid var(--ink); }
+    .skills li::before { content: "0" counter(sk); grid-row: span 2; font: 800 calc(34px * var(--fs-scale))/1 var(--font-display); color: transparent; -webkit-text-stroke: 1.5px var(--ink); }
+    .skills li:first-child::before { color: var(--accent); -webkit-text-stroke: 0; }
+    .skills h3 { font-size: var(--fs-lg); font-weight: 700; }
+    .skills p { font-size: var(--fs-sm); color: var(--text-2); }
+
+    .plan-sum { display: flex; flex-wrap: wrap; gap: 8px; margin: 16px 0 20px; }
+    .disc { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 4px 16px; align-items: center; padding: 14px 0; border-bottom: 1.5px dashed var(--border); }
+    .disc:last-child { border-bottom: none; }
+    .disc strong { font-weight: 650; }
+    .disc small { display: block; color: var(--text-3); font-size: var(--fs-xs); }
+    .disc .cluster { justify-content: flex-end; gap: 6px; }
+    .ze { font-size: var(--fs-xs); color: var(--text-3); white-space: nowrap; }
+
+    .exams-more { display: grid; gap: 20px; grid-template-columns: repeat(auto-fit, minmax(min(100%, 260px), 1fr)); margin-top: 20px; }
+    .trend { container-type: inline-size; display: grid; gap: 8px; grid-template-columns: repeat(4, minmax(0, 1fr)); align-items: end; margin-top: 16px; }
+    .trend div { text-align: center; padding: 10px 4px; border-radius: var(--r-sm); background: var(--surface); border: var(--line) solid var(--ink); }
+    .trend div:nth-child(2) { padding-top: 16px; } .trend div:nth-child(3) { padding-top: 22px; }
+    .trend b { display: block; font: 800 var(--fs-lg)/1.1 var(--font-display); }
+    .trend span { font-size: var(--fs-xs); color: var(--text-3); }
+    .trend .is-last { background: var(--lime); color: #14141a; padding-top: 28px; }
+    .trend .is-last span { color: #45434d; }
+    @container (max-width: 280px) { .trend b { font-size: 16px; } .trend div { padding-inline: 2px; } }
+
+    .career-stats { display: grid; gap: 0 28px; grid-template-columns: repeat(auto-fit, minmax(min(100%, 160px), 1fr)); margin-bottom: 28px; }
+    .career-stats > div { border-top: var(--line) solid var(--ink); padding-top: 10px; }
+    .career-stats b { display: block; font: 800 calc(clamp(36px, 4vw, 52px) * var(--fs-scale))/1 var(--font-display); letter-spacing: -.03em; }
+    .career-stats > div:nth-child(2) b { color: transparent; -webkit-text-stroke: 1.5px var(--ink); }
+    .career-stats span { font-size: var(--fs-sm); color: var(--text-2); }
+    .jobs { display: grid; gap: 12px; grid-template-columns: repeat(auto-fill, minmax(min(100%, 230px), 1fr)); }
+    .job { padding: 18px 20px; border-radius: var(--r-md); background: var(--surface); border: var(--line) solid var(--ink); }
+    .job strong { display: block; }
+    .job .salary { font-weight: 750; font-size: var(--fs-sm); margin-top: 6px; }
+    .salary-bar { height: 10px; border-radius: var(--r-pill); background: var(--surface-2); border: 1.5px solid var(--ink); margin-top: 8px; position: relative; overflow: hidden; }
+    .salary-bar span { position: absolute; top: 0; bottom: 0; background: var(--lime); }
+    .partners { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 20px; }
+    .partners span { padding: 8px 14px; border-radius: 6px; background: var(--surface); border: var(--line) solid var(--ink); font-weight: 700; font-size: var(--fs-sm); transform: rotate(var(--rot)); }
+    .partners span:nth-child(3n+1) { --rot: -1.5deg; } .partners span:nth-child(3n+2) { --rot: 1deg; }
+
+    /* Отзывы — записки разного размера */
+    .reviews { display: grid; gap: 22px; grid-template-columns: 1fr; }
+    @media (min-width: 700px) { .reviews { grid-template-columns: 1fr 1fr; } .reviews .review:first-child { grid-column: 1 / -1; } }
+    .review { margin: 0; display: flex; flex-direction: column; gap: 14px; transform: rotate(var(--rot)); }
+    .review:first-child { background: var(--lime-soft); }
+    .review:first-child p { font: 600 var(--fs-lg)/1.4 var(--font); color: var(--text); }
+    .review:nth-child(2) { --rot: -1deg; }
+    .review:nth-child(3) { --rot: 1.2deg; }
+    .review .q { width: 28px; height: 28px; color: var(--accent); }
+    .review p { color: var(--text-2); font-size: var(--fs-sm); }
+    .review .row { gap: 12px; margin-top: auto; }
+    .teachers { display: grid; gap: 16px; grid-template-columns: repeat(auto-fill, minmax(min(100%, 200px), 1fr)); }
+    .teacher { text-align: center; align-items: center; padding: 20px; }
+    .teacher .avatar { width: 72px; height: 72px; font-size: var(--fs-lg); border: var(--line) solid var(--ink); }
+    .teacher:nth-child(odd) .avatar { transform: rotate(var(--rot)); --rot: -6deg; }
+    .teacher p { font-size: var(--fs-xs); color: var(--text-2); }
+
+    /* Похожие — билеты */
+    .tickets { display: grid; gap: 14px; grid-template-columns: 1fr; }
+    .ticket { position: relative; min-width: 0; display: grid; grid-template-columns: auto minmax(0, 1fr) auto; align-items: center; gap: 18px; padding: 18px 22px; border: var(--line) solid var(--ink); border-radius: var(--r-lg); background: var(--surface); transition: transform .2s var(--ease), box-shadow .2s var(--ease), background .2s; }
+    .ticket:hover { transform: translate(-3px, -3px); box-shadow: var(--shadow-md); background: var(--lime-soft); }
+    .ticket__n { font: 800 calc(24px * var(--fs-scale))/1 var(--font-display); color: var(--text-3); width: 44px; }
+    .ticket strong { display: block; font-size: var(--fs-lg); font-weight: 700; line-height: 1.2; }
+    @media (max-width: 479px) { .ticket strong { font-size: var(--fs-md); } }
+    .ticket small { color: var(--text-3); font-size: var(--fs-sm); }
+    .ticket__arrow { width: 44px; height: 44px; border-radius: 50%; border: var(--line) solid var(--ink); display: grid; place-items: center; background: var(--surface); transition: transform .2s var(--ease); }
+    .ticket:hover .ticket__arrow { transform: rotate(-45deg); background: var(--ink); color: var(--bg); }
+    .ticket::before, .ticket::after { content: ""; position: absolute; left: 64px; width: 18px; height: 18px; border-radius: 50%; background: var(--bg); border: var(--line) solid var(--ink); }
+    .ticket::before { top: -10px; clip-path: inset(50% 0 0 0); }
+    .ticket::after { bottom: -10px; clip-path: inset(0 0 50% 0); }
+
+    /* ---------- Шансы: синяя плашка ---------- */
+    .chances { position: relative; background: #2747ff; color: #fff; border: var(--line) solid var(--ink); box-shadow: var(--shadow-lg); }
+    .chances h2 { color: #fff; }
+    .chances label, .chances dt { color: #e3e8ff; }
+    .chances > .sticker { position: absolute; top: -18px; right: 16px; --rot: 6deg; }
+    .chances .field .input { font: 800 var(--fs-lg) var(--font-display); background: #fffdf8; color: #14141a; border-color: #14141a; }
+    .chances .hand { color: #d7ff3d; }
+    .meter { position: relative; height: 14px; border-radius: var(--r-pill); background: rgba(255, 255, 255, .2); border: 1.5px solid #fff; margin: 28px 0 8px; }
+    .meter__fill { position: absolute; left: 0; top: 0; bottom: 0; border-radius: inherit; background: #d7ff3d; width: 0; transition: width .3s var(--ease), background .3s; }
+    .meter__mark { position: absolute; top: -6px; bottom: -4px; width: 2px; background: #fff; }
+    .meter__mark span { position: absolute; bottom: calc(100% + 2px); left: 50%; transform: translateX(-50%); font-size: calc(11px * var(--fs-scale)); font-weight: 700; white-space: nowrap; color: #fff; }
+    .meter__scale { display: flex; justify-content: space-between; font-size: calc(11px * var(--fs-scale)); color: #c9d2ff; }
+    .verdict { padding: 14px 16px; border-radius: var(--r-md); background: #fffdf8; color: #14141a; border: var(--line) solid #14141a; }
+    .verdict .muted { color: #45434d; }
+    .verdict strong { display: block; font: 700 var(--fs-lg)/1.2 var(--font-display); }
+    .verdict.is-ok { background: #e9ffa8; }
+    .verdict.is-ok strong { color: #0a6b40; }
+    .verdict.is-warn strong { color: #a14a06; }
+    .verdict.is-bad strong { color: #c42d12; }
+    .chances dl { display: grid; grid-template-columns: 1fr auto; gap: 6px 12px; margin: 0; font-size: var(--fs-sm); }
+    .chances dd { margin: 0; font-weight: 700; text-align: right; }
+    .chances .arrow-link { color: #fff; }
+    .chances .demo-note { color: #c9d2ff; }
+    .aside-sticky { position: sticky; top: calc(var(--stick) + 72px); align-self: start; }
+    @media (max-width: 1023px) { .aside-sticky { position: static; } }
+
+    /* ---------- Версия для слабовидящих ---------- */
+    html[data-a11y] :is(.skills li, .review, .partners span, .teacher .avatar) { transform: none !important; }
+    html[data-a11y] .ticket::before, html[data-a11y] .ticket::after { display: none; }
+    html[data-a11y] .hero-pic { display: flex; flex-direction: column; gap: 10px; padding: 0; }
+    html[data-a11y] .hero-pic .photo { height: auto; }
+    html[data-a11y] .hero-pic .photo img { height: 240px; }
+    html[data-a11y] .hero-pic .sticker, html[data-a11y] .chances > .sticker { position: static; align-self: flex-start; width: auto; height: auto; border-radius: 10px; }
+    html[data-a11y] .skills li::before { -webkit-text-stroke: 0; color: var(--text); }
+    html[data-a11y] .career-stats > div:nth-child(2) b { color: var(--text); }
+  </style>
+</head>
+<body data-page="admission">
+  <div id="site-header"></div>
+
+  <main id="main">
+    <!-- 1. Герой -->
+    <section class="page-hero page-hero--tinted prog-hero">
+      <div class="container">
+        <nav class="crumbs" aria-label="Хлебные крошки"><a href="index.html">Главная</a><i data-icon="chevron-right"></i><a href="admission.html">Поступление</a><i data-icon="chevron-right"></i><a href="programs.html">Каталог программ</a><i data-icon="chevron-right"></i><span>Программная инженерия</span></nav>
+        <div class="prog-hero__grid">
+          <div>
+            <div class="cluster">
+              <span class="tag tag--brand">Бакалавриат</span>
+              <span class="tag">Очная</span>
+              <span class="tag">4 года</span>
+              <span class="tag">Русский язык</span>
+              <span class="tag tag--accent">IT</span>
+            </div>
+            <h1 class="h1">Программная <span class="u-hand">инженерия</span></h1>
+            <span class="hand prog-hero__note">с первого курса — реальные проекты</span>
+            <p class="inst">09.03.04 · <a href="institute.html">Институт радиоэлектроники и информационных технологий — РтФ</a></p>
+            <p class="lead" style="margin-top:16px;max-width:620px">Научишься создавать программные продукты от идеи до релиза: проектировать архитектуру, писать код, тестировать и работать в команде. С первого курса — реальные проекты для IT-компаний Урала.</p>
+            <div class="keyfacts">
+              <div class="is-key"><b>120</b><span>бюджетных мест</span></div>
+              <div class="is-key"><b>262</b><span>проходной 2026</span></div>
+              <div><b>289 000 ₽</b><span>в год на платном</span></div>
+              <div><b>4 года</b><span>очно, днём</span></div>
+            </div>
+            <div class="cluster">
+              <a class="btn btn--accent btn--lg" href="admission.html#apply"><i data-icon="send"></i> Подать документы</a>
+              <button class="btn btn--ghost btn--lg cmp-toggle" type="button" id="cmp-toggle" aria-pressed="false"><i data-icon="layers"></i> <span>Сравнить</span></button>
+              <a class="btn btn--soft btn--lg only-narrow" href="#chances"><i data-icon="target"></i> Мои шансы</a>
+            </div>
+            <p class="demo-note" style="margin-top:12px">Цифры демонстрационные · <a class="link" href="programs.html" id="cmp-link" hidden>Открыть сравнение в каталоге</a></p>
+          </div>
+          <div class="hero-pic">
+            <figure class="photo tape">
+              <img src="assets/img/laptop.jpg" alt="Студенты смеются над ноутбуками в библиотеке" loading="eager">
+              <figcaption>код-ревью — это весело, честно</figcaption>
+            </figure>
+            <span class="sticker sticker--round sticker--coral s-pass" aria-hidden="true">262<br>проходной</span>
+            <span class="sticker sticker--paper s-seats" aria-hidden="true">120 мест на бюджете</span>
+            <span class="sticker sticker--blue s-job" aria-hidden="true">92% работают в IT</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Навигация по разделам -->
+    <nav class="subnav" aria-label="Разделы программы">
+      <div class="container">
+        <div class="tabs-line" id="subnav">
+          <a class="tab" href="#skills">Чему научишься</a>
+          <a class="tab" href="#plan">Учебный план</a>
+          <a class="tab" href="#exams">Экзамены</a>
+          <a class="tab" href="#career">Карьера</a>
+          <a class="tab" href="#reviews">Отзывы</a>
+          <a class="tab" href="#teachers">Преподаватели</a>
+          <a class="tab" href="#similar">Похожие</a>
+          <a class="tab" href="#faq">Вопросы</a>
+        </div>
+      </div>
+    </nav>
+
+    <div class="container prog-layout">
+      <div class="layout-aside layout-aside--right">
+        <div>
+          <!-- Чему научишься -->
+          <section class="block" id="skills" aria-labelledby="skills-h">
+            <h2 class="h2" id="skills-h">Чему научишься</h2>
+            <span class="hand block-note">шесть суперсил за 4 года</span>
+            <ol class="skills">
+              <li><h3>Проектировать системы</h3><p>Архитектура, паттерны, микросервисы — так, чтобы продукт выдерживал рост.</p></li>
+              <li><h3>Писать чистый код</h3><p>C#, Python, Kotlin и JavaScript, алгоритмы и структуры данных, код-ревью.</p></li>
+              <li><h3>Тестировать</h3><p>Автотесты, CI, контроль качества и безопасная разработка.</p></li>
+              <li><h3>Работать в команде</h3><p>Scrum, канбан, Git-флоу — с первого курса в проектных командах.</p></li>
+              <li><h3>Запускать в облаке</h3><p>Docker, Kubernetes, мониторинг — путь кода от коммита до пользователя.</p></li>
+              <li><h3>Применять ИИ</h3><p>Машинное обучение и работа с данными в прикладных задачах.</p></li>
+            </ol>
+          </section>
+
+          <!-- Учебный план -->
+          <section class="block" id="plan" aria-labelledby="plan-h">
+            <h2 class="h2" id="plan-h">Что будешь изучать</h2>
+            <p class="block-intro">Первые два года — фундамент, потом выбираешь трек: бэкенд, фронтенд, мобильная разработка или инженерия данных.</p>
+            <div class="tabs" role="tablist" aria-label="Курс">
+              <button class="tab" role="tab" id="c1-tab" aria-controls="c1" aria-selected="true">1 курс</button>
+              <button class="tab" role="tab" id="c2-tab" aria-controls="c2" aria-selected="false">2 курс</button>
+              <button class="tab" role="tab" id="c3-tab" aria-controls="c3" aria-selected="false">3 курс</button>
+              <button class="tab" role="tab" id="c4-tab" aria-controls="c4" aria-selected="false">4 курс</button>
+            </div>
+            <div class="plan-sum"><span class="tag">240 зачётных единиц</span><span class="tag">8 семестров</span><span class="tag tag--accent">4 проектных практикума</span><span class="tag tag--ok">2 стажировки</span></div>
+            <div class="tabpanel" role="tabpanel" id="c1" aria-labelledby="c1-tab"></div>
+            <div class="tabpanel" role="tabpanel" id="c2" aria-labelledby="c2-tab" hidden></div>
+            <div class="tabpanel" role="tabpanel" id="c3" aria-labelledby="c3-tab" hidden></div>
+            <div class="tabpanel" role="tabpanel" id="c4" aria-labelledby="c4-tab" hidden></div>
+            <p class="demo-note" style="margin-top:12px">Учебный план упрощён для демонстрации.</p>
+          </section>
+
+          <!-- Вступительные испытания -->
+          <section class="block" id="exams" aria-labelledby="exams-h">
+            <h2 class="h2" id="exams-h">Какие ЕГЭ нужны</h2>
+            <div class="table-wrap">
+              <table class="table">
+                <caption class="sr-only">Вступительные испытания и минимальные баллы</caption>
+                <thead><tr><th scope="col">Предмет</th><th scope="col">Минимум</th><th scope="col">Что важно</th></tr></thead>
+                <tbody>
+                  <tr><td><strong>Математика (профиль)</strong></td><td><span class="tag tag--brand">50</span></td><td class="muted">Обязательный предмет</td></tr>
+                  <tr><td><strong>Информатика или физика</strong></td><td><span class="tag tag--brand">50</span></td><td class="muted">На выбор — засчитаем лучший результат</td></tr>
+                  <tr><td><strong>Русский язык</strong></td><td><span class="tag tag--brand">45</span></td><td class="muted">Обязательный предмет</td></tr>
+                  <tr><td><strong>Индивидуальные достижения</strong></td><td><span class="tag">до 10</span></td><td class="muted">Медаль, ГТО, олимпиады, волонтёрство</td></tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="exams-more">
+              <div class="card card--flat">
+                <h3 class="h4">Проходной балл по годам</h3>
+                <div class="trend">
+                  <div><b>251</b><span>2023</span></div>
+                  <div><b>255</b><span>2024</span></div>
+                  <div><b>259</b><span>2025</span></div>
+                  <div class="is-last"><b>262</b><span>2026</span></div>
+                </div>
+                <p class="xs muted" style="margin-top:10px">Сумма трёх ЕГЭ и достижений, общий конкурс на бюджет.</p>
+              </div>
+              <div class="card card--flat">
+                <h3 class="h4">Поступаешь без ЕГЭ?</h3>
+                <p class="small muted">Выпускники колледжей и иностранные граждане сдают внутренние экзамены УрФУ по тем же предметам — онлайн, с июня по июль.</p>
+                <a class="arrow-link small" href="admission.html#dates">Сроки экзаменов <i data-icon="arrow-right"></i></a>
+              </div>
+            </div>
+          </section>
+
+          <!-- Карьера -->
+          <section class="block" id="career" aria-labelledby="career-h">
+            <h2 class="h2" id="career-h">Кем будешь работать</h2>
+            <span class="hand block-note">спойлер: тебя ждут</span>
+            <div class="career-stats">
+              <div><b>92%</b><span>работают по специальности</span></div>
+              <div><b>68%</b><span>нашли работу ещё до диплома</span></div>
+              <div><b>145 тыс</b><span>₽ — средняя зарплата через год</span></div>
+            </div>
+            <div class="jobs" id="jobs"></div>
+            <h3 class="h4" style="margin-top:28px">Где проходят практику и работают</h3>
+            <div class="partners">
+              <span>СКБ Контур</span><span>Яндекс</span><span>Сбер</span><span>Naumen</span><span>Т-Банк</span><span>Positive Technologies</span><span>Ростелеком</span><span>УГМК-Телеком</span><span>Эр-Телеком</span>
+            </div>
+            <p class="demo-note" style="margin-top:12px">Зарплатные ориентиры — по открытым вакансиям Екатеринбурга, демонстрационные.</p>
+          </section>
+
+          <!-- Отзывы -->
+          <section class="block" id="reviews" aria-labelledby="reviews-h">
+            <h2 class="h2" id="reviews-h">Что говорят студенты</h2>
+            <div class="reviews">
+              <figure class="card review">
+                <i data-icon="quote" class="q"></i>
+                <blockquote style="margin:0"><p>На первом курсе мы с командой сделали бота для расписания — им до сих пор пользуется весь институт. Это мотивирует сильнее любых оценок.</p></blockquote>
+                <figcaption class="row"><span class="avatar" style="background:var(--role-staff)">ДК</span><span><strong>Дмитрий К.</strong><span class="xs muted" style="display:block">3 курс, трек «Бэкенд»</span></span></figcaption>
+              </figure>
+              <figure class="card review">
+                <i data-icon="quote" class="q"></i>
+                <blockquote style="margin:0"><p>Нагрузка серьёзная, особенно по математике. Зато преподаватели — практики из индустрии, и на стажировку в Контур я попала прямо с проектного практикума.</p></blockquote>
+                <figcaption class="row"><span class="avatar" style="background:var(--role-intl)">АС</span><span><strong>Алина С.</strong><span class="xs muted" style="display:block">4 курс, трек «Фронтенд»</span></span></figcaption>
+              </figure>
+              <figure class="card review">
+                <i data-icon="quote" class="q"></i>
+                <blockquote style="margin:0"><p>Приехал из Тюмени, жил в общежитии рядом с корпусом. Удобно, что всё в одном районе: пары, библиотека, коворкинг и спорт.</p></blockquote>
+                <figcaption class="row"><span class="avatar" style="background:var(--role-student)">МВ</span><span><strong>Максим В.</strong><span class="xs muted" style="display:block">2 курс</span></span></figcaption>
+              </figure>
+            </div>
+            <p class="demo-note" style="margin-top:12px">Отзывы вымышленные, для демонстрации концепции.</p>
+          </section>
+
+          <!-- Преподаватели -->
+          <section class="block" id="teachers" aria-labelledby="teachers-h">
+            <h2 class="h2" id="teachers-h">Кто будет учить</h2>
+            <div class="teachers">
+              <div class="card teacher"><span class="avatar">ИП</span><strong>Ирина Павлова</strong><p>канд. техн. наук, руководитель программы · Архитектура ПО</p></div>
+              <div class="card teacher"><span class="avatar" style="background:var(--role-partner)">СЛ</span><strong>Сергей Лебедев</strong><p>тимлид в IT-компании · Промышленная разработка</p></div>
+              <div class="card teacher"><span class="avatar" style="background:var(--role-student)">ОМ</span><strong>Ольга Морозова</strong><p>доцент · Алгоритмы и структуры данных</p></div>
+              <div class="card teacher"><span class="avatar" style="background:var(--role-staff)">АГ</span><strong>Артём Григорьев</strong><p>DevOps-инженер · Облачные технологии</p></div>
+            </div>
+            <p class="demo-note" style="margin-top:12px">Имена вымышленные.</p>
+          </section>
+
+          <!-- Похожие -->
+          <section class="block" id="similar" aria-labelledby="similar-h">
+            <h2 class="h2" id="similar-h">Посмотри также</h2>
+            <div class="tickets">
+              <a class="ticket" href="programs.html?q=прикладная"><span class="ticket__n">01</span><span><strong>Прикладная информатика</strong><small>09.03.03 · ИРИТ-РтФ · проходной 248 · 75 мест</small></span><span class="ticket__arrow"><i data-icon="arrow-right"></i></span></a>
+              <a class="ticket" href="programs.html?q=безопасность"><span class="ticket__n">02</span><span><strong>Информационная безопасность</strong><small>10.03.01 · ИРИТ-РтФ · проходной 255 · 60 мест</small></span><span class="ticket__arrow"><i data-icon="arrow-right"></i></span></a>
+              <a class="ticket" href="programs.html?q=компьютерные"><span class="ticket__n">03</span><span><strong>Математика и компьютерные науки</strong><small>02.03.01 · ИЕНиМ · проходной 251 · 50 мест</small></span><span class="ticket__arrow"><i data-icon="arrow-right"></i></span></a>
+            </div>
+          </section>
+
+          <!-- FAQ -->
+          <section class="block" id="faq" aria-labelledby="faq-h">
+            <h2 class="h2" id="faq-h">Частые вопросы о программе</h2>
+            <details class="acc"><summary>Нужно ли уметь программировать до поступления?<i data-icon="plus"></i></summary><div class="acc__body">Нет. Первый семестр начинается с основ. Но если ты уже пробовал Python или участвовал в олимпиадах — будет проще, а для сильных студентов есть ускоренные группы.</div></details>
+            <details class="acc"><summary>Чем отличается от «Прикладной информатики»?<i data-icon="plus"></i></summary><div class="acc__body">Программная инженерия — про создание сложных программных продуктов и командную разработку. Прикладная информатика — про внедрение IT-решений в бизнес-процессы конкретной отрасли.</div></details>
+            <details class="acc"><summary>Можно ли учиться и работать?<i data-icon="plus"></i></summary><div class="acc__body">С 3 курса многие совмещают учёбу со стажировкой: расписание старших курсов позволяет работать на полставки. Практику можно засчитать по месту работы.</div></details>
+            <details class="acc"><summary>Есть ли военный учебный центр?<i data-icon="plus"></i></summary><div class="acc__body">Да, студенты очной формы могут поступить в военный учебный центр УрФУ после 1 курса — по конкурсу и медицинским показаниям.</div></details>
+            <details class="acc"><summary>Где проходят занятия?<i data-icon="plus"></i></summary><div class="acc__body">С 2026 года — в новом корпусе ИРИТ-РтФ в кампусе в Новокольцовском: аудитории, коворкинги и общежития НВК рядом. Остальные корпуса — на <a href="campus.html">карте кампуса</a>.</div></details>
+          </section>
+        </div>
+
+        <!-- Твои шансы -->
+        <aside class="aside-sticky" id="chances" aria-labelledby="ch-title">
+          <div class="card card--pad-lg chances stack">
+            <span class="sticker sticker--paper" aria-hidden="true">5 секунд</span>
+            <div><h2 class="h3" id="ch-title">Твои шансы</h2><span class="hand">введи сумму — скажем честно</span></div>
+            <div class="field">
+              <label for="ch-sum">Сумма баллов: 3 ЕГЭ + достижения</label>
+              <input class="input" id="ch-sum" type="number" inputmode="numeric" min="0" max="310" placeholder="Например, 255" aria-describedby="ch-verdict">
+            </div>
+            <div aria-hidden="true">
+              <div class="meter"><div class="meter__fill" id="ch-fill"></div><div class="meter__mark" style="left:calc(262 / 310 * 100%)"><span>262</span></div></div>
+              <div class="meter__scale"><span>0</span><span>310</span></div>
+            </div>
+            <div class="verdict" id="ch-verdict" aria-live="polite"><strong>Введи сумму баллов</strong><span class="small muted">Сравним с проходным баллом 2026 года</span></div>
+            <dl>
+              <dt>Проходной 2026</dt><dd>262</dd>
+              <dt>Бюджетных мест</dt><dd>120</dd>
+              <dt>Заявлений на место</dt><dd>12,3</dd>
+              <dt>Платных мест</dt><dd>80</dd>
+            </dl>
+            <a class="btn btn--white btn--block" href="admission.html#apply">Подать документы</a>
+            <a class="arrow-link small" href="programs.html#calc">Подобрать по баллам другие программы <i data-icon="arrow-right"></i></a>
+            <p class="demo-note">Оценка по демонстрационным данным и не гарантирует зачисления.</p>
+          </div>
+        </aside>
+      </div>
+    </div>
+  </main>
+
+  <div id="site-footer"></div>
+
+  <script src="assets/js/app.js"></script>
+  <script>
+    (function () {
+      const $ = (s, r = document) => r.querySelector(s);
+      const $$ = (s, r = document) => [...r.querySelectorAll(s)];
+      const plural = (n, f) => f[(n % 10 === 1 && n % 100 !== 11) ? 0 : (n % 10 >= 2 && n % 10 <= 4 && (n % 100 < 10 || n % 100 >= 20)) ? 1 : 2];
+      const PASS = 262, MAX = 310;
+
+      /* Учебный план */
+      const T = { base: ['', 'база'], proj: ['tag--accent', 'проект'], opt: ['tag--ok', 'по выбору'], prac: ['tag--brand', 'практика'] };
+      const PLAN = [
+        [['Математический анализ', '1–2 семестр', 10, 'base'], ['Линейная алгебра и геометрия', '1 семестр', 5, 'base'], ['Основы программирования на C#', '1–2 семестр', 10, 'base'], ['Дискретная математика', '2 семестр', 5, 'base'], ['Архитектура компьютера', '1 семестр', 4, 'base'], ['Английский для IT', '1–2 семестр', 6, 'base'], ['Проектный практикум: первый продукт', '2 семестр', 6, 'proj']],
+        [['Алгоритмы и структуры данных', '3–4 семестр', 10, 'base'], ['Объектно-ориентированное проектирование', '3 семестр', 5, 'base'], ['Базы данных и SQL', '3 семестр', 5, 'base'], ['Теория вероятностей и статистика', '4 семестр', 5, 'base'], ['Веб-разработка', '4 семестр', 5, 'opt'], ['Операционные системы и сети', '4 семестр', 5, 'base'], ['Проектный практикум: команда и заказчик', '4 семестр', 6, 'proj']],
+        [['Архитектура программных систем', '5 семестр', 5, 'base'], ['Тестирование и обеспечение качества', '5 семестр', 5, 'base'], ['Трек: бэкенд / фронтенд / мобильная / данные', '5–6 семестр', 15, 'opt'], ['Машинное обучение', '6 семестр', 5, 'opt'], ['Информационная безопасность', '6 семестр', 4, 'base'], ['Производственная практика в компании', 'лето', 6, 'prac'], ['Проектный практикум: продукт для индустрии', '6 семестр', 6, 'proj']],
+        [['DevOps и облачные платформы', '7 семестр', 5, 'base'], ['Управление IT-проектами', '7 семестр', 4, 'base'], ['Трек: продвинутый уровень', '7 семестр', 10, 'opt'], ['Майнор: предпринимательство, дизайн или наука', '7 семестр', 6, 'opt'], ['Преддипломная практика', '8 семестр', 9, 'prac'], ['Выпускная квалификационная работа', '8 семестр', 9, 'proj']]
+      ];
+      PLAN.forEach((list, i) => {
+        $('#c' + (i + 1)).innerHTML = list.map(([n, s, z, t]) =>
+          `<div class="disc"><span><strong>${n}</strong><small>${s}</small></span><span class="cluster"><span class="tag ${T[t][0]}">${T[t][1]}</span><span class="ze">${z} з.е.</span></span></div>`).join('');
+      });
+
+      /* Карьера */
+      const JOBS = [['Бэкенд-разработчик', 120, 280], ['Фронтенд-разработчик', 100, 240], ['Мобильный разработчик', 110, 260], ['QA-инженер', 80, 180], ['DevOps-инженер', 150, 320], ['Архитектор ПО', 250, 450]];
+      $('#jobs').innerHTML = JOBS.map(([n, a, b]) =>
+        `<div class="job"><strong>${n}</strong><div class="salary">${a}–${b} тыс ₽</div><div class="salary-bar" aria-hidden="true"><span style="left:${a / 5}%;right:${100 - b / 5}%"></span></div></div>`).join('');
+
+      /* Сравнение (общий список с каталогом) */
+      const ID = 'se';
+      let cmp = [];
+      try { cmp = JSON.parse(UI.store.get('urfu-compare', '[]')); } catch (e) { cmp = []; }
+      const btn = $('#cmp-toggle');
+      function syncCmp() {
+        const on = cmp.includes(ID);
+        btn.setAttribute('aria-pressed', String(on));
+        btn.querySelector('span').textContent = on ? 'В сравнении' : 'Сравнить';
+        $('#cmp-link').hidden = !on;
+      }
+      btn.addEventListener('click', () => {
+        const i = cmp.indexOf(ID);
+        if (i > -1) { cmp.splice(i, 1); UI.toast('Убрали из сравнения'); }
+        else if (cmp.length >= 3) { UI.toast('В сравнении уже 3 программы — убери одну в каталоге'); return; }
+        else { cmp.push(ID); UI.toast(cmp.length > 1 ? `В сравнении ${cmp.length} программы — открой каталог` : 'Добавили к сравнению. Выбери ещё программу в каталоге'); }
+        UI.store.set('urfu-compare', JSON.stringify(cmp)); syncCmp();
+      });
+      syncCmp();
+
+      /* Твои шансы */
+      const inp = $('#ch-sum'), fill = $('#ch-fill'), verdict = $('#ch-verdict');
+      function check() {
+        const raw = inp.value;
+        verdict.className = 'verdict';
+        if (raw === '') { fill.style.width = '0'; verdict.innerHTML = '<strong>Введи сумму баллов</strong><span class="small muted">Сравним с проходным баллом 2026 года</span>'; return; }
+        let v = Math.round(+raw);
+        if (v < 0 || v > MAX) { verdict.classList.add('is-bad'); verdict.innerHTML = `<strong>Проверь число</strong><span class="small muted">Максимум — ${MAX} баллов: 3 ЕГЭ по 100 и 10 за достижения</span>`; return; }
+        fill.style.width = (v / MAX * 100) + '%';
+        const d = v - PASS;
+        if (d >= 5) {
+          verdict.classList.add('is-ok'); fill.style.background = '#d7ff3d';
+          verdict.innerHTML = `<strong>Проходишь на бюджет</strong><span class="small muted">На ${d} ${plural(d, ['балл', 'балла', 'баллов'])} выше проходного прошлого года. Поставь программу первым приоритетом.</span>`;
+        } else if (d >= -5) {
+          verdict.classList.add('is-warn'); fill.style.background = '#ffb020';
+          verdict.innerHTML = `<strong>На грани</strong><span class="small muted">${d >= 0 ? 'Запас всего ' + d + ' ' + plural(d, ['балл', 'балла', 'баллов']) : 'Не хватает ' + (-d) + ' ' + plural(-d, ['балла', 'баллов', 'баллов'])}. Добавь в заявление запасные программы — например, «Прикладную информатику» (248).</span>`;
+        } else {
+          verdict.classList.add('is-bad'); fill.style.background = '#ff5a36';
+          verdict.innerHTML = `<strong>Не хватает ${-d} ${plural(-d, ['балла', 'баллов', 'баллов'])}</strong><span class="small muted">Посмотри платное обучение со скидкой или программы с проходным ниже: ${v >= 205 ? 'Электроэнергетика (205), Машиностроение (198)' : 'колледж УрФУ без ЕГЭ'}.</span>`;
+        }
+      }
+      inp.addEventListener('input', check);
+      // Подставляем сумму из «Подбора по баллам», если ты уже вводил её в каталоге
+      try {
+        const sv = JSON.parse(UI.store.get('urfu-ege', 'null'));
+        if (sv) {
+          const sum = sv.s.reduce((a, [, v]) => a + (+v || 0), 0) + (+sv.i || 0);
+          if (sum > 0) inp.value = sum;
+        }
+      } catch (e) { /* пусто */ }
+      check();
+
+      /* Липкая навигация: высота шапки и подсветка текущего раздела */
+      function setStick() {
+        const h = document.getElementById('header');
+        if (h) document.documentElement.style.setProperty('--stick', h.offsetHeight + 'px');
+      }
+      document.addEventListener('appready', setStick);
+      window.addEventListener('resize', setStick);
+
+      const links = $$('#subnav a');
+      const map = new Map(links.map((a) => [a.getAttribute('href').slice(1), a]));
+      if ('IntersectionObserver' in window) {
+        const io = new IntersectionObserver((entries) => {
+          entries.forEach((en) => {
+            if (!en.isIntersecting) return;
+            links.forEach((a) => a.removeAttribute('aria-current'));
+            const a = map.get(en.target.id);
+            if (a) {
+              a.setAttribute('aria-current', 'true');
+              const bar = $('#subnav');
+              const dx = a.getBoundingClientRect().left - bar.getBoundingClientRect().left;
+              bar.scrollLeft += dx - bar.clientWidth / 2 + a.offsetWidth / 2;
+            }
+          });
+        }, { rootMargin: '-35% 0px -60% 0px' });
+        map.forEach((_, id) => { const el = document.getElementById(id); if (el) io.observe(el); });
+      }
+    })();
+  </script>
+</body>
+</html>

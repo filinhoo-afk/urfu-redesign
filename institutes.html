@@ -1,0 +1,356 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Институты — УрФУ</title>
+  <meta name="description" content="Институты УрФУ: найди институт по направлению, познакомься с руководством университета, филиалами и подразделениями.">
+  <link rel="icon" href="assets/logo/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="assets/css/tokens.css">
+  <link rel="stylesheet" href="assets/css/components.css">
+  <style>
+    .inst-hero { padding-bottom: 48px; overflow: hidden; }
+    .inst-hero__grid { display: grid; gap: 36px; grid-template-columns: 1fr; align-items: center; }
+    .inst-hero__grid > * { min-width: 0; }
+    @media (min-width: 1024px) { .inst-hero__grid { grid-template-columns: 1.4fr 1fr; } }
+    .inst-hero .hand { display: inline-block; margin-top: 8px; transform: rotate(var(--rot)); --rot: -2deg; }
+    .inst-search { margin-top: 24px; max-width: 640px; }
+    .inst-search .input { padding-right: 56px; }
+    .inst-search__clear { position: absolute; right: 10px; top: 50%; transform: translateY(-50%); }
+    .hint-chips { margin-top: 14px; }
+    .hint-chips .chip { min-height: 34px; font-size: var(--fs-xs); }
+    .hint-chips .hand { margin: 0 4px 0 0; font-size: calc(22px * var(--fs-scale)); color: var(--text-2); }
+    .hero-pic { position: relative; padding: 18px 8px 12px; max-width: 460px; }
+    .hero-pic .photo { height: 300px; --rot: 2.5deg; }
+    .hero-pic .photo img { height: calc(100% - 36px); }
+    .hero-pic .sticker { position: absolute; z-index: 2; }
+    .hero-pic .st1 { left: -8px; top: 0; --rot: -9deg; }
+    .hero-pic .st2 { right: -6px; top: 120px; --rot: 6deg; }
+    .hero-pic .st3 { left: 18px; bottom: -6px; --rot: -3deg; }
+    @media (max-width: 1023px) { .hero-pic .photo { height: 230px; } }
+    @media (max-width: 599px) { .hero-pic .photo { height: auto; } .hero-pic .photo img { height: 196px; } .hero-pic .st3 { bottom: auto; top: 176px; } }
+
+    .inst-tools { display: flex; flex-wrap: wrap; gap: 12px 16px; align-items: center; justify-content: space-between; margin-bottom: 16px; }
+    .view-toggle { display: inline-flex; padding: 4px; background: var(--surface); border: var(--line) solid var(--ink); border-radius: var(--r-pill); }
+    .view-toggle button { width: 44px; height: 40px; display: grid; place-items: center; border: none; border-radius: var(--r-pill); background: transparent; color: var(--text-2); }
+    .view-toggle button[aria-pressed="true"] { background: var(--ink); color: var(--bg); }
+    .inst-count { margin-bottom: 20px; font-weight: 700; }
+
+    /* ---------- Институты: бенто с крупной плиткой ---------- */
+    .inst-grid { display: grid; gap: 20px; grid-template-columns: repeat(auto-fill, minmax(min(100%, 260px), 1fr)); grid-auto-flow: dense; }
+    .inst { position: relative; gap: 12px; transform: rotate(var(--rot, 0deg)); }
+    .inst:nth-child(5n+2) { --rot: .6deg; } .inst:nth-child(5n+4) { --rot: -.7deg; }
+    .inst--accent { background: var(--accent-soft); } .inst--student { background: var(--lime-soft); } .inst--intl { background: var(--brand-soft); }
+    .inst--staff { border-style: dashed; }
+    .inst__abbr { display: inline-flex; align-items: center; align-self: flex-start; padding: 7px 12px; border: var(--line) solid var(--ink); border-radius: 8px; background: var(--surface); font: 800 var(--fs-sm)/1 var(--font-display); white-space: nowrap; box-shadow: var(--shadow-sm); transform: rotate(var(--rot)); --rot: -2deg; }
+    .inst .card__title { font-size: var(--fs-md); }
+    .inst .card__title a:hover { color: var(--brand); }
+    .inst__tags .tag { font-weight: 600; }
+    .inst__match { font-size: var(--fs-xs); color: var(--role-student); font-weight: 600; }
+    .inst .card__footer .i { color: var(--text-3); transition: transform .2s var(--ease), color .2s; }
+    .inst:hover .card__footer .i { color: var(--text); transform: translate(2px, -2px); }
+    .inst .photo--flat { height: 150px; margin: 0 0 4px; }
+    .inst .photo--flat img { height: 100%; }
+    @media (min-width: 900px) {
+      .inst-grid:not(.is-list) .inst--big { grid-column: span 2; grid-row: span 2; padding: 28px; }
+      .inst-grid:not(.is-list) .inst--big .photo--flat { flex: 1; height: auto; min-height: 260px; }
+      .inst-grid:not(.is-list) .inst--big .card__title { font: 800 var(--fs-2xl)/1.1 var(--font-display); letter-spacing: -.02em; }
+    }
+    .inst--big .sticker { position: absolute; top: -14px; right: 18px; z-index: 2; --rot: 6deg; }
+    .inst-grid.is-list { grid-template-columns: 1fr; gap: 12px; }
+    .inst-grid.is-list .inst { --rot: 0deg; }
+    .inst-grid.is-list .photo--flat { display: none; }
+    @media (min-width: 768px) {
+      .is-list .inst { display: grid; grid-template-columns: 132px minmax(0, 1fr) auto; align-items: center; gap: 6px 24px; padding: 18px 24px; }
+      .is-list .inst__abbr { grid-column: 1; grid-row: 1 / span 3; align-self: center; }
+      .is-list .inst .card__title, .is-list .inst__tags, .is-list .inst__match { grid-column: 2; }
+      .is-list .inst .card__footer { grid-column: 3; grid-row: 1 / span 3; margin: 0; padding: 0; gap: 16px; }
+    }
+    .empty { grid-column: 1 / -1; display: flex; flex-direction: column; align-items: center; gap: 12px; text-align: center; padding: 56px 24px; border-radius: var(--r-lg); background: var(--surface); border: var(--line) dashed var(--ink); }
+
+    /* ---------- Руководство ---------- */
+    .s-head { display: flex; align-items: end; justify-content: space-between; gap: 16px 24px; flex-wrap: wrap; margin-bottom: 32px; }
+    .s-head p { color: var(--text-2); margin-top: 10px; max-width: 620px; }
+    .s-head .hand { display: inline-block; margin-top: 6px; transform: rotate(var(--rot)); --rot: -2deg; }
+    .leaders { display: grid; gap: 16px; grid-template-columns: repeat(auto-fill, minmax(min(100%, 280px), 1fr)); }
+    .leader { flex-direction: row; align-items: flex-start; gap: 16px; }
+    .leader .avatar { width: 56px; height: 56px; font-size: var(--fs-sm); border: var(--line) solid var(--ink); font-family: var(--font-display); }
+    .leader__body { display: flex; flex-direction: column; gap: 6px; min-width: 0; }
+    .leader--main { background: #2747ff; color: #fff; box-shadow: var(--shadow-lg); }
+    .leader--main .muted { color: #e3e8ff; }
+    .leader--main h3 { color: #fff; }
+    .leader--main .avatar { background: #d7ff3d; color: #14141a; border-color: #14141a; }
+    .leader--main .linkish { color: #fff; }
+    @media (min-width: 900px) { .leader--main { grid-column: span 2; grid-row: span 2; padding: 32px; } }
+    .av-1 { background: var(--role-applicant); } .av-2 { background: var(--role-student); } .av-3 { background: var(--role-staff); }
+    .av-4 { background: var(--role-partner); } .av-5 { background: var(--role-intl); } .av-6 { background: var(--accent); }
+    .linkish { border: none; background: none; padding: 0; color: var(--brand); font-weight: 650; font-size: var(--fs-sm); text-align: left; display: inline-flex; align-items: center; gap: 6px; }
+    .linkish:hover { text-decoration: underline; }
+    .linkish .i { width: 16px; height: 16px; }
+
+    /* ---------- Филиалы и подразделения ---------- */
+    .branches { display: grid; gap: 32px; grid-template-columns: 1fr; }
+    .branches > * { min-width: 0; }
+    @media (min-width: 1024px) { .branches { grid-template-columns: 1fr 1.15fr; } .branches > :last-child { margin-top: 40px; } }
+    .branches h3 { margin-bottom: 14px; }
+    .branches-photo { height: 210px; margin: 0 0 22px; --rot: -2deg; max-width: 420px; }
+    .branches-photo img { height: calc(100% - 34px); }
+    .link-list a { display: flex; align-items: center; gap: 14px; padding: 14px 16px; border-radius: var(--r-md); background: var(--surface); border: var(--line) solid var(--ink); margin-bottom: 10px; transition: transform .15s var(--ease), box-shadow .15s; }
+    .link-list a:hover { transform: translate(-2px, -2px); box-shadow: var(--shadow-sm); }
+    .link-list .icon-tile { width: 40px; height: 40px; }
+    .link-list .icon-tile .i { width: 20px; height: 20px; }
+    .link-list span small { display: block; color: var(--text-3); font-size: var(--fs-xs); font-weight: 400; }
+    .link-list a > .i { margin-left: auto; color: var(--text-3); flex: none; }
+    .link-list strong { font-weight: 650; }
+
+    /* ---------- Версия для слабовидящих ---------- */
+    html[data-a11y] :is(.inst, .inst__abbr) { transform: none !important; }
+    html[data-a11y] .hero-pic { display: flex; flex-direction: column; gap: 10px; padding: 0; }
+    html[data-a11y] .hero-pic .photo { height: auto; }
+    html[data-a11y] .hero-pic .photo img { height: 220px; }
+    html[data-a11y] :is(.hero-pic, .inst--big) .sticker { position: static; align-self: flex-start; width: auto; height: auto; border-radius: 10px; }
+    html[data-a11y] .inst-grid:not(.is-list) .inst--big .photo--flat { min-height: 0; flex: none; height: 220px; }
+    html[data-a11y] .branches > :last-child { margin-top: 0; }
+  </style>
+</head>
+<body data-page="about">
+  <div id="site-header"></div>
+
+  <main id="main">
+    <section class="page-hero page-hero--tinted inst-hero">
+      <div class="container inst-hero__grid">
+        <div>
+          <nav class="crumbs" aria-label="Хлебные крошки"><a href="index.html">Главная</a><i data-icon="chevron-right"></i><span>Об УрФУ</span><i data-icon="chevron-right"></i><span>Институты</span></nav>
+          <h1 class="h1">Институты <span class="u-hand">УрФУ</span></h1>
+          <span class="hand">ищи по интересу, а не по аббревиатуре</span>
+          <p class="lead" style="margin-top:14px">Университет — это 16 институтов и центров. Напиши, чем хочешь заниматься, — покажем, где этому учат.</p>
+          <div class="inst-search search-xl input-icon">
+            <i data-icon="search"></i>
+            <label for="inst-q" class="sr-only">Найди институт по направлению</label>
+            <input class="input" id="inst-q" type="search" placeholder="Найди институт по направлению: «дизайн», «нефть», «ИИ»" autocomplete="off">
+            <button class="tool-btn inst-search__clear" id="inst-clear" type="button" aria-label="Очистить поиск" hidden><i data-icon="x"></i></button>
+          </div>
+          <div class="cluster hint-chips">
+            <span class="hand">например:</span>
+            <button class="chip" type="button" data-hint="программирование">программирование</button>
+            <button class="chip" type="button" data-hint="психология">психология</button>
+            <button class="chip" type="button" data-hint="энергетика">энергетика</button>
+            <button class="chip" type="button" data-hint="архитектура">архитектура</button>
+          </div>
+        </div>
+        <div class="hero-pic" role="group" aria-label="УрФУ в цифрах">
+          <figure class="photo tape">
+            <img src="assets/img/city.jpg" alt="Зимний Екатеринбург с высоты" loading="eager">
+            <figcaption>весь этот город — наш кампус</figcaption>
+          </figure>
+          <span class="sticker sticker--round sticker--coral st1">16 институтов и центров</span>
+          <span class="sticker sticker--paper st2">400+ программ</span>
+          <span class="sticker sticker--blue st3">5 филиалов в регионе</span>
+        </div>
+      </div>
+    </section>
+
+    <section class="section--tight" aria-labelledby="list-title">
+      <div class="container">
+        <h2 class="sr-only" id="list-title">Список институтов</h2>
+        <div class="inst-tools">
+          <div class="cluster" data-chip-group id="area-chips" aria-label="Область знаний">
+            <button class="chip" aria-pressed="true" data-area="all">Все</button>
+            <button class="chip" aria-pressed="false" data-area="it"><i data-icon="cpu"></i>IT</button>
+            <button class="chip" aria-pressed="false" data-area="eng"><i data-icon="zap"></i>Инженерия</button>
+            <button class="chip" aria-pressed="false" data-area="science"><i data-icon="flask"></i>Естественные науки</button>
+            <button class="chip" aria-pressed="false" data-area="econ"><i data-icon="chart"></i>Экономика и управление</button>
+            <button class="chip" aria-pressed="false" data-area="hum"><i data-icon="book"></i>Гуманитарные</button>
+            <button class="chip" aria-pressed="false" data-area="sport"><i data-icon="activity"></i>Спорт</button>
+          </div>
+          <div class="view-toggle" role="group" aria-label="Вид списка">
+            <button type="button" data-view="grid" aria-pressed="true" aria-label="Плиткой"><i data-icon="grid"></i></button>
+            <button type="button" data-view="list" aria-pressed="false" aria-label="Списком"><i data-icon="list"></i></button>
+          </div>
+        </div>
+        <p class="small muted inst-count" id="inst-count" aria-live="polite"></p>
+        <div class="inst-grid" id="inst-grid"></div>
+        <p class="demo-note" style="margin-top:16px">Число программ — демонстрационное.</p>
+      </div>
+    </section>
+
+    <section class="section section--surface" id="leaders" aria-labelledby="leaders-title">
+      <div class="container">
+        <div class="s-head">
+          <div><h2 class="h2" id="leaders-title">Кто отвечает за университет</h2><span class="hand">к кому идти с вопросом</span><p>Ректор и проректоры — с зонами ответственности, чтобы вы знали, к кому обратиться.</p></div>
+          <a class="arrow-link" href="structure.html">Структура и органы управления <i data-icon="arrow-right"></i></a>
+        </div>
+        <div class="leaders" id="leaders-grid"></div>
+        <p class="demo-note" style="margin-top:16px">В концепте вместо имён показаны должности. Записаться на приём можно в личном кабинете.</p>
+      </div>
+    </section>
+
+    <section class="section" aria-labelledby="branches-title">
+      <div class="container">
+        <div class="s-head">
+          <div><h2 class="h2" id="branches-title">Филиалы и подразделения</h2><p>УрФУ работает в пяти городах Свердловской области. А ещё — библиотека, музеи, центры помощи и карьеры.</p></div>
+        </div>
+        <div class="branches">
+          <div>
+            <figure class="photo tape--corner branches-photo"><img src="assets/img/winter.jpg" alt="Набережная Екатеринбурга на закате: городской пруд и небоскрёбы" loading="lazy"><figcaption>а ещё — пять городов области</figcaption></figure>
+            <h3 class="h4">Филиалы</h3>
+            <div class="link-list">
+              <a href="institute.html"><span class="icon-tile"><i data-icon="building"></i></span><span><strong>Нижнетагильский технологический институт</strong><small>Нижний Тагил · инженерия и педагогика</small></span><i data-icon="chevron-right"></i></a>
+              <a href="institute.html"><span class="icon-tile"><i data-icon="building"></i></span><span><strong>Политехнический институт</strong><small>Каменск-Уральский · металлургия и машиностроение</small></span><i data-icon="chevron-right"></i></a>
+              <a href="institute.html"><span class="icon-tile"><i data-icon="building"></i></span><span><strong>Филиал в Верхней Салде</strong><small>Верхняя Салда · авиационные материалы</small></span><i data-icon="chevron-right"></i></a>
+              <a href="institute.html"><span class="icon-tile"><i data-icon="building"></i></span><span><strong>Филиал в Краснотурьинске</strong><small>Краснотурьинск · энергетика и металлургия</small></span><i data-icon="chevron-right"></i></a>
+              <a href="institute.html"><span class="icon-tile"><i data-icon="building"></i></span><span><strong>Филиал в Невьянске</strong><small>Невьянск · колледж и среднее профобразование</small></span><i data-icon="chevron-right"></i></a>
+            </div>
+          </div>
+          <div>
+            <h3 class="h4">Подразделения, которые чаще всего ищут</h3>
+            <div class="link-list">
+              <a href="student.html#services"><span class="icon-tile"><i data-icon="book"></i></span><span><strong>Зональная научная библиотека</strong><small>Книги, базы данных, читальные залы</small></span><i data-icon="chevron-right"></i></a>
+              <a href="science.html#labs"><span class="icon-tile"><i data-icon="flask"></i></span><span><strong>Лаборатории и научные центры</strong><small>120+ лабораторий, в том числе для студентов</small></span><i data-icon="chevron-right"></i></a>
+              <a href="student.html#career"><span class="icon-tile"><i data-icon="briefcase"></i></span><span><strong>Центр карьеры</strong><small>Практика, стажировки, вакансии</small></span><i data-icon="chevron-right"></i></a>
+              <a href="programs.html?level=extra"><span class="icon-tile"><i data-icon="award"></i></span><span><strong>Бизнес-школа и доп. образование</strong><small>MBA, курсы повышения квалификации</small></span><i data-icon="chevron-right"></i></a>
+              <a href="help.html"><span class="icon-tile"><i data-icon="help"></i></span><span><strong>Центр помощи</strong><small>Один вход для всех вопросов</small></span><i data-icon="chevron-right"></i></a>
+              <a href="structure.html"><span class="icon-tile"><i data-icon="layers"></i></span><span><strong>Вся структура университета</strong><small>Карта сайта и подразделений</small></span><i data-icon="chevron-right"></i></a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <div id="site-footer"></div>
+
+  <script src="assets/js/app.js"></script>
+  <script>
+  (function () {
+    'use strict';
+    const $ = (s, r = document) => r.querySelector(s);
+    const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+    const plural = (n, f) => f[(n % 10 === 1 && n % 100 !== 11) ? 0 : (n % 10 >= 2 && n % 10 <= 4 && (n % 100 < 10 || n % 100 >= 20)) ? 1 : 2];
+    const ic = (n) => UI.icon(n);
+    const norm = (s) => s.toLowerCase().replace(/ё/g, 'е');
+
+    const AREAS = { it: 'IT', eng: 'Инженерия', science: 'Естественные науки', econ: 'Экономика и управление', hum: 'Гуманитарные', sport: 'Спорт' };
+    // аббревиатура, полное название, области, 3 направления, ключевые слова для поиска, число, единица, цвет
+    const INST = [
+      ['ИРИТ-РтФ', 'Институт радиоэлектроники и информационных технологий — РтФ', ['it', 'eng'], ['Программирование', 'Информационная безопасность', 'Радиотехника'], 'it ии искусственный интеллект нейросети разработка программная инженерия данные data science связь электроника геймдев игры кибербезопасность веб приложения', 48, 'prog', 'brand'],
+      ['ИЕНиМ', 'Институт естественных наук и математики', ['science', 'it'], ['Математика', 'Физика', 'Биология'], 'химия астрономия экология биотехнологии компьютерные науки статистика анализ данных генетика обсерватория', 52, 'prog', 'staff'],
+      ['ИНМиТ', 'Институт новых материалов и технологий', ['eng'], ['Металлургия', 'Материаловедение', 'Машиностроение'], 'металлы сварка 3d печать аддитивные литейное механика автомобили транспорт станки', 41, 'prog', 'partner'],
+      ['УралЭНИН', 'Уральский энергетический институт', ['eng'], ['Энергетика', 'Электротехника', 'Теплотехника'], 'электричество электроэнергетика возобновляемая энергия водород электростанции сети нефть газ', 34, 'prog', 'accent'],
+      ['ФТИ', 'Физико-технологический институт', ['eng', 'science'], ['Ядерные технологии', 'Медицинская физика', 'Электроника'], 'атом аэс радиация лазеры нанотехнологии физика приборы роботы', 29, 'prog', 'intl'],
+      ['ХТИ', 'Химико-технологический институт', ['science', 'eng'], ['Химическая технология', 'Биотехнологии', 'Полимеры'], 'химия лекарства фармацевтика косметика нефтехимия экология материалы пищевые', 26, 'prog', 'student'],
+      ['ИСА', 'Институт строительства и архитектуры', ['eng', 'hum'], ['Строительство', 'Архитектура', 'Дизайн среды'], 'здания мосты урбанистика город дороги дизайн интерьер проектирование недвижимость', 30, 'prog', 'partner'],
+      ['ИнЭУ', 'Институт экономики и управления', ['econ'], ['Экономика', 'Менеджмент', 'Финансы'], 'бизнес маркетинг логистика бухгалтерия банки аналитика торговля предпринимательство', 45, 'prog', 'brand'],
+      ['ИГУП', 'Институт государственного управления и предпринимательства', ['econ', 'hum'], ['Госуправление', 'Предпринимательство', 'Управление персоналом'], 'стартап hr право муниципальное управление политика проекты', 22, 'prog', 'staff'],
+      ['УГИ', 'Уральский гуманитарный институт', ['hum'], ['Журналистика', 'Психология', 'Лингвистика'], 'история философия филология перевод иностранные языки искусство социология международные отношения реклама pr культура дизайн медиа', 64, 'prog', 'intl'],
+      ['ИФКСиМП', 'Институт физической культуры, спорта и молодёжной политики', ['sport', 'hum'], ['Спорт и тренерство', 'Спортивный менеджмент', 'Молодёжная политика'], 'физкультура тренер фитнес туризм адаптивная физкультура здоровье волонтерство', 14, 'prog', 'student'],
+      ['ИнФО', 'Институт фундаментального образования', ['science', 'eng'], ['Высшая математика', 'Инженерная графика', 'Прикладная механика'], 'первый курс базовая подготовка физика механика черчение', 12, 'prog', 'accent'],
+      ['ИТОО', 'Институт технологий открытого образования', ['it', 'hum'], ['Онлайн-курсы', 'Цифровое обучение', 'Повышение квалификации'], 'дистанционно онлайн mooc взрослым курсы обучение без отрыва', 120, 'course', 'brand'],
+      ['УПИШ', 'Уральская передовая инженерная школа «Цифровое производство»', ['eng', 'it'], ['Цифровое производство', 'Промышленный ИИ', 'Цифровые двойники'], 'индустрия 4.0 станки чпу роботы автоматизация заводы ии магистратура', 9, 'prog', 'staff'],
+      ['СУНЦ', 'Специализированный учебно-научный центр', ['science'], ['Физмат-профиль', 'Химбио-профиль', 'Олимпиады'], 'школьникам школа лицей 10 класс 11 класс одаренные', 4, 'profile', 'partner'],
+      ['ВУЦ', 'Военный учебный центр', ['eng', 'sport'], ['Военная подготовка', 'Офицер запаса', 'Связь и радиолокация'], 'армия лейтенант военная кафедра служба', 11, 'vus', 'intl']
+    ].map((a, i) => ({ i, abbr: a[0], name: a[1], areas: a[2], tags: a[3], kw: a[4], n: a[5], unit: a[6], color: a[7] }));
+    const PHOTO = { 'ИРИТ-РтФ': ['robotics', 'Трое исследователей склонились над прибором в лаборатории'], 'ИЕНиМ': ['lab', 'Исследователь у микроскопа в лаборатории'], 'УГИ': ['library', 'Студенты в библиотеке'], 'ИФКСиМП': ['sport', 'Студенты играют в баскетбол'], 'ИСА': ['bench', 'Студенты отдыхают у корпуса'] };
+    const UNITS = { prog: ['программа', 'программы', 'программ'], course: ['онлайн-курс', 'онлайн-курса', 'онлайн-курсов'], profile: ['профиль', 'профиля', 'профилей'], vus: ['специальность', 'специальности', 'специальностей'] };
+
+    const store = UI.store;
+    const st = { q: '', area: 'all', view: store.get('urfu-inst-view', 'grid') === 'list' ? 'list' : 'grid' };
+
+    function hl(text, q) {
+      if (!q) return esc(text);
+      const i = norm(text).indexOf(q);
+      return i < 0 ? esc(text) : esc(text.slice(0, i)) + '<mark style="background:var(--accent-soft);color:inherit;border-radius:4px">' + esc(text.slice(i, i + q.length)) + '</mark>' + esc(text.slice(i + q.length));
+    }
+    function render() {
+      const q = norm(st.q.trim());
+      const list = INST.filter((x) => (st.area === 'all' || x.areas.includes(st.area)) &&
+        (!q || norm(x.abbr + ' ' + x.name + ' ' + x.tags.join(' ') + ' ' + x.kw + ' ' + x.areas.map((a) => AREAS[a]).join(' ')).includes(q)));
+      const grid = $('#inst-grid');
+      grid.classList.toggle('is-list', st.view === 'list');
+      document.querySelectorAll('.view-toggle button').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.view === st.view)));
+      const area = st.area === 'all' ? '' : ` · ${AREAS[st.area]}`;
+      $('#inst-count').textContent = list.length
+        ? `${list.length} ${plural(list.length, ['институт', 'института', 'институтов'])}${area}${q ? ` по запросу «${st.q.trim()}»` : ''}`
+        : 'Ничего не нашли';
+      if (!list.length) {
+        grid.innerHTML = `<div class="empty"><span class="hand">хм, пусто…</span><h3 class="h4">Не нашли «${esc(st.q.trim())}»${area ? ' в разделе ' + AREAS[st.area] : ''}</h3><p class="small muted">Попробуй другое слово или открой каталог — там 400+ программ с подробным поиском.</p><div class="cluster" style="justify-content:center"><button class="btn btn--soft btn--sm" type="button" id="inst-reset">Сбросить фильтры</button><a class="btn btn--sm" href="programs.html">Каталог программ</a></div></div>`;
+        return;
+      }
+      grid.innerHTML = list.map((x, k) => {
+        const big = k === 0 && list.length > 3;
+        const ph = PHOTO[x.abbr];
+        const tagHit = q && x.tags.some((t) => norm(t).includes(q));
+        const nameHit = q && norm(x.abbr + ' ' + x.name).includes(q);
+        const kwHit = q && !tagHit && !nameHit ? x.kw.split(' ').find((w) => norm(w).includes(q)) : '';
+        return `<article class="card card--hover inst inst--${x.color}${big ? ' inst--big' : ''}">
+          ${big && x.abbr === 'ИРИТ-РтФ' ? '<span class="sticker sticker--coral" aria-hidden="true">новый кампус</span>' : ''}
+          ${ph ? `<figure class="photo photo--flat"><img src="assets/img/${ph[0]}.jpg" alt="${ph[1]}" loading="lazy"></figure>` : ''}
+          <span class="inst__abbr" aria-hidden="true">${esc(x.abbr)}</span>
+          <h3 class="card__title"><a class="stretched" href="institute.html" aria-label="${esc(x.name)} (${esc(x.abbr)})">${hl(x.name, q)}</a></h3>
+          <div class="cluster inst__tags">${x.tags.map((t) => `<span class="tag${q && norm(t).includes(q) ? ' tag--brand' : ''}">${hl(t, q)}</span>`).join('')}</div>
+          ${kwHit ? `<span class="inst__match">${ic('check')} Есть направление «${esc(kwHit)}»</span>` : ''}
+          <div class="card__footer"><span class="small muted">${x.n} ${plural(x.n, UNITS[x.unit])}</span>${ic('arrow-up-right')}</div>
+        </article>`;
+      }).join('');
+    }
+
+    const input = $('#inst-q'), clear = $('#inst-clear');
+    input.addEventListener('input', () => { st.q = input.value; clear.hidden = !input.value; render(); });
+    clear.addEventListener('click', () => { input.value = ''; st.q = ''; clear.hidden = true; render(); input.focus(); });
+    document.querySelectorAll('[data-hint]').forEach((b) => b.addEventListener('click', () => {
+      input.value = b.dataset.hint; st.q = b.dataset.hint; clear.hidden = false; render();
+      $('#inst-count').scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }));
+    $('#area-chips').addEventListener('chipchange', () => { st.area = $('#area-chips [aria-pressed="true"]').dataset.area; render(); });
+    document.querySelectorAll('.view-toggle button').forEach((b) => b.addEventListener('click', () => {
+      st.view = b.dataset.view; store.set('urfu-inst-view', st.view); render();
+    }));
+    document.addEventListener('click', (e) => {
+      if (e.target.closest('#inst-reset')) {
+        st.q = ''; st.area = 'all'; input.value = ''; clear.hidden = true;
+        document.querySelectorAll('#area-chips .chip').forEach((c) => c.setAttribute('aria-pressed', String(c.dataset.area === 'all')));
+        render();
+      }
+    });
+    // ?area=it или ?q=дизайн — прямые ссылки на подборку
+    (function () {
+      const p = new URLSearchParams(location.search);
+      const a = p.get('area'); const q = p.get('q');
+      if (a && AREAS[a]) { st.area = a; document.querySelectorAll('#area-chips .chip').forEach((c) => c.setAttribute('aria-pressed', String(c.dataset.area === a))); }
+      if (q) { st.q = q; input.value = q; clear.hidden = false; }
+    })();
+    render();
+
+    /* ---------- Руководство (без реальных имён) ---------- */
+    const LEADERS = [
+      ['Р', 'Ректор', 'Стратегия развития университета, учёный совет, взаимодействие с правительством и индустрией', 'main'],
+      ['ПП', 'Первый проректор', 'Операционное управление, бюджет, имущественный комплекс', 1],
+      ['ПН', 'Проректор по науке', 'Исследования, лаборатории, гранты, аспирантура и научные журналы', 3],
+      ['ПО', 'Проректор по образовательной деятельности', 'Образовательные программы, расписание, приёмная кампания, качество обучения', 2],
+      ['ПМ', 'Проректор по молодёжной политике', 'Студенческая жизнь, общежития, стипендии, сообщества и волонтёрство', 6],
+      ['ПМД', 'Проректор по международной деятельности', 'Иностранные студенты, обмены, партнёрства с зарубежными вузами', 5],
+      ['ПЭ', 'Проректор по экономике и стратегическому развитию', 'Финансовая модель, эндаумент, программы развития университета', 4],
+      ['ПЦ', 'Проректор по цифровой трансформации', 'IT-сервисы, личные кабинеты, сайт и цифровая инфраструктура кампуса', 1]
+    ];
+    $('#leaders-grid').innerHTML = LEADERS.map((l) => {
+      const main = l[3] === 'main';
+      return `<article class="card leader${main ? ' leader--main' : ''}">
+        <span class="avatar${main ? '' : ' av-' + l[3]}" aria-hidden="true">${l[0]}</span>
+        <div class="leader__body">
+          <h3 class="h4" style="font-size:${main ? 'var(--fs-xl)' : 'var(--fs-md)'}">${l[1]}</h3>
+          <p class="small muted">${l[2]}</p>
+          <div class="cluster" style="margin-top:4px;gap:16px">
+            <button type="button" class="linkish" data-appt="${esc(l[1])}">${ic('calendar')}Записаться на приём</button>
+            <a class="linkish" href="help.html#contacts">${ic('mail')}Написать</a>
+          </div>
+        </div>
+      </article>`;
+    }).join('');
+    $('#leaders-grid').addEventListener('click', (e) => {
+      const b = e.target.closest('[data-appt]');
+      if (b) UI.toast(`Заявка на приём к руководителю (${b.dataset.appt.toLowerCase()}) отправлена — ответим в течение 3 дней (демо)`);
+    });
+  })();
+  </script>
+</body>
+</html>

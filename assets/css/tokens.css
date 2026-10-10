@@ -1,0 +1,98 @@
+/* УрФУ — дизайн-токены. Стиль «Живой студенческий»: бумага, чернила, смелые цвета. */
+@import url('https://fonts.googleapis.com/css2?family=Unbounded:wght@500;600;700;800&family=Onest:wght@400;500;600;700&family=Caveat:wght@600;700&display=swap');
+
+:root {
+  /* Бренд */
+  --brand: #2747ff;          /* синий УрФУ, ярче */
+  --brand-strong: #1530d6;
+  --brand-soft: #dfe5ff;
+  --accent: #ff5a36;         /* горячий коралл — главное действие */
+  --accent-strong: #e8401c;
+  --accent-soft: #ffe1d6;
+  --lime: #d7ff3d;           /* кислотный лайм — стикеры, бегущая строка */
+  --lime-soft: #f1ffc2;
+  --ink: #14141a;            /* чернила: текст, обводки */
+  --shade: #14141a;          /* цвет жёсткой тени */
+
+  /* Роли — насыщенные */
+  --role-applicant: #2747ff;  --role-applicant-bg: #dfe5ff;
+  --role-student:   #008f5a;  --role-student-bg:   #c9f5df;
+  --role-staff:     #7c4dff;  --role-staff-bg:     #e6dcff;
+  --role-partner:   #c27400;  --role-partner-bg:   #ffe7b3;
+  --role-intl:      #e0287a;  --role-intl-bg:      #ffd6e7;
+
+  /* Нейтральные — тёплая бумага */
+  --bg: #f6f2ea;
+  --surface: #fffdf8;
+  --surface-2: #eee8da;
+  --border: #d8cfbd;
+  --text: #14141a;
+  --text-2: #45434d;
+  --text-3: #6d6a72;
+  --on-brand: #ffffff;
+
+  /* Статусы */
+  --ok: #008f5a;
+  --warn: #c27400;
+  --danger: #d92d20;
+
+  /* Типографика */
+  --font: 'Onest', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --font-display: 'Unbounded', 'Onest', system-ui, sans-serif;
+  --font-hand: 'Caveat', 'Segoe Print', cursive;
+  --fs-scale: 1;
+  --fs-xs: calc(13px * var(--fs-scale));
+  --fs-sm: calc(15px * var(--fs-scale));
+  --fs-md: calc(17px * var(--fs-scale));
+  --fs-lg: calc(20px * var(--fs-scale));
+  --fs-xl: calc(24px * var(--fs-scale));
+  --fs-2xl: calc(32px * var(--fs-scale));
+  --fs-3xl: calc(clamp(32px, 4.2vw, 56px) * var(--fs-scale));
+  --fs-4xl: calc(clamp(40px, 7vw, 104px) * var(--fs-scale));
+
+  /* Форма и ритм */
+  --r-sm: 8px;
+  --r-md: 12px;
+  --r-lg: 18px;
+  --r-xl: 28px;
+  --r-pill: 999px;
+  --gap: 24px;
+  --container: 1280px;
+  --gutter: 16px;
+  --header-h: 72px;
+  --line: 2px;               /* толщина чернильной обводки */
+
+  --shadow-sm: 2px 2px 0 var(--shade);
+  --shadow-md: 4px 4px 0 var(--shade);
+  --shadow-lg: 8px 8px 0 var(--shade);
+  --shadow-soft: 0 18px 50px rgba(20, 20, 26, .14);
+  --focus: 0 0 0 3px var(--lime), 0 0 0 5px var(--ink);
+  --ease: cubic-bezier(.2, .7, .2, 1);
+}
+
+@media (min-width: 768px) { :root { --gutter: 32px; } }
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --brand: #7b8cff; --brand-strong: #a3afff; --brand-soft: #23284d;
+    --accent: #ff7a5c; --accent-strong: #ff9b82; --accent-soft: #3d2219;
+    --lime-soft: #2d3312; --ink: #f3eee3; --shade: #000000;
+    --role-applicant: #8d9bff; --role-student: #3fd69a; --role-staff: #ad8cff; --role-partner: #ffb84d; --role-intl: #ff6fae;
+    --role-applicant-bg: #23284d; --role-student-bg: #123327; --role-staff-bg: #2b2148; --role-partner-bg: #3a2c10; --role-intl-bg: #3d1a2b;
+    --bg: #15140f; --surface: #1f1d17; --surface-2: #2a2720; --border: #3d392f;
+    --text: #f3eee3; --text-2: #c9c2b4; --text-3: #9c958a; --on-brand: #0f0f14;
+    --ok: #3fd69a; --warn: #ffb84d;
+    --shadow-soft: 0 18px 50px rgba(0, 0, 0, .5);
+  }
+}
+:root[data-theme="dark"] {
+  --brand: #7b8cff; --brand-strong: #a3afff; --brand-soft: #23284d;
+  --accent: #ff7a5c; --accent-strong: #ff9b82; --accent-soft: #3d2219;
+  --lime-soft: #2d3312; --ink: #f3eee3; --shade: #000000;
+  --role-applicant: #8d9bff; --role-student: #3fd69a; --role-staff: #ad8cff; --role-partner: #ffb84d; --role-intl: #ff6fae;
+  --role-applicant-bg: #23284d; --role-student-bg: #123327; --role-staff-bg: #2b2148; --role-partner-bg: #3a2c10; --role-intl-bg: #3d1a2b;
+  --bg: #15140f; --surface: #1f1d17; --surface-2: #2a2720; --border: #3d392f;
+  --text: #f3eee3; --text-2: #c9c2b4; --text-3: #9c958a; --on-brand: #0f0f14;
+  --ok: #3fd69a; --warn: #ffb84d;
+  --shadow-soft: 0 18px 50px rgba(0, 0, 0, .5);
+}

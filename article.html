@@ -1,0 +1,449 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Материал для батарей, работающих при −40 °C — УрФУ</title>
+  <meta name="description" content="Учёные УрФУ создали твёрдый электролит, который сохраняет работоспособность батарей в сильный мороз.">
+  <link rel="icon" href="assets/logo/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="assets/css/tokens.css">
+  <link rel="stylesheet" href="assets/css/components.css">
+  <style>
+    /* Прогресс чтения */
+    .read-progress { position: fixed; left: 0; right: 0; top: 0; height: 5px; z-index: 120; pointer-events: none; }
+    .read-progress span { display: block; height: 100%; background: var(--accent); transform-origin: 0 50%; transform: scaleX(0); }
+
+    /* ---------- Герой: заголовок + обложка-полароид ---------- */
+    .art-hero { padding: 40px 0 0; }
+    .art-hero__inner { max-width: 900px; }
+    .art-hero h1 { margin: 18px 0 16px; font-size: calc(clamp(28px, 4vw, 52px) * var(--fs-scale)); }
+    .art-meta { display: flex; flex-wrap: wrap; gap: 10px 20px; align-items: center; font-size: var(--fs-sm); color: var(--text-3); }
+    .art-meta span { display: inline-flex; align-items: center; gap: 6px; }
+    .art-meta .i { width: 16px; height: 16px; }
+    .byline { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; margin-top: 24px; }
+    .byline .avatar { background: var(--role-staff); border: var(--line) solid var(--ink); font-family: var(--font-display); }
+    .byline .hand { margin-left: 8px; display: inline-block; transform: rotate(-3deg); }
+    .art-cover { position: relative; margin: 40px 0 0; }
+    .art-cover .photo { height: clamp(260px, 38vw, 480px); --rot: -1deg; }
+    .art-cover .photo img { height: calc(100% - 36px); }
+    .art-cover .sticker { position: absolute; z-index: 3; }
+    .art-cover .s1 { right: -6px; top: -26px; --rot: 8deg; }
+    .art-cover .s2 { left: 18px; bottom: 34px; --rot: -5deg; }
+    @media (max-width: 599px) { .art-cover .photo { height: auto; } .art-cover .photo img { height: 220px; } .art-cover .s2 { bottom: auto; top: 172px; } }
+    .art-caption { font-size: var(--fs-xs); color: var(--text-3); margin-top: 14px; }
+
+    /* ---------- Раскладка: оглавление | текст | шеринг ---------- */
+    .art-layout { display: grid; gap: 32px; grid-template-columns: minmax(0, 1fr); }
+    @media (min-width: 1100px) { .art-layout { grid-template-columns: 220px minmax(0, 1fr) 56px; gap: 48px; } }
+    .toc { display: none; }
+    @media (min-width: 1100px) { .toc { display: block; position: sticky; top: calc(var(--header-h) + 76px); align-self: start; } .toc-mobile { display: none; } }
+    .toc h2 { font-family: var(--font-hand); font-size: calc(26px * var(--fs-scale)); color: var(--brand); font-weight: 700; letter-spacing: 0; }
+    .toc-mobile summary { font-size: var(--fs-sm); text-transform: uppercase; letter-spacing: .06em; font-weight: 700; }
+    .toc ol { list-style: none; margin: 10px 0 0; padding: 0; border-left: var(--line) solid var(--ink); }
+    .toc a { display: block; padding: 8px 0 8px 16px; margin-left: -2px; border-left: 4px solid transparent; font-size: var(--fs-sm); color: var(--text-2); line-height: 1.35; }
+    .toc a:hover { color: var(--text); background: var(--lime-soft); }
+    .toc a[aria-current="true"] { color: var(--text); font-weight: 700; border-left-color: var(--accent); }
+    .toc-mobile { border: var(--line) solid var(--ink); border-radius: var(--r-md); background: var(--surface); padding: 0 16px; }
+    .toc-mobile summary { list-style: none; display: flex; justify-content: space-between; align-items: center; padding: 14px 0; cursor: pointer; }
+    .toc-mobile summary::-webkit-details-marker { display: none; }
+    .toc-mobile[open] summary .i { transform: rotate(45deg); }
+    .toc-mobile ol { margin: 0 0 14px; padding-left: 1.2em; display: flex; flex-direction: column; gap: 8px; font-size: var(--fs-sm); }
+    .toc-mobile a { color: var(--brand); }
+
+    .share { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+    @media (min-width: 1100px) { .share { position: sticky; top: calc(var(--header-h) + 76px); align-self: start; flex-direction: column; } }
+    .share__label { font-size: var(--fs-xs); color: var(--text-3); font-weight: 700; }
+    .share .btn--icon { border-radius: 50%; }
+    .share .btn--icon[aria-pressed="true"] { background: var(--lime); color: #14141a; }
+    .share .net { font-weight: 800; font-size: 13px; }
+
+    /* ---------- Текст ---------- */
+    .prose { position: relative; font-size: calc(18px * var(--fs-scale)); }
+    @media (min-width: 1100px) { .prose { max-width: 660px; } }
+    .prose h2 { scroll-margin-top: calc(var(--header-h) + 72px); }
+    .prose ul li + li { margin-top: 6px; }
+    /* Рукописные пометки на полях */
+    .mnote { display: flex; align-items: flex-start; gap: 6px; font-family: var(--font-hand); font-weight: 700; font-size: calc(24px * var(--fs-scale)); line-height: 1.05; color: var(--brand); transform: rotate(-2deg); margin: 1.2em 0 -.2em; }
+    .mnote::before { content: "↳"; color: var(--accent); }
+    @media (min-width: 1280px) {
+      .mnote { position: absolute; left: calc(100% + 22px); width: 150px; margin: 4px 0 0; transform: rotate(-4deg); }
+      .mnote::before { content: "←"; }
+      .mnote--alt { transform: rotate(3deg); color: var(--accent-strong); }
+    }
+    /* Коротко */
+    .short { position: relative; border: var(--line) solid var(--ink); border-radius: var(--r-lg); background: var(--lime-soft); padding: 30px 24px 24px; box-shadow: var(--shadow-sm); }
+    .short h2 { margin-top: 0 !important; }
+    .short .sticker { position: absolute; top: -18px; left: 20px; --rot: -4deg; }
+    .short ol { list-style: none; padding: 0; margin: 4px 0 0; counter-reset: s; display: flex; flex-direction: column; gap: 14px; }
+    .short li { counter-increment: s; display: grid; grid-template-columns: 34px 1fr; gap: 12px; font-size: var(--fs-md); line-height: 1.5; }
+    .short li::before { content: counter(s); font: 800 calc(28px * var(--fs-scale))/1 var(--font-display); color: var(--accent); }
+    /* Цитата крупно */
+    .prose blockquote.pull { position: relative; margin: 2.4em 0 2em; padding: 46px 0 22px 0; border: 0; border-top: var(--line) solid var(--ink); border-bottom: var(--line) solid var(--ink); background: none; border-radius: 0; }
+    .pull::before { content: "«"; position: absolute; top: -34px; left: -6px; padding: 0 8px; background: var(--bg); font: 800 72px/1 var(--font-display); color: var(--accent); }
+    .pull p { font: 700 calc(clamp(22px, 2.4vw, 30px) * var(--fs-scale))/1.25 var(--font-display); letter-spacing: -.02em; }
+    .pull footer { display: flex; align-items: center; gap: 12px; margin-top: 18px; font-size: var(--fs-sm); color: var(--text-2); }
+    .pull footer .avatar { background: var(--accent); border: var(--line) solid var(--ink); font-family: var(--font-display); }
+    /* Цифры: контурные через одну, первая крупнее */
+    .infographic { display: grid; gap: 4px 28px; grid-template-columns: repeat(2, minmax(0, 1fr)); margin-top: 1.4em; }
+    .infographic > div { padding: 14px 0; border-top: var(--line) solid var(--ink); display: flex; flex-direction: column; gap: 6px; }
+    .infographic > div:first-child { grid-column: 1 / -1; }
+    .infographic b { font: 800 calc(clamp(34px, 4.4vw, 56px) * var(--fs-scale))/1 var(--font-display); letter-spacing: -.03em; color: var(--text); }
+    .infographic > div:first-child b { font-size: calc(clamp(56px, 8vw, 104px) * var(--fs-scale)); color: var(--accent); }
+    .infographic > div:nth-child(odd):not(:first-child) b { color: transparent; -webkit-text-stroke: 2px var(--ink); }
+    .infographic span { font-size: var(--fs-sm); color: var(--text-2); line-height: 1.35; }
+    .chartbar { margin-top: 1.4em; padding: 22px; border-radius: var(--r-lg); background: var(--surface); border: var(--line) solid var(--ink); }
+    .chartbar h3 { margin: 0 0 14px !important; font-size: var(--fs-md) !important; }
+    .bar { display: grid; grid-template-columns: minmax(0, 150px) 1fr 52px; gap: 12px; align-items: center; font-size: var(--fs-sm); margin-top: 12px; }
+    .bar__track { height: 18px; border-radius: 6px; background: var(--surface-2); border: var(--line) solid var(--ink); overflow: hidden; }
+    .bar__fill { height: 100%; background: var(--text-3); width: 0; transition: width 1s var(--ease); }
+    .bar--ours .bar__fill { background: var(--lime); }
+    .bar--ours span { font-weight: 700; }
+    .bar b { text-align: right; font-family: var(--font-display); }
+    @media (max-width: 480px) { .bar { grid-template-columns: 1fr 52px; } .bar__track { grid-column: 1 / -1; grid-row: 2; } }
+    /* CTA: синяя плашка с полароидом */
+    .cta-inline { position: relative; display: grid; gap: 20px; grid-template-columns: 1fr; align-items: center; padding: 26px; border-radius: var(--r-xl); border: var(--line) solid var(--ink); background: #2747ff; color: #fff; box-shadow: var(--shadow-lg); margin-top: 2em !important; }
+    @media (min-width: 640px) { .cta-inline { grid-template-columns: 1fr 170px; } }
+    .cta-inline strong { display: block; font: 700 var(--fs-xl)/1.15 var(--font-display); color: #fff; }
+    .cta-inline p { color: #e3e8ff; font-size: var(--fs-sm); margin-top: 8px; }
+    .cta-inline .photo { height: 170px; --rot: 5deg; }
+    .cta-inline .photo img { height: calc(100% - 30px); }
+    @media (max-width: 639px) { .cta-inline .photo { display: none; } }
+    .art-tags { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 32px; }
+    .art-tags a { padding: 6px 12px; border-radius: 8px; border: var(--line) solid var(--ink); background: var(--surface); color: var(--text); font-size: var(--fs-sm); font-weight: 700; }
+    .art-tags a:nth-child(even) { transform: rotate(-2deg); }
+    .art-tags a:hover { background: var(--lime); color: #14141a; }
+    .feedback { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; justify-content: space-between; margin-top: 32px; padding: 18px 20px; border-radius: var(--r-lg); border: var(--line) dashed var(--ink); }
+
+    /* ---------- Автор и контакты ---------- */
+    .author-grid { display: grid; gap: var(--gap); grid-template-columns: 1fr; margin-top: 40px; }
+    @media (min-width: 720px) { .author-grid { grid-template-columns: 1fr 1fr; } }
+    .author-grid .card { display: flex; flex-direction: column; gap: 12px; }
+    .author-grid .hand { transform: rotate(-2deg); display: inline-block; }
+    .person { display: flex; gap: 14px; align-items: center; }
+    .person .avatar { width: 52px; height: 52px; border: var(--line) solid var(--ink); font-family: var(--font-display); }
+    .av-staff { background: var(--role-staff); }
+    .av-student { background: var(--role-student); }
+
+    /* ---------- Читайте также: журнал ---------- */
+    .more-mag { display: grid; gap: 28px; grid-template-columns: 1fr; }
+    @media (min-width: 1024px) { .more-mag { grid-template-columns: 1.3fr 1fr; gap: 40px; } }
+    .more-head { display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: 10px 20px; margin-bottom: 32px; }
+    .more-head .hand { display: inline-block; transform: rotate(-3deg); margin-left: 10px; }
+    .lead-story { display: block; }
+    .lead-story .photo { --rot: 1.5deg; height: clamp(220px, 28vw, 340px); }
+    .lead-story .photo img { height: calc(100% - 34px); }
+    .lead-story h3 { font-size: calc(clamp(20px, 2.2vw, 28px) * var(--fs-scale)); margin: 20px 0 8px; line-height: 1.15; }
+    .lead-story:hover h3 { text-decoration: underline; text-decoration-color: var(--accent); text-decoration-thickness: 3px; }
+    .story { display: grid; grid-template-columns: 96px 1fr; gap: 16px; padding: 18px 0; border-bottom: var(--line) solid var(--ink); align-items: center; }
+    .story:first-child { padding-top: 0; }
+    .story img { width: 96px; height: 96px; object-fit: cover; border: var(--line) solid var(--ink); border-radius: 12px; }
+    .story strong { font-size: var(--fs-md); line-height: 1.3; display: block; margin: 6px 0 4px; }
+    .story:hover strong { color: var(--brand); }
+
+    /* Наверх */
+    .to-top { position: fixed; right: 20px; bottom: 20px; z-index: 90; width: 52px; height: 52px; border-radius: 50%; border: var(--line) solid var(--ink); background: var(--lime); color: #14141a; box-shadow: var(--shadow-sm); display: grid; place-items: center; opacity: 0; transform: translateY(12px); pointer-events: none; transition: opacity .2s, transform .2s var(--ease); }
+    .to-top.is-on { opacity: 1; transform: none; pointer-events: auto; }
+    .to-top:hover { box-shadow: var(--shadow-md); }
+    .to-top .i { transform: rotate(180deg); }
+    .art-hero h1:focus { outline: none; box-shadow: none; }
+
+    /* ---------- Версия для слабовидящих ---------- */
+    html[data-a11y] :is(.mnote, .byline .hand, .art-tags a, .author-grid .hand, .more-head .hand) { transform: none !important; }
+    html[data-a11y] .mnote { position: static; width: auto; font-family: var(--font); font-size: var(--fs-md); color: var(--text); margin: 1em 0 0; }
+    html[data-a11y] .art-cover .sticker, html[data-a11y] .short .sticker { position: static; display: inline-flex; margin: 0 8px 10px 0; }
+    html[data-a11y] .art-cover .photo { height: auto; }
+    html[data-a11y] .art-cover .photo img { height: 280px; }
+    html[data-a11y] .lead-story .photo { height: auto; }
+    html[data-a11y] .lead-story .photo img { height: 240px; }
+    html[data-a11y] .pull::before { display: none; }
+    html[data-a11y] .pull p { font-family: var(--font); font-size: var(--fs-xl); }
+    html[data-a11y] .infographic > div b { font-size: var(--fs-2xl) !important; }
+    html[data-a11y] .story { grid-template-columns: 1fr; }
+    html[data-a11y] .cta-inline { grid-template-columns: 1fr; }
+    html[data-a11y] .cta-inline .photo { display: none; }
+  </style>
+</head>
+<body data-page="about">
+  <div class="read-progress" aria-hidden="true"><span id="progress"></span></div>
+  <div id="site-header"></div>
+
+  <main id="main">
+    <article>
+      <header class="art-hero">
+        <div class="container">
+          <div class="art-hero__inner">
+            <nav class="crumbs" aria-label="Хлебные крошки"><a href="index.html">Главная</a><i data-icon="chevron-right"></i><a href="news.html">Новости</a><i data-icon="chevron-right"></i><a href="news.html?cat=science">Наука</a></nav>
+            <div class="art-meta">
+              <span class="tag tag--brand">Наука</span>
+              <span><i data-icon="calendar"></i><time datetime="2026-10-07">7 октября 2026</time></span>
+              <span><i data-icon="clock"></i><span id="read-time">6 мин чтения</span></span>
+              <span><i data-icon="building"></i>ИЕНиМ</span>
+            </div>
+            <h1 class="h1">Учёные УрФУ создали материал для твердотельных батарей, работающих при <span class="u-hand">−40&nbsp;°C</span></h1>
+            <p class="lead">Новый твёрдый электролит из лаборатории электрохимических материалов не замерзает в уральскую зиму и может удвоить запас хода электробусов и электромобилей в мороз.</p>
+            <div class="byline">
+              <span class="avatar" aria-hidden="true">МЛ</span>
+              <div><strong>Мария Лебедева</strong><div class="xs muted">пресс-служба УрФУ</div></div>
+              <span class="hand" aria-hidden="true">объясняем без формул ↓</span>
+            </div>
+          </div>
+          <div class="art-cover">
+            <figure class="photo tape"><img src="assets/img/lab.jpg" alt="Исследователь у микроскопа в лаборатории" loading="eager"><figcaption>лаборатория электрохимических материалов</figcaption></figure>
+            <span class="sticker sticker--round sticker--coral s1" aria-hidden="true">не боится −40&nbsp;°C</span>
+            <span class="sticker sticker--paper s2" aria-hidden="true"><i data-icon="zap"></i>×2 запас хода зимой</span>
+          </div>
+          <p class="art-caption">Фото иллюстративное: работа в лаборатории электрохимических материалов ИЕНиМ.</p>
+        </div>
+      </header>
+
+      <div class="section--tight">
+        <div class="container art-layout">
+          <nav class="toc" aria-labelledby="toc-title">
+            <h2 id="toc-title">Содержание</h2>
+            <ol id="toc">
+              <li><a href="#short">Коротко</a></li>
+              <li><a href="#why">Почему батареи боятся мороза</a></li>
+              <li><a href="#what">Что придумали в УрФУ</a></li>
+              <li><a href="#tests">Как проверяли</a></li>
+              <li><a href="#numbers">Результаты в цифрах</a></li>
+              <li><a href="#next">Что будет дальше</a></li>
+            </ol>
+          </nav>
+
+          <div>
+            <details class="toc-mobile">
+              <summary>Содержание <i data-icon="plus"></i></summary>
+              <ol>
+                <li><a href="#short">Коротко</a></li>
+                <li><a href="#why">Почему батареи боятся мороза</a></li>
+                <li><a href="#what">Что придумали в УрФУ</a></li>
+                <li><a href="#tests">Как проверяли</a></li>
+                <li><a href="#numbers">Результаты в цифрах</a></li>
+                <li><a href="#next">Что будет дальше</a></li>
+              </ol>
+            </details>
+
+            <div class="prose" id="prose" style="margin-top:8px">
+              <section class="short" aria-labelledby="short">
+                <span class="sticker" aria-hidden="true"><i data-icon="sparkles"></i>за 30 секунд</span>
+                <h2 id="short">Коротко</h2>
+                <ol>
+                  <li>Новый твёрдый электролит проводит ионы лития даже при −40&nbsp;°C — там, где обычные аккумуляторы теряют до половины ёмкости.</li>
+                  <li>Материал не горит и не вытекает, поэтому батарея безопаснее при ударе, проколе и перегреве.</li>
+                  <li>Первые ячейки испытают на городских электробусах Екатеринбурга зимой 2028/29 года.</li>
+                </ol>
+              </section>
+
+              <h2 id="why">Почему батареи боятся мороза</h2>
+              <p>Каждую зиму владельцы электромобилей на Урале замечают одно и то же: в мороз запас хода тает на глазах. При −25&nbsp;°C машина, которая летом проезжает 400&nbsp;километров, едва дотягивает до двухсот. Причина — в жидком электролите, который заполняет обычный литий-ионный аккумулятор.</p>
+              <span class="mnote" aria-hidden="true">400 км летом → 200 км зимой</span>
+              <p>Электролит — это среда, по которой ионы лития перемещаются между электродами при зарядке и разрядке. На холоде жидкость густеет, ионы движутся медленнее, и батарея не может отдать накопленную энергию. Часть заряда буквально «застревает» внутри. Чтобы этого избежать, производители ставят системы подогрева, но они сами расходуют энергию той же батареи.</p>
+              <p>Твердотельные батареи, в которых жидкость заменена твёрдым материалом, считаются следующим поколением накопителей энергии. Они безопаснее и могут хранить больше энергии в том же объёме. Однако у большинства известных твёрдых электролитов та же проблема: на морозе их проводимость резко падает.</p>
+              <p>Для Урала и Сибири это не мелочь. Почти полгода температура здесь держится ниже нуля, а в январе столбик термометра нередко опускается до −30&nbsp;°C. Городские электробусы в такие дни работают с запасом хода, урезанным вдвое, и чаще возвращаются в парк на подзарядку. Это делает электротранспорт дороже и менее удобным именно там, где он особенно нужен для чистого воздуха в промышленных городах.</p>
+
+              <h2 id="what">Что придумали в УрФУ</h2>
+              <p>Команда лаборатории электрохимических материалов Института естественных наук и математики пошла другим путём. Вместо того чтобы искать один идеальный материал, исследователи соединили два: прочную керамику на основе оксида лития, лантана и циркония и тонкую гибкую полимерную прослойку толщиной в несколько микрон.</p>
+              <span class="mnote mnote--alt" aria-hidden="true">керамика + полимер = дружба</span>
+              <p>Керамика отвечает за быстрый перенос ионов, а полимер — за плотный контакт с электродами, который обычно теряется при сжатии материалов на холоде. Ключевым оказался небольшой добавочный компонент: он не даёт кристаллической решётке «сжиматься» при охлаждении и сохраняет внутри свободные каналы для движения ионов.</p>
+              <blockquote class="pull">
+                <p>Мы три года искали состав, который не «засыпает» на морозе. Решение оказалось в балансе: керамика даёт скорость, полимер — гибкость.</p>
+                <footer><span class="avatar" aria-hidden="true">АВ</span><span><strong>Анна Ветлугина</strong><br>заведующая лабораторией электрохимических материалов УрФУ</span></footer>
+              </blockquote>
+              <p>«По отдельности они не работают при −40, а вместе — работают», — добавляет Анна.</p>
+              <p>Синтез материала проходит при относительно невысокой температуре — около 900&nbsp;°C вместо привычных 1200&nbsp;°C. Это делает производство дешевле и позволяет использовать оборудование, которое уже есть на уральских предприятиях.</p>
+              <span class="mnote" aria-hidden="true">3000 вариантов за месяцы, а не годы</span>
+              <p>Подобрать состав помогло компьютерное моделирование. Вместе с коллегами из Института радиоэлектроники и информационных технологий команда обучила модель машинного обучения предсказывать, как поведёт себя кристаллическая решётка при охлаждении. Модель перебрала больше трёх тысяч вариантов добавок и отобрала два десятка самых перспективных — их уже проверяли в лаборатории. Так удалось сократить поиск с нескольких лет до нескольких месяцев.</p>
+
+              <h2 id="tests">Как проверяли</h2>
+              <p>Опытные ячейки собрали прямо в лаборатории и прогнали через серию испытаний, которые имитируют реальную жизнь электробуса в Екатеринбурге:</p>
+              <ul>
+                <li><b>Холод.</b> В климатической камере ячейки работали при температуре от −50 до +60&nbsp;°C и сохранили работоспособность во всём диапазоне.</li>
+                <li><b>Выносливость.</b> 1&nbsp;200 циклов зарядки и разрядки — это примерно три года ежедневной работы городского транспорта.</li>
+                <li><b>Безопасность.</b> Ячейки прокалывали, сжимали и нагревали: ни возгорания, ни утечки.</li>
+                <li><b>Быстрая зарядка.</b> На холоде ячейка заряжалась до 80% за 40 минут без предварительного подогрева.</li>
+              </ul>
+              <p>Часть измерений провели независимые специалисты в лаборатории партнёра — уральского производителя электротранспорта. Их результаты совпали с университетскими в пределах погрешности.</p>
+
+              <h2 id="numbers">Результаты в цифрах</h2>
+              <p>Главное отличие нового электролита — он почти не теряет ёмкость при охлаждении. Вот как ведут себя ячейки в мороз −30&nbsp;°C по сравнению с обычными аккумуляторами:</p>
+              <div class="infographic" aria-label="Ключевые результаты">
+                <div><b>−40&nbsp;°C</b><span>минимальная рабочая температура</span></div>
+                <div><b>92%</b><span>ёмкости сохраняется при −30&nbsp;°C</span></div>
+                <div><b>1&nbsp;200</b><span>циклов зарядки без заметной деградации</span></div>
+                <div><b>×2</b><span>запас хода зимой против обычных батарей</span></div>
+              </div>
+              <div class="chartbar" role="img" aria-label="Сохранение ёмкости при −30 °C: новый электролит 92%, обычный литий-ионный аккумулятор 48%, твердотельный аналог 35%">
+                <h3>Сколько ёмкости остаётся при −30&nbsp;°C</h3>
+                <div class="bar bar--ours"><span>Новый электролит УрФУ</span><div class="bar__track"><div class="bar__fill" data-w="92"></div></div><b>92%</b></div>
+                <div class="bar"><span>Обычный литий-ионный</span><div class="bar__track"><div class="bar__fill" data-w="48"></div></div><b>48%</b></div>
+                <div class="bar"><span>Твердотельный аналог</span><div class="bar__track"><div class="bar__fill" data-w="35"></div></div><b>35%</b></div>
+              </div>
+              <p class="demo-note">Цифры в статье демонстрационные.</p>
+
+              <h2 id="next">Что будет дальше</h2>
+              <p>Университет уже подал заявку на патент. Следующий шаг — увеличить размер ячеек с лабораторных «таблеток» до промышленных форматов и собрать первый модуль батареи. Партнёр проекта планирует установить его на два городских электробуса и проверить зимой 2028/29 года.</p>
+              <p>Помимо транспорта, у разработки есть и другие применения: накопители для метеостанций и датчиков на Крайнем Севере, резервное питание для телекоммуникационных вышек, аккумуляторы для дронов, которые работают в Арктике.</p>
+              <span class="mnote mnote--alt" aria-hidden="true">это могут быть твои стажировки</span>
+              <p>В проекте участвуют студенты и аспиранты: шестеро магистрантов пишут по его материалам выпускные работы, а летом лаборатория снова наберёт стажёров.</p>
+              <p>Исследование поддержано грантом на развитие научных лабораторий и программой стратегического академического лидерства. Результаты опубликованы в рецензируемом научном журнале, а образцы материала уже запросили две исследовательские группы из других университетов, чтобы проверить их в своих установках.</p>
+              <div class="cta-inline">
+                <div><strong>Хочешь создавать такие материалы?</strong><p>Посмотри программы по химии и материаловедению — и лаборатории, где можно начать с первого курса.</p>
+                  <div class="cluster" style="margin-top:16px"><a class="btn btn--soft btn--sm" href="programs.html">Программы</a><a class="btn btn--white btn--sm" href="science.html#labs">Лаборатории</a></div></div>
+                <figure class="photo tape"><img src="assets/img/robotics.jpg" alt="Студенты собирают устройство в лаборатории" loading="lazy"><figcaption>с первого курса</figcaption></figure>
+              </div>
+            </div>
+
+            <div class="art-tags" aria-label="Теги">
+              <a href="news.html?cat=science">#наука</a><a href="news.html?cat=science">#энергетика</a><a href="news.html?cat=science">#материалы</a><a href="institutes.html">#ИЕНиМ</a>
+            </div>
+
+            <div class="feedback">
+              <strong>Статья была полезной?</strong>
+              <div class="cluster" id="feedback">
+                <button class="btn btn--ghost btn--sm" type="button" data-fb="yes">Да, интересно</button>
+                <button class="btn btn--ghost btn--sm" type="button" data-fb="no">Сложновато</button>
+              </div>
+            </div>
+
+            <div class="author-grid">
+              <div class="card card--flat">
+                <span class="hand">кто это написал</span>
+                <div class="person"><span class="avatar av-staff" aria-hidden="true">МЛ</span><div><strong>Мария Лебедева</strong><div class="small muted">Научный журналист пресс-службы УрФУ. Пишет о материалах, энергетике и людях науки.</div></div></div>
+                <a class="arrow-link small" href="news.html?cat=science">Другие материалы автора <i data-icon="arrow-right"></i></a>
+              </div>
+              <div class="card card--flat">
+                <span class="hand">для журналистов</span>
+                <div class="person"><span class="avatar av-student" aria-hidden="true">ПС</span><div><strong>Пресс-служба УрФУ</strong><div class="small muted">Организуем интервью с авторами разработки и пришлём фото в высоком разрешении.</div></div></div>
+                <div class="cluster"><a class="btn btn--sm" href="mailto:press@urfu.ru"><i data-icon="mail"></i> press@urfu.ru</a><a class="btn btn--ghost btn--sm" href="news.html#press">Пресс-центр</a></div>
+              </div>
+            </div>
+          </div>
+
+          <aside class="share" aria-label="Поделиться статьёй">
+            <span class="share__label">Поделиться</span>
+            <button class="btn btn--ghost btn--icon" type="button" id="copy-link" aria-label="Скопировать ссылку"><i data-icon="copy"></i></button>
+            <button class="btn btn--ghost btn--icon" type="button" data-toast="Откроем ВКонтакте, чтобы поделиться (демо)" aria-label="Поделиться во ВКонтакте"><span class="net" aria-hidden="true">VK</span></button>
+            <button class="btn btn--ghost btn--icon" type="button" data-toast="Откроем Telegram, чтобы поделиться (демо)" aria-label="Поделиться в Telegram"><i data-icon="send"></i></button>
+            <button class="btn btn--ghost btn--icon" type="button" id="save-btn" aria-pressed="false" aria-label="Сохранить в закладки"><i data-icon="bookmark"></i></button>
+          </aside>
+        </div>
+      </div>
+    </article>
+
+    <section class="section section--surface" aria-labelledby="more-title">
+      <div class="container">
+        <div class="more-head">
+          <h2 class="h2" id="more-title">Читайте также<span class="hand" aria-hidden="true">тоже про науку</span></h2>
+          <a class="arrow-link" href="news.html?cat=science">Все новости науки <i data-icon="arrow-right"></i></a>
+        </div>
+        <div class="more-mag">
+          <a class="lead-story" href="article.html">
+            <figure class="photo tape"><img src="assets/img/laptop.jpg" alt="Студенты обсуждают проект за ноутбуком в библиотеке" loading="lazy"><figcaption>ИРИТ-РтФ, команда проекта</figcaption></figure>
+            <div class="cluster" style="margin-top:20px"><span class="tag tag--brand">Наука</span><span class="xs muted">1 октября · 4 мин</span></div>
+            <h3>Нейросеть ИРИТ-РтФ находит дефекты в трубах по ультразвуку в пять раз быстрее</h3>
+            <p class="muted">Система уже тестируется на двух уральских заводах трубной промышленности.</p>
+          </a>
+          <div>
+            <a class="story" href="article.html"><img src="assets/img/lab.jpg" alt="" loading="lazy"><span><span class="tag tag--brand">Наука</span><strong>Химики ХТИ предложили перерабатывать металлургические шлаки в стройматериалы</strong><span class="xs muted">25 сентября · 5 мин</span></span></a>
+            <a class="story" href="article.html"><img src="assets/img/winter.jpg" alt="" loading="lazy"><span><span class="tag tag--brand">Наука</span><strong>Астрономы Коуровской обсерватории обнаружили новую переменную звезду</strong><span class="xs muted">16 сентября · 4 мин</span></span></a>
+            <a class="story" href="article.html"><img src="assets/img/robotics.jpg" alt="" loading="lazy"><span><span class="tag tag--brand">Наука</span><strong>Студенческое конструкторское бюро собрало дрон для мониторинга лесов</strong><span class="xs muted">5 сентября · 3 мин</span></span></a>
+          </div>
+        </div>
+        <p class="demo-note" style="margin-top:28px">Статья, имена и цифры вымышлены для демонстрации концепта редизайна.</p>
+      </div>
+    </section>
+  </main>
+
+  <button class="to-top" id="to-top" type="button" aria-label="Наверх"><i data-icon="chevron-down"></i></button>
+
+  <div id="site-footer"></div>
+
+  <script src="assets/js/app.js"></script>
+  <script>
+  (function () {
+    'use strict';
+    const $ = (s) => document.querySelector(s);
+    const prose = $('#prose');
+
+    // Время чтения: ~180 слов в минуту
+    const words = prose.textContent.trim().split(/\s+/).length;
+    $('#read-time').textContent = `${Math.max(1, Math.round(words / 180))} мин чтения`;
+
+    // Прогресс чтения + кнопка «Наверх»
+    const bar = $('#progress'), top = $('#to-top');
+    let ticking = false;
+    function onScroll() {
+      const r = prose.getBoundingClientRect();
+      const total = r.height - window.innerHeight * 0.6;
+      const p = Math.min(1, Math.max(0, (-r.top + window.innerHeight * 0.2) / Math.max(1, total)));
+      bar.style.transform = `scaleX(${p})`;
+      top.classList.toggle('is-on', window.scrollY > 700);
+      ticking = false;
+    }
+    window.addEventListener('scroll', () => { if (!ticking) { ticking = true; requestAnimationFrame(onScroll); } }, { passive: true });
+    window.addEventListener('resize', onScroll);
+    onScroll();
+    top.addEventListener('click', () => {
+      window.scrollTo({ top: 0, behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' });
+      const h1 = document.querySelector('#main h1'); h1.setAttribute('tabindex', '-1'); h1.focus({ preventScroll: true });
+    });
+
+    // Оглавление: подсветка текущего раздела
+    const links = [...document.querySelectorAll('#toc a')];
+    const heads = links.map((a) => document.getElementById(a.getAttribute('href').slice(1))).filter(Boolean);
+    const setActive = (id) => links.forEach((a) => a.setAttribute('aria-current', String(a.getAttribute('href') === '#' + id)));
+    if ('IntersectionObserver' in window) {
+      const visible = new Map();
+      const io = new IntersectionObserver((entries) => {
+        entries.forEach((en) => visible.set(en.target.id, en.isIntersecting));
+        const firstVisible = heads.find((h) => visible.get(h.id));
+        if (firstVisible) setActive(firstVisible.id);
+        else {
+          // заголовок ушёл выше — активен последний пройденный раздел
+          const passed = heads.filter((h) => h.getBoundingClientRect().top < window.innerHeight * 0.3);
+          if (passed.length) setActive(passed[passed.length - 1].id);
+        }
+      }, { rootMargin: '-15% 0px -55% 0px' });
+      heads.forEach((h) => io.observe(h));
+    }
+    setActive(heads[0].id);
+    document.querySelectorAll('.toc-mobile a').forEach((a) => a.addEventListener('click', () => { a.closest('details').open = false; }));
+
+    // Анимация столбиков, когда график попал в кадр
+    const fills = document.querySelectorAll('.bar__fill');
+    const grow = () => fills.forEach((f) => { f.style.width = f.dataset.w + '%'; });
+    if ('IntersectionObserver' in window) {
+      const io2 = new IntersectionObserver((en) => { if (en.some((e) => e.isIntersecting)) { grow(); io2.disconnect(); } }, { threshold: .3 });
+      io2.observe(document.querySelector('.chartbar'));
+    } else grow();
+
+    // Шеринг
+    async function copy(text) {
+      try { await navigator.clipboard.writeText(text); return true; } catch (e) {
+        const ta = document.createElement('textarea'); ta.value = text; ta.setAttribute('readonly', ''); ta.style.position = 'fixed'; ta.style.opacity = '0';
+        document.body.appendChild(ta); ta.select();
+        let ok = false; try { ok = document.execCommand('copy'); } catch (err) { ok = false; }
+        ta.remove(); return ok;
+      }
+    }
+    $('#copy-link').addEventListener('click', async () => {
+      const ok = await copy(location.href.split('#')[0]);
+      UI.toast(ok ? 'Ссылка на статью скопирована' : 'Не получилось скопировать — ссылка в адресной строке');
+    });
+    const save = $('#save-btn');
+    save.addEventListener('click', () => {
+      const on = save.getAttribute('aria-pressed') !== 'true';
+      save.setAttribute('aria-pressed', String(on));
+      save.setAttribute('aria-label', on ? 'Убрать из закладок' : 'Сохранить в закладки');
+      UI.toast(on ? 'Сохранили в закладки личного кабинета (демо)' : 'Убрали из закладок');
+    });
+
+    // Обратная связь
+    $('#feedback').addEventListener('click', (e) => {
+      const b = e.target.closest('[data-fb]'); if (!b) return;
+      $('#feedback').innerHTML = `<span class="small muted">${b.dataset.fb === 'yes' ? 'Спасибо! Будем писать больше о науке.' : 'Спасибо! Постараемся объяснять проще.'}</span>`;
+    });
+  })();
+  </script>
+</body>
+</html>

@@ -1,0 +1,323 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Концепция редизайна — УрФУ</title>
+  <link rel="icon" href="assets/logo/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="assets/css/tokens.css">
+  <link rel="stylesheet" href="assets/css/components.css">
+  <style>
+    .cover { padding: clamp(40px, 7vw, 96px) 0 clamp(40px, 6vw, 80px); border-bottom: var(--line) solid var(--ink); }
+    .cover__grid { display: grid; gap: 40px; grid-template-columns: minmax(0, 1fr); align-items: center; }
+    @media (min-width: 1024px) { .cover__grid { grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr); } }
+    .cover .display { max-width: 13ch; margin: 16px 0 24px; font-size: calc(clamp(40px, 5.2vw, 76px) * var(--fs-scale)); }
+    .cover .display .u-hand { white-space: nowrap; }
+    .cover .hand { display: inline-block; margin-top: 18px; transform: rotate(-2deg); }
+    .cover-pics { position: relative; height: 420px; max-width: 520px; }
+    .cover-pics .photo { position: absolute; }
+    .cover-pics .photo img { height: calc(100% - 36px); }
+    .cover-pics .c1 { left: 0; top: 30px; width: 62%; height: 300px; --rot: -4deg; z-index: 1; }
+    .cover-pics .c2 { right: 0; top: 130px; width: 50%; height: 250px; --rot: 5deg; z-index: 2; }
+    .cover-pics .sticker { position: absolute; z-index: 3; }
+    .cover-pics .s1 { right: 6%; top: 34px; --rot: 8deg; }
+    .cover-pics .s2 { left: 4%; bottom: 0; --rot: -6deg; }
+    @media (max-width: 599px) { .cover-pics { height: 340px; } .cover-pics .c1 { width: 57%; height: 230px; } .cover-pics .c2 { width: 46%; top: 110px; height: 200px; } .cover-pics .s1 { top: 4px; } }
+    .problem { display: grid; gap: 16px; grid-template-columns: minmax(0, 1fr); }
+    @media (min-width: 600px) { .problem { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+    @media (min-width: 1024px) { .problem { grid-template-columns: repeat(3, minmax(0, 1fr)); } .problem .card:nth-child(3n+2) { transform: translateY(14px); } }
+    .problem .card { gap: 6px; }
+    .problem .stat__num { color: var(--accent-strong); }
+    .principle { display: grid; gap: 20px; grid-template-columns: 56px 1fr; align-items: start; padding: 28px 0; border-bottom: 1px solid var(--border); }
+    .principle:last-child { border: none; }
+    .principle__n { width: 56px; height: 56px; border-radius: var(--r-md); display: grid; place-items: center; font: 800 var(--fs-lg) var(--font-display); background: var(--lime); color: #14141a; border: var(--line) solid var(--ink); box-shadow: var(--shadow-sm); transform: rotate(var(--rot, -4deg)); }
+    .principle:nth-child(even) .principle__n { --rot: 3deg; }
+    .ba { display: grid; gap: 12px; grid-template-columns: 1fr; margin-top: 12px; }
+    @media (min-width: 768px) { .ba { grid-template-columns: 1fr 1fr; } }
+    .ba > div { padding: 14px 16px; border-radius: var(--r-md); font-size: var(--fs-sm); border: var(--line) solid var(--ink); }
+    .ba .was { border-style: dashed; }
+    .ba .was { background: var(--surface-2); color: var(--text-2); }
+    .ba .now { background: var(--lime-soft); color: var(--text); }
+    .ba b { display: block; font-size: var(--fs-xs); text-transform: uppercase; letter-spacing: .06em; margin-bottom: 4px; }
+    .ba .was b { color: var(--text-3); }
+    .ba .now b { color: var(--text); }
+    .flows { display: grid; gap: 16px; grid-template-columns: repeat(auto-fit, minmax(min(100%, 340px), 1fr)); }
+    .flow { display: flex; align-items: center; flex-wrap: wrap; gap: 6px; font-size: var(--fs-sm); margin-top: 8px; }
+    .flow span { padding: 6px 10px; border-radius: var(--r-sm); background: var(--surface-2); font-weight: 600; }
+    .flow .i { color: var(--text-3); width: 16px; height: 16px; }
+    .swatches { display: grid; gap: 12px; grid-template-columns: repeat(auto-fit, minmax(min(100%, 108px), 1fr)); }
+    .sw { border-radius: var(--r-md); overflow: hidden; border: var(--line) solid var(--ink); background: var(--surface); box-shadow: var(--shadow-sm); }
+    .sw div { height: 72px; border-bottom: var(--line) solid var(--ink); }
+    .sw p { padding: 10px 12px; font-size: var(--fs-xs); color: var(--text-2); }
+    .sw p strong { display: block; font-size: var(--fs-sm); color: var(--text); }
+    .sw code { font-size: var(--fs-xs); }
+    .vl-grid { display: grid; gap: 28px; grid-template-columns: minmax(0, 1fr); }
+    @media (min-width: 1024px) { .vl-grid { grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr); gap: 48px; } }
+    .fonts { display: grid; gap: 12px; }
+    .font-row { display: grid; gap: 4px; padding: 16px 18px; border: var(--line) solid var(--ink); border-radius: var(--r-md); background: var(--surface); }
+    .font-row small { font-size: var(--fs-xs); color: var(--text-3); text-transform: uppercase; letter-spacing: .08em; }
+    .font-row .f-display { font: 800 calc(40px * var(--fs-scale))/1 var(--font-display); letter-spacing: -.03em; }
+    .font-row .f-text { font: 400 var(--fs-lg)/1.4 var(--font); }
+    .font-row .f-hand { font: 600 calc(34px * var(--fs-scale))/1 var(--font-hand); color: var(--brand); }
+    .kit { position: relative; display: grid; gap: 20px; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); align-items: start; padding: 28px 22px 22px; border: var(--line) solid var(--ink); border-radius: var(--r-xl); background: var(--surface); box-shadow: var(--shadow-md); }
+    .kit .photo { height: 230px; --rot: -3deg; }
+    .kit .photo img { height: calc(100% - 36px); }
+    .kit__side { display: grid; gap: 14px; justify-items: start; }
+    .kit .sticker { --rot: 6deg; }
+    .kit .hand { font-size: 24px; }
+    .kit__btns { grid-column: 1 / -1; display: flex; flex-wrap: wrap; gap: 10px; }
+    @media (max-width: 599px) { .kit { grid-template-columns: minmax(0, 1fr); } }
+    .rules { display: grid; margin: 0; padding: 0; list-style: none; counter-reset: r; }
+    .rules li { display: grid; grid-template-columns: 44px 1fr; gap: 12px; padding: 14px 0; border-bottom: var(--line) dashed var(--ink); counter-increment: r; }
+    .rules li::before { content: counter(r, decimal-leading-zero); font: 800 var(--fs-md) var(--font-display); color: var(--accent); }
+    .rules strong { display: block; }
+    .rules span { color: var(--text-2); font-size: var(--fs-sm); }
+    .was-now { display: grid; gap: 12px; grid-template-columns: minmax(0, 1fr); margin-top: 24px; }
+    @media (min-width: 768px) { .was-now { grid-template-columns: 1fr 1fr; } }
+    .was-now > div { padding: 16px 18px; border: var(--line) solid var(--ink); border-radius: var(--r-md); font-size: var(--fs-sm); }
+    .was-now .was { border-style: dashed; color: var(--text-2); }
+    .was-now .now { background: var(--lime-soft); }
+    .was-now b { display: block; margin-bottom: 4px; font: 700 var(--fs-xs) var(--font-display); text-transform: uppercase; letter-spacing: .06em; color: var(--text); }
+    .tricks { display: grid; gap: 20px; grid-template-columns: minmax(0, 1fr); }
+    @media (min-width: 768px) { .tricks { grid-template-columns: repeat(2, minmax(0, 1fr)); } .tricks > :first-child { grid-column: 1 / -1; } }
+    @media (min-width: 1100px) { .tricks { grid-template-columns: repeat(6, minmax(0, 1fr)); } .tricks > :nth-child(-n+2) { grid-column: span 3; } .tricks > :nth-child(n+3) { grid-column: span 2; } }
+    .trick { position: relative; display: flex; flex-direction: column; gap: 10px; padding: 24px; border: var(--line) solid var(--ink); border-radius: var(--r-lg); background: var(--surface); }
+    .trick:nth-child(2) { transform: rotate(.8deg); } .trick:nth-child(4) { transform: rotate(-.8deg); }
+    .trick__n { font: 800 calc(44px * var(--fs-scale))/1 var(--font-display); color: var(--text-3); }
+    .trick h3 { font: 700 var(--fs-lg)/1.2 var(--font-display); }
+    .trick p { margin: 0; color: var(--text-2); font-size: var(--fs-sm); }
+    .trick .arrow-link { margin-top: auto; align-self: flex-start; }
+    .trick button.arrow-link { border: 0; background: none; padding: 0; cursor: pointer; font: inherit; font-weight: 600; color: var(--text); }
+    .trick--hero { background: #2747ff; color: #fff; box-shadow: var(--shadow-lg); }
+    .trick--hero .trick__n { color: #d7ff3d; } .trick--hero h3 { color: #fff; } .trick--hero p { color: #e3e8ff; }
+    .trick--hero .btn { align-self: flex-start; margin-top: auto; }
+    .trick .sticker { position: absolute; top: -16px; right: 18px; --rot: 6deg; }
+    .pages { display: grid; gap: 12px; grid-template-columns: repeat(auto-fill, minmax(min(100%, 280px), 1fr)); }
+    .pages a { display: flex; gap: 14px; align-items: center; padding: 16px; border-radius: var(--r-md); background: var(--surface); border: var(--line) solid var(--ink); transition: transform .2s var(--ease), box-shadow .2s; }
+    .pages a:hover { transform: translate(-2px, -2px); box-shadow: var(--shadow-sm); }
+    .pages small { display: block; color: var(--text-3); font-size: var(--fs-xs); }
+    .pages .pages__video { grid-column: 1 / -1; background: #14141a; color: #fff; border-color: #14141a; }
+    .pages .pages__video .n { color: #d7ff3d; } .pages .pages__video small { color: #c9c9d3; }
+    .pages .n { font: 800 var(--fs-sm) var(--font-display); color: var(--text-3); width: 26px; flex: none; }
+    .bva { display: grid; gap: 16px; }
+    .ba-row { display: grid; gap: 14px; grid-template-columns: 1fr; padding: 20px; border: var(--line) solid var(--ink); border-radius: var(--r-lg); background: var(--surface); }
+    @media (min-width: 900px) { .ba-row { grid-template-columns: 1fr 1.3fr 1.3fr; align-items: start; gap: 24px; } }
+    .ba-task { font: 700 var(--fs-lg)/1.25 var(--font-display); }
+    .ba-col { display: grid; gap: 8px; }
+    .ba-col__label { display: flex; align-items: center; gap: 10px; font-size: var(--fs-xs); text-transform: uppercase; letter-spacing: .08em; color: var(--text-2); }
+    .ba-n { display: inline-grid; place-items: center; min-width: 40px; height: 40px; padding: 0 10px; border: var(--line) solid var(--ink); border-radius: var(--r-pill); font: 800 var(--fs-md) var(--font-display); color: #14141a; letter-spacing: 0; text-transform: none; }
+    .ba-n--was { background: var(--accent-soft); } .ba-n--now { background: var(--lime); }
+    .ba-path { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; margin: 0; padding: 0; list-style: none; font-size: var(--fs-sm); }
+    .ba-path li { padding: 4px 10px; border: 1px solid var(--border); border-radius: var(--r-pill); background: var(--surface-2); }
+    .ba-path li + li::before { content: "→"; margin: 0 6px 0 -2px; color: var(--text-3); }
+    .ba-path li.is-out { border-style: dashed; }
+    .ba-note { font-size: var(--fs-xs); color: var(--text-3); margin: 0; }
+    .ba-sum { display: grid; gap: 16px; grid-template-columns: repeat(auto-fit, minmax(min(100%, 240px), 1fr)); margin-top: 24px; }
+    html[data-a11y] .cover-pics { height: auto; display: grid; gap: 16px; }
+    html[data-a11y] .cover-pics :is(.photo, .sticker) { position: static; width: auto; height: auto; }
+    html[data-a11y] .cover-pics .photo img { height: 220px; }
+    html[data-a11y] .cover-pics .sticker { justify-self: start; }
+    html[data-a11y] .trick .sticker { position: static; align-self: flex-start; }
+    html[data-a11y] :is(.trick, .principle__n, .cover .hand, .problem .card) { transform: none !important; }
+    html[data-a11y] .kit .photo { height: auto; } html[data-a11y] .kit .photo img { height: 200px; }
+  </style>
+</head>
+<body data-page="about">
+  <div id="site-header"></div>
+  <main id="main">
+    <section class="cover">
+      <div class="container">
+        <div class="cover__grid">
+          <div>
+            <span class="eyebrow">Конкурс «Взломай веб-дизайн университета» · Концепция</span>
+            <h1 class="display">Сайт, который знает, <span class="u-hand">кто ты</span></h1>
+            <p class="lead" style="max-width:640px">Сейчас urfu.ru — витрина всего, что есть в университете. Мы превращаем его в инструмент: человек говорит, кто он, и сразу видит свои задачи. Любая частая задача — не больше двух кликов от главной. А выглядит сайт как живой студенческий журнал, а не как отчёт.</p>
+            <div class="cluster" style="margin-top:28px">
+              <a class="btn btn--accent btn--lg" href="index.html">Открыть прототип <i data-icon="arrow-right"></i></a>
+              <a class="btn btn--ghost btn--lg" href="structure.html"><i data-icon="layers"></i> Новая структура</a>
+              <a class="btn btn--ghost btn--lg" href="logo.html"><i data-icon="sparkles"></i> Логотип</a>
+            </div>
+            <span class="hand" aria-hidden="true">17 страниц, всё кликается →</span>
+          </div>
+          <div class="cover-pics">
+            <figure class="photo tape c1"><img src="assets/img/friends.jpg" alt="Студенты смеются за столом с ноутбуком" loading="eager"><figcaption>первая сессия — сдали!</figcaption></figure>
+            <figure class="photo tape--corner c2"><img src="assets/img/lecture.jpg" alt="Студенты в аудитории-амфитеатре" loading="eager"><figcaption>поточка, 9:00</figcaption></figure>
+            <span class="sticker sticker--round sticker--coral s1" aria-hidden="true">2 клика до ответа</span>
+            <span class="sticker s2" aria-hidden="true">5 ролей — 1 сайт</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="container">
+        <div class="section-head"><div><span class="eyebrow">01 · Проблема</span><h2 class="h2" style="margin-top:8px">Что мешает сейчас</h2><p>Аудит главной страницы urfu.ru (октябрь 2026).</p></div></div>
+        <div class="problem">
+          <div class="card"><span class="stat__num">2</span><strong>параллельных меню</strong><span class="muted small">«Все разделы» (8 ролей) и «Меню» (14 пунктов) с пересекающимся содержимым</span></div>
+          <div class="card"><span class="stat__num">200+</span><strong>ссылок на главной</strong><span class="muted small">в разделах «Студентам» и «Абитуриентам» — по 60+ ссылок</span></div>
+          <div class="card"><span class="stat__num">18</span><strong>блоков без иерархии</strong><span class="muted small">«Пилотный проект» повторяется дважды, блок «Видео» пустой</span></div>
+          <div class="card"><span class="stat__num">41</span><strong>фильтр в лентах</strong><span class="muted small">24 фильтра новостей и 17 — событий</span></div>
+          <div class="card"><span class="stat__num">×3</span><strong>дубли контактов</strong><span class="muted small">контакты приёмной, расписание, анкетирование, перевод — в нескольких местах</span></div>
+          <div class="card"><span class="stat__num">?</span><strong>внутренний жаргон</strong><span class="muted small">«Круглый год», «Университет — это мы», «БРС», «Школам» и «Школьникам», «Прессе» и «СМИ»</span></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section grid-paper" id="before-after">
+      <div class="container">
+        <div class="section-head"><div><span class="eyebrow">Было → стало</span><h2 class="h2" style="margin-top:8px">Четыре частые задачи: клики до ответа</h2><p>Пути пройдены по живому urfu.ru в октябре 2026 и по этому прототипу. Число — сколько переходов от главной до ответа.</p></div></div>
+        <div class="bva">
+          <div class="ba-row">
+            <div class="ba-task">Посмотреть расписание своей группы</div>
+            <div class="ba-col"><span class="ba-col__label"><span class="ba-n ba-n--was">3</span> сейчас на urfu.ru</span><ol class="ba-path"><li>Главная</li><li>«Расписание занятий»</li><li>Страница без расписания</li><li class="is-out">istudent.urfu.ru + вход</li></ol><p class="ba-note">Расписание живёт на другом сайте — «отображается только в личном кабинете».</p></div>
+            <div class="ba-col"><span class="ba-col__label"><span class="ba-n ba-n--now">1</span> в прототипе</span><ol class="ba-path"><li>Главная, роль «учусь»</li><li>«Расписание»</li></ol><p class="ba-note">Поиск по группе, преподавателю или аудитории. Аудитория в паре — ссылка на карту.</p></div>
+          </div>
+          <div class="ba-row">
+            <div class="ba-task">Найти общежитие: адрес и цена</div>
+            <div class="ba-col"><span class="ba-col__label"><span class="ba-n ba-n--was">2+</span> сейчас на urfu.ru</span><ol class="ba-path"><li>Главная</li><li>«Поселение студентов»</li><li>«Контакты»</li><li>«Плата за проживание»</li></ol><p class="ba-note">Слова «общежитие» на главной нет. Адреса и цены — на разных страницах.</p></div>
+            <div class="ba-col"><span class="ba-col__label"><span class="ba-n ba-n--now">1</span> в прототипе</span><ol class="ba-path"><li>Главная, роль «поступаю»</li><li>«Общежития»</li></ol><p class="ba-note">Одна таблица: адрес, цена в месяц, комнаты, сколько идти до учёбы.</p></div>
+          </div>
+          <div class="ba-row">
+            <div class="ba-task">Понять, есть ли шанс на бюджет</div>
+            <div class="ba-col"><span class="ba-col__label"><span class="ba-n ba-n--was">нет</span> сейчас на urfu.ru</span><ol class="ba-path"><li>Главная</li><li class="is-out">calcege.my1.urfu.ru</li></ol><p class="ba-note">Проходных баллов прошлых лет на главной нет, калькулятор ЕГЭ — на отдельном поддомене.</p></div>
+            <div class="ba-col"><span class="ba-col__label"><span class="ba-n ba-n--now">0</span> в прототипе</span><ol class="ba-path"><li>Главная: ползунок баллов</li></ol><p class="ba-note">Калькулятор прямо на главной: двигаешь баллы — видишь программы и бюджетные места.</p></div>
+          </div>
+          <div class="ba-row">
+            <div class="ba-task">Найти аудиторию «Р-404»</div>
+            <div class="ba-col"><span class="ba-col__label"><span class="ba-n ba-n--was">нет</span> сейчас на urfu.ru</span><ol class="ba-path"><li>Нет карты корпусов и поиска по аудиториям</li></ol><p class="ba-note">Первокурсник спрашивает у старших или в чате группы.</p></div>
+            <div class="ba-col"><span class="ba-col__label"><span class="ba-n ba-n--now">0</span> в прототипе</span><ol class="ba-path"><li>Главная: «Где эта аудитория?»</li></ol><p class="ba-note">Код → корпус, адрес и этаж. Ещё 1 клик — точка на карте кампуса.</p></div>
+          </div>
+        </div>
+        <div class="ba-sum">
+          <div class="card"><span class="stat__num">~40</span><strong>поддоменов в ссылках с главной</strong><span class="muted small">istudent, my, my1, campus, career, lib, sport, priem-rtf… У каждого своё меню и свой поиск.</span></div>
+          <div class="card"><span class="stat__num">1</span><strong>сайт и один поиск</strong><span class="muted small">Сервисы остаются, но вход в них — из общей навигации по задаче, а не по названию поддомена.</span></div>
+          <div class="card"><span class="stat__num">≤ 2</span><strong>клика до ответа</strong><span class="muted small">Правило концепции: роль → задача → ответ. Самое частое — прямо на главной.</span></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section section--surface">
+      <div class="container layout-aside">
+        <div><span class="eyebrow">02 · Принципы</span><h2 class="h2" style="margin-top:8px">Пять правил нового сайта</h2></div>
+        <div>
+          <div class="principle"><span class="principle__n">1</span><div><h3 class="h3">Роль → задача → 2 клика</h3><p class="muted" style="margin-top:8px">Переключатель «Я — поступаю / учусь / работаю / партнёр / из другой страны» живёт в шапке. Он меняет главную, быстрые действия и подсказки поиска и запоминается.</p>
+            <div class="ba"><div class="was"><b>Было</b>Расписание: «Все разделы» → «Студентам» → найти среди 60 ссылок → внешний сайт</div><div class="now"><b>Стало</b>«Я — учусь» → «Расписание» в быстрых действиях (или Ctrl K → «расп»)</div></div></div></div>
+          <div class="principle"><span class="principle__n">2</span><div><h3 class="h3">Одна навигация</h3><p class="muted" style="margin-top:8px">Пять разделов по смыслу, а не по оргструктуре: Поступление, Обучение, Наука, Кампус, Об УрФУ. В каждом мега-меню — 3 колонки по 3–6 пунктов и одно главное действие.</p>
+            <div class="ba"><div class="was"><b>Было</b>22 пункта верхнего уровня в двух меню</div><div class="now"><b>Стало</b>5 разделов + поиск + роль + Центр помощи</div></div></div></div>
+          <div class="principle"><span class="principle__n">3</span><div><h3 class="h3">Человеческий язык</h3><p class="muted" style="margin-top:8px">Названия — это задачи с глаголами. Аббревиатуры расшифрованы, дубли объединены.</p>
+            <div class="ba"><div class="was"><b>Было</b>«Круглый год», «БРС», «Школам» + «Школьникам»</div><div class="now"><b>Стало</b>«Перевод и восстановление», «Оценки и рейтинг», «Школьникам: олимпиады и курсы»</div></div></div></div>
+          <div class="principle"><span class="principle__n">4</span><div><h3 class="h3">Поиск как главный вход</h3><p class="muted" style="margin-top:8px">Большая строка поиска в герое и Ctrl K / «/» на любой странице. Сначала ищем задачи («заказать справку»), потом страницы и контакты.</p></div></div>
+          <div class="principle"><span class="principle__n">5</span><div><h3 class="h3">Доступность — на каждой странице</h3><p class="muted" style="margin-top:8px">Версия для слабовидящих — не отдельный сайт, а режим той же страницы: кнопка-«глаз» в шапке. Три размера текста, шесть цветовых схем (в том числе ч/б, б/ч, синяя, бежевая, зелёная на коричневом), картинки цветные, ч/б или скрыты, увеличенный интервал. Без анимаций, поворотов и рукописного шрифта. И для всех: контраст AA, клавиатура, видимый фокус, светлая и тёмная тема.</p>
+            <div class="ba"><div class="was"><b>Было</b>Отдельная упрощённая копия сайта со своим меню</div><div class="now"><b>Стало</b>Та же страница и та же навигация — меняется только отображение, настройки запоминаются</div></div>
+            <button class="btn btn--sm" type="button" data-a11y-toggle style="margin-top:14px"><i data-icon="eye"></i> <span data-a11y-label>Версия для слабовидящих</span></button></div></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="container">
+        <div class="section-head"><div><span class="eyebrow">03 · Сценарии</span><h2 class="h2" style="margin-top:8px">Ключевые пути по ролям</h2></div><a class="arrow-link" href="structure.html">Вся структура <i data-icon="arrow-right"></i></a></div>
+        <div class="flows">
+          <div class="card"><span class="tag tag--applicant">Абитуриент</span><strong>Понять, куда пройду</strong><div class="flow"><span>Главная</span><i data-icon="arrow-right"></i><span>Калькулятор баллов</span><i data-icon="arrow-right"></i><span>Программа</span><i data-icon="arrow-right"></i><span>Подать документы</span></div></div>
+          <div class="card"><span class="tag tag--student">Студент</span><strong>Заказать справку</strong><div class="flow"><span>Я — учусь</span><i data-icon="arrow-right"></i><span>Заказать справку</span><i data-icon="arrow-right"></i><span>Готово, статус в кабинете</span></div></div>
+          <div class="card"><span class="tag tag--staff">Сотрудник</span><strong>Найти грант</strong><div class="flow"><span>Я — работаю</span><i data-icon="arrow-right"></i><span>Гранты и конкурсы</span><i data-icon="arrow-right"></i><span>Дедлайн и заявка</span></div></div>
+          <div class="card"><span class="tag tag--partner">Партнёр</span><strong>Заказать исследование</strong><div class="flow"><span>Наука</span><i data-icon="arrow-right"></i><span>Для бизнеса</span><i data-icon="arrow-right"></i><span>Заявка за 1 минуту</span></div></div>
+          <div class="card"><span class="tag tag--intl">International</span><strong>Apply from abroad</strong><div class="flow"><span>I’m international</span><i data-icon="arrow-right"></i><span>Programs in English</span><i data-icon="arrow-right"></i><span>Visa help</span></div></div>
+          <div class="card"><span class="tag">Любой</span><strong>Найти аудиторию</strong><div class="flow"><span>Расписание</span><i data-icon="arrow-right"></i><span>Пара</span><i data-icon="arrow-right"></i><span>«Как пройти» на карте</span></div></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section section--surface">
+      <div class="container">
+        <div class="section-head"><div><span class="eyebrow">04 · Визуальный язык</span><h2 class="h2" style="margin-top:8px">«Живой студенческий»: журнал, а не шаблон</h2><p>Первая версия прототипа была аккуратной — и скучной: ровные пастельные карточки, как у сотни других сайтов. Мы взяли за основу то, чем студенты живут на самом деле: тетрадь в клетку, полароиды на стене общаги, стикеры на ноутбуке и пометки на полях.</p></div></div>
+        <div class="vl-grid">
+          <div class="stack">
+            <h3 class="h4">Цвета: бумага, чернила и три смелых акцента</h3>
+            <div class="swatches">
+              <div class="sw"><div style="background:#f6f2ea"></div><p><strong>Бумага</strong>фон · <code>#f6f2ea</code></p></div>
+              <div class="sw"><div style="background:#14141a"></div><p><strong>Чернила</strong>текст, обводки, тени · <code>#14141a</code></p></div>
+              <div class="sw"><div style="background:#2747ff"></div><p><strong>Синий УрФУ</strong>бренд, кнопки · <code>#2747ff</code></p></div>
+              <div class="sw"><div style="background:#ff5a36"></div><p><strong>Коралл</strong>главное действие · <code>#ff5a36</code></p></div>
+              <div class="sw"><div style="background:#d7ff3d"></div><p><strong>Лайм</strong>маркер, стикеры · <code>#d7ff3d</code></p></div>
+            </div>
+            <h3 class="h4" style="margin-top:12px">Три шрифта — три голоса</h3>
+            <div class="fonts">
+              <div class="font-row"><small>Unbounded — заголовки, цифры, стикеры</small><span class="f-display">Аа Бб 2027</span></div>
+              <div class="font-row"><small>Onest — основной текст</small><span class="f-text">Отечественный гротеск с отличной кириллицей, 17 px</span></div>
+              <div class="font-row"><small>Caveat — пометки от руки</small><span class="f-hand">это ты через год →</span></div>
+            </div>
+            <h3 class="h4" style="margin-top:12px">Цвета ролей</h3>
+            <div class="cluster"><span class="tag tag--applicant">Абитуриент</span><span class="tag tag--student">Студент</span><span class="tag tag--staff">Сотрудник</span><span class="tag tag--partner">Партнёр</span><span class="tag tag--intl">International</span></div>
+          </div>
+          <div class="stack">
+            <h3 class="h4">Набор элементов</h3>
+            <div class="kit">
+              <figure class="photo tape"><img src="assets/img/bench.jpg" alt="Студенты сидят на скамейке у корпуса" loading="lazy"><figcaption>после пар у ГУКа</figcaption></figure>
+              <div class="kit__side">
+                <span class="sticker" aria-hidden="true">бюджет есть!</span>
+                <span class="sticker sticker--blue" aria-hidden="true" style="--rot:-5deg">14 лабораторий</span>
+                <span class="hand">часто ищут →</span>
+                <span class="tag tag--accent">сейчас</span>
+              </div>
+              <div class="kit__btns"><button class="btn" type="button" data-toast="Кнопки «прыгают» при наведении (демо)">Основная</button><button class="btn btn--accent" type="button" data-toast="Коралл — одно главное действие на экран (демо)">Главное действие</button><button class="chip" aria-pressed="true" type="button">Фильтр</button><button class="chip" type="button">Фильтр</button></div>
+            </div>
+            <ol class="rules">
+              <li><div><strong>Обводка 2 px и жёсткие тени</strong><span>Всё обведено чернилами, тень без размытия со сдвигом 2–8 px — как вырезано из бумаги.</span></div></li>
+              <li><div><strong>Настоящие фото людей</strong><span>Полароид со скотчем и подписью от руки вместо стоковых офисов и градиентных заглушек.</span></div></li>
+              <li><div><strong>Одна цветная плашка на экран</strong><span>Синяя — поступление, коралловая — помощь, чёрная — афиша. Цвет всегда что-то значит.</span></div></li>
+              <li><div><strong>Неровная сетка</strong><span>Коллажи с наложением, бенто с крупной плиткой, повороты соседей на 1–3°.</span></div></li>
+              <li><div><strong>Живой голос</strong><span>Стикеры — для коротких фактов, пометки от руки — для подсказок: «общага — 5 минут до пар».</span></div></li>
+            </ol>
+          </div>
+        </div>
+        <div class="was-now">
+          <div class="was"><b>Не делаем</b>Ряды одинаковых карточек «иконка в кружке + заголовок + текст», пастель и мягкие размытые тени, всё по центру.</div>
+          <div class="now"><b>Делаем</b>Бумага, чернила, фото и стикеры. В версии для слабовидящих декор отключается сам: остаются текст, контраст и порядок.</div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="container">
+        <div class="section-head"><div><span class="eyebrow">05 · Фишки</span><h2 class="h2" style="margin-top:8px">Пять вещей, которых нет на сайтах других вузов</h2></div><span class="hand" aria-hidden="true">попробуй сам ↓</span></div>
+        <div class="tricks">
+          <article class="trick trick--hero"><span class="trick__n">01</span><h3>Главная перестраивается под роль</h3><p>«Я — поступаю / учусь / работаю / партнёр / из другой страны» меняет порядок и набор блоков, коллаж, быстрые действия и подсказки поиска. Студент сразу видит «Твой день» с парами и аудиториями.</p><a class="btn btn--white" href="index.html">Переключить роль на главной <i data-icon="arrow-right"></i></a></article>
+          <article class="trick"><span class="sticker sticker--coral" aria-hidden="true">первокурсникам</span><span class="trick__n">02</span><h3>«Где эта аудитория?»</h3><p>Вводишь код из расписания — «И-311», «Т-1011», «E-203» — и получаешь корпус, адрес, этаж и точку на карте. Понимает и блоки нового кампуса.</p><a class="arrow-link" href="index.html#room-finder">Найти аудиторию</a></article>
+          <article class="trick"><span class="trick__n">03</span><h3>Карта с новым кампусом</h3><p>Два района: Втузгородок и Новокольцовский. Корпуса ИРИТ-РтФ и ИнЭУ, общежития НВК, остановки — по OpenStreetMap.</p><a class="arrow-link" href="campus.html#map">Открыть карту</a></article>
+          <article class="trick"><span class="trick__n">04</span><h3>Версия для слабовидящих на каждой странице</h3><p>Размер, шесть цветовых схем, картинки, интервал — без отдельного сайта и без потери навигации.</p><button class="arrow-link" type="button" data-a11y-toggle>Включить</button></article>
+          <article class="trick"><span class="trick__n">05</span><h3>Было → стало в кликах</h3><p>Четыре частые задачи замерены на живом urfu.ru и в прототипе: расписание 3 → 1, общежитие 2+ → 1, шанс на бюджет и аудитория — сразу с главной.</p><a class="arrow-link" href="#before-after">Смотреть замеры</a></article>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="container">
+        <div class="section-head"><div><span class="eyebrow">06 · Состав проекта</span><h2 class="h2" style="margin-top:8px">Главная + 16 страниц разных типов</h2><p>Все страницы кликабельны и адаптивны (375 / 768 / 1024 / 1440), со светлой и тёмной темой и версией для слабовидящих. Макеты всех экранов — в Figma, обзор — в 60-секундном видео.</p></div></div>
+        <div class="pages">
+          <a href="index.html"><span class="n">00</span><span class="icon-tile"><i data-icon="home"></i></span><span><strong>Главная</strong><small>Лендинг, меняется по роли</small></span></a>
+          <a href="admission.html"><span class="n">01</span><span class="icon-tile"><i data-icon="graduation"></i></span><span><strong>Поступление</strong><small>Воронка в 3 шага, сроки, рейтинги</small></span></a>
+          <a href="programs.html"><span class="n">02</span><span class="icon-tile"><i data-icon="grid"></i></span><span><strong>Каталог программ</strong><small>Фильтры, подбор по баллам, сравнение</small></span></a>
+          <a href="program.html"><span class="n">03</span><span class="icon-tile"><i data-icon="cpu"></i></span><span><strong>Страница программы</strong><small>Детальная карточка с шансами</small></span></a>
+          <a href="student.html"><span class="n">04</span><span class="icon-tile"><i data-icon="user"></i></span><span><strong>Кабинет студента</strong><small>Дашборд, справки, стипендии</small></span></a>
+          <a href="schedule.html"><span class="n">05</span><span class="icon-tile"><i data-icon="calendar"></i></span><span><strong>Расписание</strong><small>Неделя/день, экспорт в календарь</small></span></a>
+          <a href="news.html"><span class="n">06</span><span class="icon-tile"><i data-icon="bell"></i></span><span><strong>Новости и события</strong><small>Лента, календарь, пресс-центр</small></span></a>
+          <a href="article.html"><span class="n">07</span><span class="icon-tile"><i data-icon="file"></i></span><span><strong>Статья</strong><small>Длинное чтение с оглавлением</small></span></a>
+          <a href="institutes.html"><span class="n">08</span><span class="icon-tile"><i data-icon="building"></i></span><span><strong>Институты</strong><small>Каталог с поиском по направлениям</small></span></a>
+          <a href="institute.html"><span class="n">09</span><span class="icon-tile"><i data-icon="building"></i></span><span><strong>Страница института</strong><small>Профиль подразделения</small></span></a>
+          <a href="science.html"><span class="n">10</span><span class="icon-tile"><i data-icon="flask"></i></span><span><strong>Наука</strong><small>Лаборатории, гранты, для бизнеса</small></span></a>
+          <a href="campus.html"><span class="n">11</span><span class="icon-tile"><i data-icon="map-pin"></i></span><span><strong>Кампус</strong><small>Интерактивная карта, общежития</small></span></a>
+          <a href="help.html"><span class="n">12</span><span class="icon-tile"><i data-icon="help"></i></span><span><strong>Центр помощи</strong><small>FAQ, контакты, чат-бот</small></span></a>
+          <a href="structure.html"><span class="n">+</span><span class="icon-tile"><i data-icon="layers"></i></span><span><strong>Структура сайта</strong><small>Было → стало</small></span></a>
+          <a href="logo.html"><span class="n">+</span><span class="icon-tile"><i data-icon="sparkles"></i></span><span><strong>Логотип</strong><small>3 концепции, примерка</small></span></a>
+          <a href="404.html"><span class="n">+</span><span class="icon-tile"><i data-icon="navigation"></i></span><span><strong>Страница 404</strong><small>Потерялся — поможем найти</small></span></a>
+          <a class="pages__video" href="urfu-walkthrough-60s.mp4"><span class="n">▶</span><span class="icon-tile"><i data-icon="play"></i></span><span><strong>Видеопроход 60 с</strong><small>Главные сценарии одним роликом</small></span></a>
+        </div>
+        <p class="demo-note" style="margin-top:24px">Все цифры, баллы, имена и новости в прототипе — демонстрационные. Конкурсная работа, не официальный сайт УрФУ.</p>
+      </div>
+    </section>
+  </main>
+  <div id="site-footer"></div>
+  <script src="assets/js/app.js"></script>
+</body>
+</html>

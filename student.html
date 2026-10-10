@@ -1,0 +1,703 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Кабинет студента — УрФУ</title>
+  <meta name="description" content="Кабинет студента УрФУ: пары на сегодня, дедлайны, сервисы, справки, стипендии, практика и обмен — в одном месте.">
+  <link rel="icon" href="assets/logo/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="assets/css/tokens.css">
+  <link rel="stylesheet" href="assets/css/components.css">
+  <style>
+    main [id] { scroll-margin-top: 140px; }
+    .st-grid > *, .two > *, .req-grid > *, .money-grid > * { min-width: 0; }
+    .role-notice { margin-bottom: 24px; flex-wrap: wrap; }
+    .role-notice .btn { margin-left: auto; }
+    .s-head { display: flex; flex-wrap: wrap; gap: 8px 20px; align-items: flex-end; justify-content: space-between; margin-bottom: 28px; }
+    .s-head .hand { display: block; margin-top: 6px; }
+    .s-head p:not(.hand) { color: var(--text-2); max-width: 620px; margin-top: 10px; }
+
+    /* Герой: привет + «Сегодня» */
+    .st-grid { display: grid; gap: 36px; grid-template-columns: 1fr; align-items: start; }
+    @media (min-width: 1024px) { .st-grid { grid-template-columns: 1fr 1.1fr; gap: 48px; } }
+    .hello { display: flex; gap: 14px; align-items: center; flex-wrap: wrap; }
+    .hello .avatar { width: 60px; height: 60px; font: 800 var(--fs-lg) var(--font-display); background: var(--role-student); border: var(--line) solid var(--ink); box-shadow: var(--shadow-sm); }
+    .st-h1 { margin-top: 18px; }
+    .st-hand { display: inline-block; margin-top: 14px; transform: rotate(-2deg); color: var(--accent-strong); }
+    .kpis { display: grid; gap: 12px; grid-template-columns: repeat(2, minmax(0, 1fr)); margin-top: 26px; }
+    @media (min-width: 640px) { .kpis { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
+    .kpi { display: block; padding: 12px 14px; background: var(--surface); border: var(--line) solid var(--ink); border-radius: var(--r-md); transition: transform .2s var(--ease), box-shadow .2s var(--ease); }
+    .kpi:nth-child(2) { transform: rotate(1.5deg); } .kpi:nth-child(3) { transform: rotate(-1deg); }
+    .kpi:hover { transform: translate(-2px, -2px); box-shadow: var(--shadow-md); }
+    .kpi:first-child { background: var(--lime); color: #14141a; }
+    .kpi:first-child span { color: #45434d; }
+    .kpi b { display: block; font: 800 var(--fs-xl)/1.1 var(--font-display); letter-spacing: -.02em; }
+    .kpi span { font-size: var(--fs-xs); color: var(--text-2); }
+    .quick-row { margin-top: 22px; }
+
+    .today { position: relative; display: grid; gap: 18px; border: var(--line) solid var(--ink); border-radius: var(--r-xl); background: var(--surface); box-shadow: var(--shadow-lg); padding: clamp(18px, 3vw, 30px); }
+    .today__head { display: flex; gap: 18px; align-items: center; }
+    .today__head .h2 { margin: 0; }
+    .today__status { margin: 6px 0 0; font-size: calc(24px * var(--fs-scale)); }
+    .tear__day { width: 104px; flex: none; background: #fffdf8; color: #14141a; border: var(--line) solid #14141a; border-radius: 10px; overflow: hidden; text-align: center; box-shadow: 3px 3px 0 #14141a; transform: rotate(-3deg); }
+    .tear__day b { display: block; background: #ff5a36; color: #fff; font: 700 calc(12px * var(--fs-scale))/1 var(--font-display); text-transform: uppercase; padding: 7px 0; }
+    .tear__day strong { display: block; font: 800 calc(40px * var(--fs-scale))/1 var(--font-display); padding: 10px 0 2px; }
+    .tear__day span { display: block; font-size: var(--fs-xs); padding: 0 8px 10px; color: #45434d; line-height: 1.2; }
+    .pairs { list-style: none; margin: 0; padding: 0; display: grid; gap: 10px; }
+    .pair { display: grid; grid-template-columns: 64px minmax(0, 1fr) auto; gap: 14px; align-items: center; padding: 12px 14px; border: var(--line) solid var(--ink); border-radius: var(--r-md); background: var(--bg); }
+    .pair time { font: 700 var(--fs-md)/1.1 var(--font-display); }
+    .pair time small { display: block; font: 500 var(--fs-xs) var(--font); color: var(--text-3); margin-top: 3px; }
+    .pair strong { display: block; font-size: var(--fs-md); line-height: 1.25; }
+    .pair span small { color: var(--text-3); font-size: var(--fs-xs); }
+    .pair__badge { display: inline-block; margin-top: 6px; padding: 2px 8px; border: 1.5px solid currentColor; border-radius: 6px; font: 700 var(--fs-xs) var(--font); }
+    .pair.is-now { background: var(--lime); color: #14141a; box-shadow: var(--shadow-sm); }
+    .pair.is-now time small, .pair.is-now span small { color: #45434d; }
+    .pair.is-next { border-style: dashed; background: var(--lime-soft); }
+    .pair.is-past { opacity: .55; }
+    .room-chip { display: inline-grid; place-items: center; min-height: 40px; padding: 0 12px; border: var(--line) solid var(--ink); border-radius: 10px; background: var(--surface); color: var(--text); font: 700 var(--fs-sm) var(--font-display); box-shadow: var(--shadow-sm); white-space: nowrap; }
+    .room-chip:hover { background: var(--ink); color: var(--bg); }
+    .today__foot { display: flex; flex-wrap: wrap; gap: 12px 20px; align-items: center; justify-content: space-between; }
+    .st-photo { display: none; }
+    @media (min-width: 1200px) {
+      .st-photo { display: block; position: absolute; z-index: 2; right: -26px; top: -10px; width: 168px; height: 176px; }
+      .st-photo img { height: calc(100% - 34px); }
+      .st-photo figcaption { font-size: calc(19px * var(--fs-scale)); }
+      .today__head { padding-right: 150px; }
+    }
+    @media (max-width: 479px) { .pair { grid-template-columns: minmax(0, 1fr) auto; } .pair time { grid-column: 1 / -1; display: flex; gap: 8px; align-items: baseline; } .pair time small { margin: 0; } .tear__day { width: 88px; } }
+
+    /* Дедлайны и уведомления */
+    .two { display: grid; gap: var(--gap); grid-template-columns: 1fr; align-items: start; }
+    @media (min-width: 1024px) { .two { grid-template-columns: 1.25fr 1fr; } .two > :last-child { margin-top: 28px; } }
+    .two .hand { font-size: calc(22px * var(--fs-scale)); }
+    .dl-item { display: flex; gap: 16px; align-items: center; padding: 14px 0; border-bottom: var(--line) dashed var(--border); }
+    .dl-item:last-child { border-bottom: none; }
+    .dl-date { flex: none; width: 60px; text-align: center; border: var(--line) solid #14141a; border-radius: 8px; overflow: hidden; background: #fffdf8; color: #14141a; box-shadow: 2px 2px 0 #14141a; }
+    .dl-date b { display: block; padding: 4px 0; background: #14141a; color: #fff; font: 700 calc(11px * var(--fs-scale))/1 var(--font-display); text-transform: uppercase; }
+    .dl-date strong { display: block; padding: 6px 0; font: 800 calc(24px * var(--fs-scale))/1 var(--font-display); }
+    .dl-item.is-urgent .dl-date { transform: rotate(-4deg); }
+    .dl-item.is-urgent .dl-date b { background: #ff5a36; }
+    .dl-item > div:nth-child(2) { flex: 1; min-width: 0; }
+    .dl-item small { display: block; color: var(--text-3); font-size: var(--fs-xs); }
+    @media (max-width: 479px) { .dl-item { display: grid; grid-template-columns: 60px minmax(0, 1fr); column-gap: 16px; row-gap: 6px; } .dl-item > .tag { grid-column: 2; justify-self: start; } }
+    .ntf { display: flex; gap: 12px; align-items: flex-start; padding: 12px; border-radius: var(--r-md); border: var(--line) solid transparent; }
+    .ntf + .ntf { margin-top: 6px; }
+    .ntf.is-unread { background: var(--lime-soft); border-color: var(--ink); }
+    .ntf .icon-tile { width: 40px; height: 40px; border-radius: 12px; }
+    .ntf .icon-tile .i { width: 20px; height: 20px; }
+    .ntf > div { flex: 1; min-width: 0; }
+    .ntf small { display: block; color: var(--text-3); font-size: var(--fs-xs); margin-top: 2px; }
+    .ntf__dot { width: 12px; height: 12px; border-radius: 50%; background: var(--accent); border: var(--line) solid var(--ink); flex: none; margin-top: 6px; }
+    .ntf:not(.is-unread) .ntf__dot { visibility: hidden; }
+    .badge-count { display: inline-grid; place-items: center; min-width: 28px; height: 28px; padding: 0 6px; border-radius: var(--r-pill); background: #ff5a36; color: #fff; border: var(--line) solid var(--ink); font: 700 var(--fs-xs) var(--font-display); vertical-align: middle; }
+    .badge-count[data-zero="true"] { background: var(--surface-2); color: var(--text-3); }
+    .tag--warn { background: var(--role-partner-bg); color: var(--role-partner); }
+
+    /* Сервисы: бенто */
+    .desk { display: grid; gap: 14px; grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    @media (min-width: 900px) { .desk { grid-template-columns: repeat(4, minmax(0, 1fr)); } .desk__tile--main { grid-column: span 2; grid-row: span 2; } .desk__tile--photo { grid-row: span 2; } }
+    @media (max-width: 899px) { .desk__tile--main, .desk__tile--photo { grid-column: 1 / -1; } }
+    .desk__tile { position: relative; display: flex; flex-direction: column; gap: 6px; width: 100%; min-height: 140px; padding: 18px; border: var(--line) solid var(--ink); border-radius: var(--r-lg); background: var(--surface); color: var(--text); font: inherit; text-align: left; transition: transform .2s var(--ease), box-shadow .2s var(--ease); }
+    .desk__tile:hover { transform: translate(-3px, -3px); box-shadow: var(--shadow-md); }
+    .desk__tile > .i { width: 28px; height: 28px; margin-bottom: auto; }
+    .desk__tile strong { font: 700 var(--fs-md)/1.2 var(--font-display); margin-top: 16px; }
+    .desk__tile small { color: var(--text-3); font-size: var(--fs-xs); }
+    .desk__tile strong, .desk__tile small { overflow-wrap: anywhere; hyphens: auto; }
+    @media (max-width: 479px) { .desk__tile:not(.desk__tile--main) strong { font-size: var(--fs-sm); } }
+    .desk__tile--main { background: #2747ff; color: #fff; justify-content: flex-end; min-height: 240px; }
+    .desk__tile--main strong { font-size: var(--fs-2xl); }
+    .desk__tile--main small { color: #e3e8ff; font-size: var(--fs-md); max-width: 38ch; }
+    .desk__tile--main > .i { width: 44px; height: 44px; }
+    .desk__tile--main .sticker { position: absolute; top: -14px; right: 18px; --rot: 5deg; }
+    .desk__tile--lime { background: var(--lime); color: #14141a; }
+    .desk__tile--lime small { color: #45434d; }
+    .desk__tile--photo { padding: 0; overflow: hidden; justify-content: flex-end; min-height: 300px; background: var(--surface-2); }
+    .desk__tile--photo img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+    .desk__tile--photo .cap { position: relative; margin: 12px; padding: 10px 14px; background: var(--surface); border: var(--line) solid var(--ink); border-radius: var(--r-md); }
+    .desk__tile--photo .cap strong { display: block; margin: 0; }
+    .grades td.num { font-variant-numeric: tabular-nums; font-weight: 700; }
+    #grades { margin-top: 36px; }
+
+    /* Справки */
+    .req-grid { display: grid; gap: 32px; grid-template-columns: 1fr; align-items: start; }
+    @media (min-width: 1024px) { .req-grid { grid-template-columns: 1fr 1.1fr; } }
+    .req-form { position: relative; box-shadow: var(--shadow-lg); }
+    .req-form > .sticker { position: absolute; top: -16px; right: 20px; --rot: 6deg; }
+    .req-form .hand { font-size: calc(22px * var(--fs-scale)); }
+    .qty { display: inline-flex; align-items: center; border: var(--line) solid var(--ink); border-radius: var(--r-pill); overflow: hidden; background: var(--surface); }
+    .qty button { width: 44px; height: 44px; border: none; background: none; display: grid; place-items: center; color: var(--text); }
+    .qty button:hover { background: var(--lime-soft); }
+    .qty input { width: 48px; height: 44px; border: none; text-align: center; font: 700 var(--fs-md) var(--font-display); background: none; color: var(--text); -moz-appearance: textfield; }
+    .qty input::-webkit-outer-spin-button, .qty input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+    .radio-cards { display: grid; gap: 8px; border: none; padding: 0; margin: 0; }
+    .radio-cards legend { margin-bottom: 8px; padding: 0; }
+    .rcard { display: flex; gap: 12px; align-items: flex-start; padding: 12px 14px; border: var(--line) solid var(--border); border-radius: var(--r-md); cursor: pointer; transition: border-color .15s, background .15s; }
+    .rcard input { width: 18px; height: 18px; margin-top: 3px; accent-color: var(--ink); flex: none; }
+    .rcard:has(input:checked) { border-color: var(--ink); background: var(--lime-soft); box-shadow: var(--shadow-sm); }
+    .rcard small { display: block; color: var(--text-3); font-size: var(--fs-xs); }
+    .req-item { display: flex; gap: 14px; align-items: center; padding: 14px 0; border-bottom: var(--line) dashed var(--border); flex-wrap: wrap; }
+    .req-item:last-child { border-bottom: none; }
+    .req-item > div { flex: 1; min-width: 180px; }
+    .req-item small { display: block; color: var(--text-3); font-size: var(--fs-xs); }
+    .req-item.is-new { animation: flash 1.6s var(--ease); }
+    @keyframes flash { from { background: var(--lime); } }
+    .apps { display: grid; gap: 10px; grid-template-columns: repeat(auto-fill, minmax(min(100%, 220px), 1fr)); margin-top: 16px; }
+    .apps a, .apps button { display: flex; justify-content: space-between; align-items: center; gap: 8px; padding: 12px 14px; border-radius: var(--r-md); background: var(--surface); border: var(--line) dashed var(--ink); font: inherit; font-weight: 600; font-size: var(--fs-sm); color: var(--text); text-align: left; }
+    .apps a:hover, .apps button:hover { border-style: solid; background: var(--lime-soft); }
+
+    /* Деньги */
+    .money-grid { display: grid; gap: 32px; grid-template-columns: 1fr; align-items: start; }
+    @media (min-width: 1024px) { .money-grid { grid-template-columns: 400px 1fr; } }
+    .pay-card { position: relative; display: flex; flex-direction: column; gap: 18px; padding: clamp(22px, 3vw, 32px); background: #14141a; color: #f3eee3; border: var(--line) solid var(--ink); border-radius: var(--r-xl); box-shadow: var(--shadow-lg); transform: rotate(-1deg); }
+    .pay-card .sticker { position: absolute; top: -16px; right: 22px; --rot: 7deg; }
+    .pay-card__label { display: inline-flex; align-items: center; gap: 8px; font: 700 var(--fs-xs) var(--font-display); text-transform: uppercase; letter-spacing: .06em; color: #d7ff3d; }
+    .pay-sum { font: 800 calc(clamp(40px, 5vw, 60px) * var(--fs-scale))/1 var(--font-display); letter-spacing: -.03em; color: #d7ff3d; }
+    .pay-when { color: #c9c2b4; font-size: var(--fs-sm); margin-top: 6px; }
+    .pay-lines { display: flex; flex-direction: column; gap: 6px; font-size: var(--fs-sm); }
+    .pay-lines div { display: flex; justify-content: space-between; gap: 12px; padding-top: 8px; border-top: 1px dashed rgba(243, 238, 227, .35); }
+    .scholar { list-style: none; margin: 0; padding: 0; }
+    .scholar li { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 4px 18px; align-items: center; padding: 16px 0; border-bottom: var(--line) dashed var(--border); }
+    .scholar li:first-child { padding-top: 0; }
+    .scholar li:last-child { border-bottom: none; padding-bottom: 0; }
+    .scholar strong { font-size: var(--fs-md); margin-right: 8px; }
+    .scholar p { font-size: var(--fs-sm); color: var(--text-2); margin-top: 4px; }
+    .scholar .amount { font: 800 var(--fs-lg)/1.1 var(--font-display); text-align: right; white-space: nowrap; }
+    @media (max-width: 559px) { .scholar li { grid-template-columns: 1fr; } .scholar .amount { text-align: left; } }
+    .calc-out { font: 800 var(--fs-2xl)/1.1 var(--font-display); letter-spacing: -.02em; }
+
+    /* Карьера */
+    .vac { gap: 10px; }
+    .vac .card__title { font-size: var(--fs-md); }
+    .vac .company { font: 700 var(--fs-sm) var(--font-display); }
+    @media (min-width: 1024px) { #vacancies { grid-template-columns: repeat(3, minmax(0, 1fr)); } #vacancies .vac:nth-child(3n+2) { margin-top: 22px; } #vacancies .vac:nth-child(3n) { margin-top: 8px; } }
+    #vacancies .vac:first-child { background: var(--lime-soft); box-shadow: var(--shadow-md); }
+
+    /* Мобильность: открытки */
+    .posts { display: grid; gap: 18px; grid-template-columns: repeat(auto-fit, minmax(min(100%, 230px), 1fr)); }
+    .post { position: relative; display: flex; flex-direction: column; gap: 8px; padding: 22px 20px 20px; background: var(--surface); border: var(--line) solid var(--ink); border-radius: var(--r-md); box-shadow: var(--shadow-sm); transform: rotate(-1.2deg); }
+    .post:nth-child(even) { transform: rotate(1.4deg); }
+    .post::after { content: ""; position: absolute; inset: 7px; border: 1.5px dashed var(--border); border-radius: 8px; pointer-events: none; }
+    .post__stamp { position: absolute; top: 14px; right: 14px; width: 46px; height: 54px; display: grid; place-items: center; border: 2px dashed var(--ink); border-radius: 4px; background: var(--lime); color: #14141a; transform: rotate(6deg); }
+    .post__stamp .i { width: 22px; height: 22px; }
+    .post__country { font: 800 var(--fs-xl)/1 var(--font-display); text-transform: uppercase; letter-spacing: -.01em; padding-right: 56px; color: var(--role-intl); }
+    .post--ru .post__country { color: var(--brand); }
+    .post h3 { font: 700 var(--fs-md)/1.25 var(--font); padding-right: 52px; }
+    .mob-steps { list-style: none; margin: 36px 0 0; padding: 0; }
+    .mob-steps .step { padding: 20px; }
+
+    /* Помощь: коралловая плашка */
+    .help-band { position: relative; border: var(--line) solid var(--ink); border-radius: var(--r-xl); box-shadow: var(--shadow-lg); background: #ff5a36; color: #fff; padding: clamp(26px, 4vw, 52px); display: grid; gap: 32px; grid-template-columns: 1fr; align-items: center; }
+    @media (min-width: 900px) { .help-band { grid-template-columns: 1.2fr 1fr; } }
+    .help-band h2 { color: #fff; margin-bottom: 16px; }
+    .help-band p { color: #fff1ec; }
+    .help-band .sticker { position: absolute; top: -22px; right: 28px; --rot: 8deg; }
+    @media (max-width: 899px) { .help-band { padding-top: 84px; } .help-band .sticker { top: -42px; right: 12px; } }
+    .help-links { display: grid; gap: 10px; }
+    .help-links a { display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 14px 18px; border-radius: var(--r-md); background: #fffdf8; color: #14141a; border: var(--line) solid #14141a; font-weight: 700; transition: transform .2s var(--ease), box-shadow .2s var(--ease); }
+    .help-links a:nth-child(2) { transform: rotate(-1deg); } .help-links a:nth-child(3) { transform: rotate(.8deg); }
+    .help-links a:hover { transform: translate(-2px, -2px); box-shadow: 4px 4px 0 #14141a; }
+
+    /* Версия для слабовидящих */
+    html[data-a11y] :is(.kpi, .tear__day, .dl-date, .st-hand, .pay-card, .post, .post__stamp, .help-links a, .desk__tile) { transform: none !important; }
+    html[data-a11y] .st-photo { display: none; }
+    html[data-a11y] .today__head { padding-right: 0; flex-wrap: wrap; }
+    html[data-a11y] :is(.desk__tile--main, .req-form, .pay-card) > .sticker,
+    html[data-a11y] .help-band .sticker { position: static; align-self: flex-start; justify-self: start; width: auto; height: auto; border-radius: 10px; }
+    html[data-a11y] .req-form > .sticker { margin-bottom: 4px; }
+    html[data-a11y] .desk__tile--photo { min-height: 0; }
+    html[data-a11y] .desk__tile--photo img { position: static; height: 200px; }
+    html[data-a11y] .desk__tile--photo .cap { margin: 0; border-width: var(--line) 0 0; border-radius: 0; }
+    html[data-a11y] .help-band { padding-top: clamp(26px, 4vw, 52px); }
+    html[data-a11y] .post::after { display: none; }
+    html[data-a11y] .post__stamp { position: static; }
+    html[data-a11y] :is(.post__country, .post h3) { padding-right: 0; }
+    html[data-a11y] .pair { grid-template-columns: 1fr; }
+    html[data-a11y] .pair .room-chip { justify-self: start; }
+    html[data-a11y] .scholar li { grid-template-columns: 1fr; }
+    html[data-a11y] .scholar .amount { text-align: left; }
+    html[data-a11y] .kpis { grid-template-columns: repeat(auto-fit, minmax(min(100%, 200px), 1fr)); }
+    html[data-a11y] #vacancies .vac { margin-top: 0; }
+  </style>
+</head>
+<body data-page="study">
+  <div id="site-header"></div>
+
+  <main id="main">
+    <!-- 1. Привет + Сегодня -->
+    <section class="page-hero page-hero--tinted">
+      <div class="container">
+        <nav class="crumbs" aria-label="Хлебные крошки"><a href="index.html">Главная</a><i data-icon="chevron-right"></i><span>Обучение</span><i data-icon="chevron-right"></i><span>Кабинет студента</span></nav>
+
+        <div class="notice notice--accent role-notice" data-for-role="applicant staff partner intl">
+          <i data-icon="info"></i>
+          <div><strong>Это кабинет студента.</strong> <span id="role-now">Ты сейчас в другой роли</span> — часть подсказок на сайте рассчитана на неё.</div>
+          <button class="btn btn--sm" data-set-role="student"><i data-icon="user"></i> Я студент</button>
+        </div>
+
+        <div class="st-grid">
+          <div>
+            <div class="hello">
+              <span class="avatar" aria-hidden="true">АС</span>
+              <span class="eyebrow">2 курс · РИ-250915 · ИРИТ-РтФ</span>
+            </div>
+            <h1 class="h1 st-h1">Привет, <span class="u-hand">Анна</span>!</h1>
+            <span class="hand st-hand">твой стол на сегодня — всё под рукой</span>
+            <p class="lead" style="margin-top:14px" id="today-lead">Сегодня 3 пары и 2 дедлайна на этой неделе. Всё важное — ниже.</p>
+            <div class="kpis">
+              <a class="kpi" href="#grades"><b>4,7</b><span>средний балл</span></a>
+              <a class="kpi" href="#grades"><b>5 / 27</b><span>место в рейтинге группы</span></a>
+              <a class="kpi" href="#money"><b id="kpi-pay">25 окт</b><span>стипендия</span></a>
+              <a class="kpi" href="#requests"><b id="kpi-req">1</b><span>справка готова</span></a>
+            </div>
+            <div class="cluster quick-row">
+              <a class="btn btn--accent" href="#requests"><i data-icon="file"></i> Заказать справку</a>
+              <a class="btn btn--ghost" href="schedule.html"><i data-icon="calendar"></i> Расписание на неделю</a>
+              <button class="btn btn--ghost" data-search-open aria-label="Найти сервис или документ"><i data-icon="search"></i> Найти</button>
+            </div>
+            <p class="demo-note" style="margin-top:12px">Кабинет показан на демонстрационных данных студентки Анны.</p>
+          </div>
+
+          <aside class="today" aria-labelledby="today-h">
+            <figure class="photo tape st-photo" style="--rot:5deg"><img src="assets/img/selfie.jpg" alt="Селфи студентов в аудитории" loading="eager"><figcaption>наша группа, 2 курс</figcaption></figure>
+            <div class="today__head">
+              <div class="tear__day" aria-hidden="true"><b id="td-month">октябрь</b><strong id="td-num">10</strong><span id="td-wd">суббота</span></div>
+              <div>
+                <h2 class="h2" id="today-h">Сегодня</h2>
+                <p class="hand today__status" id="today-status">три пары, первая в 10:15</p>
+              </div>
+            </div>
+            <ol class="pairs" id="lessons"></ol>
+            <p class="small muted" id="lessons-done" hidden>Пары на сегодня закончились — отдыхай! Завтра первая пара в 8:30.</p>
+            <div class="today__foot">
+              <button class="btn btn--soft btn--sm" data-toast="Расписание группы добавлено в календарь телефона (демо)"><i data-icon="calendar"></i> Добавить в календарь</button>
+              <a class="arrow-link small" href="schedule.html">Вся неделя</a>
+            </div>
+          </aside>
+        </div>
+      </div>
+    </section>
+
+    <!-- 2. Дедлайны и уведомления -->
+    <section class="section--tight">
+      <div class="container two">
+        <div class="card card--pad-lg">
+          <div class="row between" style="flex-wrap:wrap;gap:8px"><div><h2 class="h3">Дедлайны</h2><span class="hand">сначала — то, что горит</span></div><span class="tag tag--accent" id="dl-week">2 на этой неделе</span></div>
+          <div id="deadlines" style="margin-top:8px"></div>
+        </div>
+        <div class="card card--pad-lg">
+          <div class="row between" style="flex-wrap:wrap;gap:8px">
+            <h2 class="h3">Уведомления <span class="badge-count" id="unread" aria-label="непрочитанных">0</span></h2>
+            <button class="btn btn--ghost btn--sm" type="button" id="read-all">Прочитать все</button>
+          </div>
+          <div id="notes" style="margin-top:12px" aria-live="polite"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 3. Сервисы -->
+    <section class="section" id="services">
+      <div class="container">
+        <div class="s-head">
+          <div><h2 class="h2">Всё для учёбы — в один клик</h2><span class="hand">один пароль — тот же, что от почты</span></div>
+          <a class="arrow-link" href="help.html#it">Не получается войти?</a>
+        </div>
+        <div class="desk">
+          <button class="desk__tile desk__tile--main" type="button" data-toast="Открываем личный кабинет студента (демо)"><span class="sticker sticker--coral" aria-hidden="true">один вход</span><i data-icon="user"></i><strong>Личный кабинет</strong><small>Зачётка, приказы, оплата и заявления — всё, ради чего раньше ходили в дирекцию</small></button>
+          <button class="desk__tile desk__tile--photo" type="button" data-toast="Открываем электронную библиотеку (демо)"><img src="assets/img/library.jpg" alt="Студенты в библиотеке" loading="lazy"><span class="cap"><strong>Библиотека</strong><small>электронные книги и бронь места</small></span></button>
+          <button class="desk__tile" type="button" data-toast="Открываем электронное обучение (демо)"><i data-icon="layers"></i><strong>Электронное обучение</strong><small>курсы, задания, тесты</small></button>
+          <a class="desk__tile" href="schedule.html"><i data-icon="calendar"></i><strong>Расписание</strong><small>пары, сессия, аудитории</small></a>
+          <a class="desk__tile desk__tile--lime" href="#grades"><i data-icon="chart"></i><strong>Оценки и рейтинг</strong><small>баллы по дисциплинам</small></a>
+          <a class="desk__tile" href="help.html#it"><i data-icon="mail"></i><strong>Корпоративная почта</strong><small>@urfu.me и облако</small></a>
+          <a class="desk__tile" href="help.html#it"><i data-icon="wifi"></i><strong>Wi‑Fi в кампусе</strong><small>сеть UrFU, как подключиться</small></a>
+          <button class="desk__tile" type="button" data-toast="Открываем витрину проектов (демо)"><i data-icon="rocket"></i><strong>Проектное обучение</strong><small>выбор проекта на семестр</small></button>
+        </div>
+
+        <div class="card card--pad-lg" id="grades">
+          <div class="row between" style="flex-wrap:wrap">
+            <div><h3 class="h3">Текущие баллы</h3><p class="small muted" style="margin-top:4px">Балльно-рейтинговая система: 100 баллов за дисциплину, «отлично» — от 80.</p></div>
+            <div class="tabs" role="tablist" aria-label="Семестр">
+              <button class="tab" role="tab" id="sem-now-tab" aria-controls="sem-now" aria-selected="true">Осень 2026</button>
+              <button class="tab" role="tab" id="sem-prev-tab" aria-controls="sem-prev" aria-selected="false">Весна 2026</button>
+            </div>
+          </div>
+          <div class="tabpanel" role="tabpanel" id="sem-now" aria-labelledby="sem-now-tab" style="margin-top:16px">
+            <div class="table-wrap"><table class="table grades"><caption class="sr-only">Текущие баллы за осенний семестр</caption><thead><tr><th scope="col">Дисциплина</th><th scope="col">Баллы</th><th scope="col">Прогноз</th></tr></thead><tbody>
+              <tr><td>Алгоритмы и структуры данных</td><td class="num">42 / 60</td><td><span class="tag tag--ok">отлично</span></td></tr>
+              <tr><td>Базы данных и SQL</td><td class="num">35 / 60</td><td><span class="tag tag--ok">хорошо</span></td></tr>
+              <tr><td>Теория вероятностей</td><td class="num">24 / 60</td><td><span class="tag tag--warn">нужно подтянуть</span></td></tr>
+              <tr><td>Английский для IT</td><td class="num">50 / 60</td><td><span class="tag tag--ok">отлично</span></td></tr>
+            </tbody></table></div>
+          </div>
+          <div class="tabpanel" role="tabpanel" id="sem-prev" aria-labelledby="sem-prev-tab" style="margin-top:16px" hidden>
+            <div class="table-wrap"><table class="table grades"><caption class="sr-only">Итоговые оценки за весенний семестр</caption><thead><tr><th scope="col">Дисциплина</th><th scope="col">Баллы</th><th scope="col">Оценка</th></tr></thead><tbody>
+              <tr><td>Дискретная математика</td><td class="num">86</td><td><span class="tag tag--ok">5</span></td></tr>
+              <tr><td>Основы программирования на C#</td><td class="num">94</td><td><span class="tag tag--ok">5</span></td></tr>
+              <tr><td>Математический анализ</td><td class="num">74</td><td><span class="tag">4</span></td></tr>
+              <tr><td>Проектный практикум</td><td class="num">90</td><td><span class="tag tag--ok">5</span></td></tr>
+            </tbody></table></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 4. Справки и заявления -->
+    <section class="section section--surface" id="requests">
+      <div class="container">
+        <div class="s-head">
+          <div><h2 class="h2">Справки и заявления</h2><p>Электронная справка с подписью — за 1 рабочий день, бумажная — за 2. Ходить в дирекцию не нужно.</p></div>
+        </div>
+        <div class="req-grid">
+          <form class="card card--pad-lg stack req-form" id="req-form">
+            <span class="sticker" aria-hidden="true">без очереди</span>
+            <div><h3 class="h3">Заказать справку</h3><span class="hand">PDF придёт на почту завтра</span></div>
+            <div class="field">
+              <label for="req-type">Какая справка нужна</label>
+              <select class="select" id="req-type">
+                <option>Справка об обучении</option>
+                <option>Для военкомата</option>
+                <option>Для соцзащиты</option>
+                <option>О размере стипендии</option>
+                <option>Для визы (на английском)</option>
+                <option>Справка-вызов на сессию</option>
+              </select>
+            </div>
+            <div class="field">
+              <label for="req-qty">Количество экземпляров</label>
+              <div class="qty">
+                <button type="button" data-qty="-1" aria-label="Меньше экземпляров"><i data-icon="minus"></i></button>
+                <input id="req-qty" type="number" min="1" max="5" value="1" inputmode="numeric">
+                <button type="button" data-qty="1" aria-label="Больше экземпляров"><i data-icon="plus"></i></button>
+              </div>
+            </div>
+            <fieldset class="radio-cards">
+              <legend class="label">Как получить</legend>
+              <label class="rcard"><input type="radio" name="req-way" value="pdf" checked><span><strong>Электронно на почту</strong><small>PDF с электронной подписью · завтра</small></span></label>
+              <label class="rcard"><input type="radio" name="req-way" value="office"><span><strong>В дирекции института</strong><small>Новый кампус, корпус ИРИТ-РтФ · через 2 дня</small></span></label>
+              <label class="rcard"><input type="radio" name="req-way" value="post"><span><strong>Почтой России</strong><small>заказное письмо · 5–7 дней</small></span></label>
+            </fieldset>
+            <div class="field">
+              <label for="req-to">Куда предоставляется <span class="muted">(необязательно)</span></label>
+              <input class="input" id="req-to" placeholder="Например, по месту работы родителей">
+            </div>
+            <button class="btn btn--accent btn--block" type="submit" data-toast="Заявка на справку отправлена (демо)"><i data-icon="send"></i> Заказать справку</button>
+          </form>
+          <div class="stack">
+            <div class="card card--pad-lg">
+              <div class="row between"><h3 class="h3">Мои заявки</h3><span class="tag" id="req-count">3</span></div>
+              <div id="req-list" style="margin-top:8px" aria-live="polite"></div>
+            </div>
+            <div style="padding-top:8px">
+              <h3 class="h4">Другие заявления</h3>
+              <div class="apps">
+                <button type="button" data-toast="Форма заявления на академический отпуск (демо)">Академический отпуск <i data-icon="chevron-right"></i></button>
+                <a href="help.html#transfer">Перевод на другую программу <i data-icon="chevron-right"></i></a>
+                <a href="#money">Материальная помощь <i data-icon="chevron-right"></i></a>
+                <button type="button" data-toast="Форма заявления на индивидуальный график (демо)">Индивидуальный график <i data-icon="chevron-right"></i></button>
+                <a href="campus.html#dorms">Заселение в общежитие <i data-icon="chevron-right"></i></a>
+                <button type="button" data-toast="Заявка на дубликат студенческого билета (демо)">Дубликат студенческого <i data-icon="chevron-right"></i></button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 5. Стипендии и выплаты -->
+    <section class="section" id="money">
+      <div class="container">
+        <div class="s-head">
+          <div><h2 class="h2">Стипендии и выплаты</h2><p>Что тебе начисляют, когда придут деньги и на что ещё можно претендовать.</p></div>
+        </div>
+        <div class="money-grid">
+          <div class="pay-card">
+            <span class="sticker" aria-hidden="true">25-го числа</span>
+            <span class="pay-card__label"><i data-icon="coins"></i> Ближайшая выплата</span>
+            <div><div class="pay-sum">6 450 ₽</div><div class="pay-when" id="pay-when">25 октября</div></div>
+            <div class="pay-lines">
+              <div><span>Академическая стипендия</span><strong>3 950 ₽</strong></div>
+              <div><span>Надбавка за отличную учёбу</span><strong>2 500 ₽</strong></div>
+            </div>
+            <button class="btn btn--white btn--block" data-toast="Реквизиты карты: МИР •• 4821 (демо)"><i data-icon="id-card"></i> Карта для выплат</button>
+          </div>
+          <div class="stack">
+            <div class="card card--pad-lg">
+              <ul class="scholar">
+                <li><div><strong>Академическая</strong><span class="tag tag--ok">у тебя есть</span><p>Сессия без троек и долгов.</p></div><span class="amount">от 3 950 ₽</span></li>
+                <li><div><strong>Повышенная</strong><span class="tag">можно подать</span><p>За науку, спорт, творчество или общественную работу.</p></div><span class="amount">до 22 000 ₽</span></li>
+                <li><div><strong>Социальная</strong><span class="tag">по документам</span><p>Для студентов из семей с невысоким доходом и льготных категорий.</p></div><span class="amount">5 900 ₽</span></li>
+                <li><div><strong>Именные и губернаторские</strong><span class="tag">конкурс</span><p>Отбор раз в год, заявки — в сентябре.</p></div><span class="amount">до 15 000 ₽</span></li>
+              </ul>
+            </div>
+            <div class="card card--pad-lg">
+              <div class="grid" style="grid-template-columns:repeat(auto-fit,minmax(min(100%,260px),1fr));gap:24px;align-items:center">
+                <form class="stack-sm" id="sch-form">
+                  <h3 class="h4">Сколько я буду получать?</h3>
+                  <div class="field">
+                    <label for="sch-grade">Итоги сессии</label>
+                    <select class="select" id="sch-grade">
+                      <option value="5">Только «отлично»</option>
+                      <option value="45" selected>«Хорошо» и «отлично»</option>
+                      <option value="4">Только «хорошо»</option>
+                      <option value="3">Есть «удовлетворительно»</option>
+                    </select>
+                  </div>
+                  <label class="check"><input type="checkbox" id="sch-social"> Есть право на социальную</label>
+                  <label class="check"><input type="checkbox" id="sch-up"> Подам на повышенную (наука/спорт)</label>
+                </form>
+                <div>
+                  <div class="label">В месяц, примерно</div>
+                  <div class="calc-out" id="sch-out" aria-live="polite">5 200 ₽</div>
+                  <p class="small muted" id="sch-hint">Академическая с надбавкой за «хорошо» и «отлично».</p>
+                  <p class="demo-note" style="margin-top:8px">Суммы демонстрационные.</p>
+                </div>
+              </div>
+            </div>
+            <div class="notice"><i data-icon="heart"></i><div><strong>Материальная помощь — до 10 000 ₽ раз в семестр</strong><p class="small muted" style="margin-top:4px">Если сложная ситуация: болезнь, рождение ребёнка, потеря работы у родителей. Решение — за 10 дней.</p><button class="btn btn--sm btn--soft" style="margin-top:12px" data-toast="Заявление на материальную помощь отправлено (демо)">Подать заявление</button></div></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 6. Практика и вакансии -->
+    <section class="section section--surface" id="career">
+      <div class="container">
+        <div class="s-head">
+          <div><h2 class="h2">Практика и вакансии</h2><span class="hand">подобрали под твоё направление</span><p>120 предложений от партнёров университета.</p></div>
+          <div class="cluster" data-chip-group id="vac-chips" role="group" aria-label="Тип предложения">
+            <button class="chip" aria-pressed="true" data-kind="all">Все</button>
+            <button class="chip" aria-pressed="false" data-kind="practice">Практика</button>
+            <button class="chip" aria-pressed="false" data-kind="intern">Стажировка</button>
+            <button class="chip" aria-pressed="false" data-kind="job">Работа</button>
+          </div>
+        </div>
+        <div class="grid grid-3" id="vacancies">
+          <article class="card vac" data-kind="intern"><div class="card__meta"><span class="tag tag--brand">Стажировка</span><span><i data-icon="map-pin"></i>Екатеринбург</span></div><span class="company">СКБ Контур</span><h3 class="card__title">Стажёр-разработчик C#</h3><p class="small muted">3 месяца, 20 часов в неделю, с наставником. Можно засчитать как практику.</p><div class="card__footer"><strong class="small">60 000 ₽</strong><button class="btn btn--sm" data-toast="Отклик отправлен (демо)">Откликнуться</button></div></article>
+          <article class="card vac" data-kind="practice"><div class="card__meta"><span class="tag tag--ok">Практика</span><span><i data-icon="globe"></i>Удалённо</span></div><span class="company">Naumen</span><h3 class="card__title">Летняя практика: тестирование</h3><p class="small muted">Учебная практика 2 курса: автотесты для реального продукта.</p><div class="card__footer"><strong class="small">по договору с УрФУ</strong><button class="btn btn--sm" data-toast="Заявка на практику отправлена (демо)">Записаться</button></div></article>
+          <article class="card vac" data-kind="job"><div class="card__meta"><span class="tag tag--accent">Работа</span><span><i data-icon="clock"></i>Частичная занятость</span></div><span class="company">Лаборатория ИИ УрФУ</span><h3 class="card__title">Младший аналитик данных</h3><p class="small muted">Работа в кампусе, гибкий график под расписание.</p><div class="card__footer"><strong class="small">35 000 ₽</strong><button class="btn btn--sm" data-toast="Отклик отправлен (демо)">Откликнуться</button></div></article>
+          <article class="card vac" data-kind="intern"><div class="card__meta"><span class="tag tag--brand">Стажировка</span><span><i data-icon="map-pin"></i>Екатеринбург</span></div><span class="company">Сбер</span><h3 class="card__title">Стажёр фронтенд-разработки</h3><p class="small muted">Отбор: тестовое задание и интервью. Старт — февраль.</p><div class="card__footer"><strong class="small">70 000 ₽</strong><button class="btn btn--sm" data-toast="Отклик отправлен (демо)">Откликнуться</button></div></article>
+          <article class="card vac" data-kind="practice"><div class="card__meta"><span class="tag tag--ok">Практика</span><span><i data-icon="map-pin"></i>Верхняя Пышма</span></div><span class="company">УГМК-Телеком</span><h3 class="card__title">Производственная практика: сети</h3><p class="small muted">Настройка и мониторинг сетевой инфраструктуры. Трансфер от кампуса.</p><div class="card__footer"><strong class="small">стипендия компании</strong><button class="btn btn--sm" data-toast="Заявка на практику отправлена (демо)">Записаться</button></div></article>
+          <article class="card vac" data-kind="job"><div class="card__meta"><span class="tag tag--accent">Работа</span><span><i data-icon="globe"></i>Удалённо</span></div><span class="company">Студенческий офис УрФУ</span><h3 class="card__title">Тьютор для первокурсников</h3><p class="small muted">Помогать новичкам освоиться: 6 часов в неделю.</p><div class="card__footer"><strong class="small">12 000 ₽</strong><button class="btn btn--sm" data-toast="Отклик отправлен (демо)">Откликнуться</button></div></article>
+        </div>
+        <div class="row between" style="margin-top:28px;flex-wrap:wrap">
+          <p class="demo-note">Вакансии демонстрационные.</p>
+          <div class="cluster">
+            <button class="btn btn--ghost" data-toast="Консультация с карьерным центром: 14 октября, 15:00 (демо)"><i data-icon="edit"></i> Разобрать резюме</button>
+            <a class="btn btn--soft" href="news.html">Ярмарка вакансий 15 октября <i data-icon="arrow-right"></i></a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 7. Обмен и мобильность -->
+    <section class="section" id="mobility">
+      <div class="container">
+        <div class="s-head">
+          <div><h2 class="h2">Семестр в другом университете</h2><span class="hand">и без потери года</span><p>Учись в вузе-партнёре и получай зачёт по дисциплинам. Приём заявок на весну 2027 — до 1 ноября.</p></div>
+          <a class="arrow-link" href="article.html">Новость о наборе</a>
+        </div>
+        <div class="posts">
+          <article class="post"><span class="post__stamp" aria-hidden="true"><i data-icon="globe"></i></span><span class="post__country">Китай</span><h3>Харбинский политехнический университет</h3><p class="small muted">IT и инженерия, обучение на английском.</p></article>
+          <article class="post"><span class="post__stamp" aria-hidden="true"><i data-icon="globe"></i></span><span class="post__country">Казахстан</span><h3>Казахский национальный университет</h3><p class="small muted">Программы на русском, стипендия на проживание.</p></article>
+          <article class="post"><span class="post__stamp" aria-hidden="true"><i data-icon="globe"></i></span><span class="post__country">Сербия</span><h3>Белградский университет</h3><p class="small muted">Гуманитарные и экономические направления.</p></article>
+          <article class="post post--ru"><span class="post__stamp" aria-hidden="true"><i data-icon="building"></i></span><span class="post__country">Россия</span><h3>Сетевой семестр в вузах России</h3><p class="small muted">Томск, Казань, Санкт-Петербург — по программе академической мобильности.</p></article>
+        </div>
+        <ol class="steps mob-steps">
+          <li class="step"><h3 class="h4">Выбери вуз</h3><p class="small muted" style="margin-top:8px">Сверь дисциплины с куратором — составим план зачёта.</p></li>
+          <li class="step"><h3 class="h4">Подай заявку</h3><p class="small muted" style="margin-top:8px">Мотивационное письмо и средний балл от 4,0. Язык — B1 и выше.</p></li>
+          <li class="step"><h3 class="h4">Собери документы</h3><p class="small muted" style="margin-top:8px">Поможем с визой, страховкой и жильём.</p></li>
+        </ol>
+        <div class="cluster" style="margin-top:24px">
+          <button class="btn btn--lg" data-toast="Заявка на обмен создана — черновик в личном кабинете (демо)"><i data-icon="send"></i> Подать заявку на обмен</button>
+          <a class="btn btn--ghost btn--lg" href="help.html#visa">Визы и документы</a>
+        </div>
+      </div>
+    </section>
+
+    <!-- 8. Помощь -->
+    <section class="section" style="padding-top:24px">
+      <div class="container">
+        <div class="help-band">
+          <span class="sticker sticker--round">бесплатно и анонимно</span>
+          <div>
+            <h2 class="h2">Если что-то пошло не так</h2>
+            <p>Долги, стресс перед сессией, сложности с переводом — с этим не нужно разбираться в одиночку.</p>
+            <div class="cluster" style="margin-top:24px">
+              <a class="btn btn--white btn--lg" href="help.html#chat"><i data-icon="message"></i> Написать в чат</a>
+            </div>
+          </div>
+          <div class="help-links">
+            <a href="help.html#psy">Психологическая помощь — бесплатно <i data-icon="arrow-right"></i></a>
+            <a href="help.html#transfer">Перевод и восстановление <i data-icon="arrow-right"></i></a>
+            <a href="help.html#access">Поддержка студентов с ОВЗ <i data-icon="arrow-right"></i></a>
+            <a href="help.html#it">Не работает почта или Wi‑Fi <i data-icon="arrow-right"></i></a>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <div id="site-footer"></div>
+
+  <script src="assets/js/app.js"></script>
+  <script>
+    (function () {
+      const $ = (s, r = document) => r.querySelector(s);
+      const $$ = (s, r = document) => [...r.querySelectorAll(s)];
+      const ic = (n) => UI.icon(n);
+      const fmt = (n) => Math.round(n).toLocaleString('ru-RU');
+      const plural = (n, f) => f[(n % 10 === 1 && n % 100 !== 11) ? 0 : (n % 10 >= 2 && n % 10 <= 4 && (n % 100 < 10 || n % 100 >= 20)) ? 1 : 2];
+      const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+      const now = new Date();
+      const MONTHS = ['янв', 'фев', 'мар', 'апр', 'мая', 'июн', 'июл', 'авг', 'сен', 'окт', 'ноя', 'дек'];
+      const addDays = (n) => { const d = new Date(now); d.setDate(d.getDate() + n); return d; };
+
+      /* Подсказка о роли */
+      document.addEventListener('rolechange', (e) => {
+        const r = UI.ROLES.find((x) => x.key === e.detail);
+        $('#role-now').textContent = 'Ты сейчас в роли «' + (r ? r.full : e.detail) + '»';
+      });
+
+      /* Сегодня: отрывной листок и пары */
+      $('#td-month').textContent = now.toLocaleDateString('ru-RU', { month: 'long' });
+      $('#td-num').textContent = now.getDate();
+      $('#td-wd').textContent = now.toLocaleDateString('ru-RU', { weekday: 'long' });
+      const LESSONS = [
+        ['10:15', '11:45', 'Алгоритмы и структуры данных', 'лекция', 'D-204', 'Морозова О. А.'],
+        ['12:00', '13:30', 'Базы данных и SQL', 'практика, компьютерный класс', 'G-302', 'Лебедев С. Н.'],
+        ['14:15', '15:45', 'Английский для IT', 'практика', 'H-302', 'Смирнова Е. В.']
+      ];
+      const mins = (t) => { const [h, m] = t.split(':').map(Number); return h * 60 + m; };
+      const nowM = now.getHours() * 60 + now.getMinutes();
+      const focus = LESSONS.findIndex(([, end]) => mins(end) >= nowM);
+      let status = 'пары закончились — отдыхай';
+      $('#lessons').innerHTML = LESSONS.map(([s, e, name, kind, room, who], i) => {
+        const done = mins(e) < nowM;
+        const live = mins(s) <= nowM && nowM <= mins(e);
+        let badge = '';
+        if (live) { badge = '<em class="pair__badge">идёт сейчас</em>'; status = 'сейчас пара, до ' + e; }
+        else if (i === focus) {
+          const left = mins(s) - nowM;
+          badge = `<em class="pair__badge">${left < 60 ? 'через ' + left + ' мин' : 'следующая'}</em>`;
+          status = (i === 0 ? 'первая пара в ' : 'следующая в ') + s;
+        }
+        return `<li class="pair${done ? ' is-past' : ''}${live ? ' is-now' : i === focus ? ' is-next' : ''}"${i === focus ? ' aria-current="true"' : ''}>
+          <time>${s}<small>${e}</small></time>
+          <span><strong>${name}</strong><small>${kind} · ${who}</small>${badge ? '<br>' + badge : ''}</span>
+          <a class="room-chip" href="campus.html?room=${room}" aria-label="Где аудитория ${room}">${room}</a></li>`;
+      }).join('');
+      $('#today-status').textContent = status;
+      if (focus === -1) $('#lessons-done').hidden = false;
+      const leftToday = LESSONS.filter(([, e]) => mins(e) >= nowM).length;
+      $('#today-lead').textContent = leftToday
+        ? `Сегодня ${leftToday === 3 ? 'у тебя 3 пары' : 'осталось ' + leftToday + ' ' + plural(leftToday, ['пара', 'пары', 'пар'])} и 2 дедлайна на этой неделе. Всё важное — ниже.`
+        : 'Пары на сегодня закончились. Проверь дедлайны и уведомления — всё важное ниже.';
+
+      /* Дедлайны (даты считаются от сегодняшнего дня) */
+      const DL = [
+        [1, 'Лабораторная №3: хеш-таблицы', 'Алгоритмы · загрузить в электронное обучение'],
+        [4, 'Выбор проекта на весенний семестр', 'Проектное обучение'],
+        [9, 'Оплата общежития за ноябрь', 'Общежитие №6 · 1 450 ₽'],
+        [23, 'Заявка на семестр обмена', 'Международная служба']
+      ];
+      $('#deadlines').innerHTML = DL.map(([d, t, s]) => {
+        const date = addDays(d);
+        return `<div class="dl-item${d <= 3 ? ' is-urgent' : ''}"><div class="dl-date"><b>${MONTHS[date.getMonth()]}</b><strong>${date.getDate()}</strong></div>
+          <div><strong>${t}</strong><small>${s}</small></div>
+          <span class="tag ${d <= 3 ? 'tag--accent' : ''}">${d === 1 ? 'завтра' : 'через ' + d + ' ' + plural(d, ['день', 'дня', 'дней'])}</span></div>`;
+      }).join('');
+      const week = DL.filter(([d]) => d <= 7).length;
+      $('#dl-week').textContent = week + ' ' + plural(week, ['дедлайн', 'дедлайна', 'дедлайнов']) + ' за 7 дней';
+
+      /* Уведомления */
+      const NOTES = [
+        { id: 'n1', i: 'file', t: 'Справка об обучении готова', s: 'Скачай PDF в разделе «Мои заявки»', a: '#requests', unread: true },
+        { id: 'n2', i: 'calendar', t: 'Перенос пары 15 октября', s: 'Базы данных переехали в G-303', a: 'schedule.html', unread: true },
+        { id: 'n3', i: 'coins', t: 'Стипендия будет начислена 25 октября', s: 'Сумма — 6 450 ₽', a: '#money', unread: true },
+        { id: 'n4', i: 'globe', t: 'Открыт набор на семестр обмена', s: 'Заявки до 1 ноября', a: '#mobility', unread: false }
+      ];
+      let readIds = [];
+      try { readIds = JSON.parse(UI.store.get('urfu-read', '[]')); } catch (e) { readIds = []; }
+      NOTES.forEach((n) => { if (readIds.includes(n.id)) n.unread = false; });
+      function renderNotes() {
+        $('#notes').innerHTML = NOTES.map((n) => `<div class="ntf${n.unread ? ' is-unread' : ''}">
+          <span class="icon-tile">${ic(n.i)}</span>
+          <div><a href="${n.a}" data-note="${n.id}"><strong>${n.t}</strong>${n.unread ? '<span class="sr-only"> (не прочитано)</span>' : ''}</a><small>${n.s}</small></div>
+          <span class="ntf__dot" aria-hidden="true"></span></div>`).join('');
+        const c = NOTES.filter((n) => n.unread).length;
+        const b = $('#unread'); b.textContent = c; b.dataset.zero = String(c === 0); b.setAttribute('aria-label', c + ' непрочитанных');
+        UI.store.set('urfu-read', JSON.stringify(NOTES.filter((n) => !n.unread).map((n) => n.id)));
+      }
+      $('#notes').addEventListener('click', (e) => {
+        const a = e.target.closest('[data-note]'); if (!a) return;
+        const n = NOTES.find((x) => x.id === a.dataset.note); if (n) { n.unread = false; renderNotes(); }
+      });
+      $('#read-all').addEventListener('click', () => { NOTES.forEach((n) => { n.unread = false; }); renderNotes(); UI.toast('Все уведомления прочитаны'); });
+      renderNotes();
+
+      /* Справки */
+      const STATUS = { ready: ['tag--ok', 'Готова'], work: ['tag--warn', 'В работе'], new: ['tag--brand', 'Принята'] };
+      const WAYS = { pdf: 'на почту, PDF', office: 'в дирекции, E-101', post: 'Почтой России' };
+      let reqs;
+      try { reqs = JSON.parse(UI.store.get('urfu-requests', 'null')); } catch (e) { reqs = null; }
+      if (!Array.isArray(reqs)) reqs = [
+        { t: 'Справка об обучении', q: 1, w: 'pdf', d: '7 окт', st: 'ready' },
+        { t: 'Для военкомата', q: 1, w: 'office', d: '6 окт', st: 'work' },
+        { t: 'О размере стипендии', q: 2, w: 'office', d: '28 сен', st: 'ready' }
+      ];
+      function renderReqs(highlightFirst) {
+        $('#req-list').innerHTML = reqs.map((r, i) => `<div class="req-item${highlightFirst && i === 0 ? ' is-new' : ''}">
+          <span class="icon-tile" style="width:40px;height:40px">${ic('file')}</span>
+          <div><strong>${esc(r.t)}</strong><small>${r.q} экз. · ${WAYS[r.w]} · заказана ${r.d}</small></div>
+          <span class="tag ${STATUS[r.st][0]}">${STATUS[r.st][1]}</span>
+          ${r.st === 'ready' && r.w === 'pdf' ? `<button class="btn btn--sm btn--ghost" type="button" data-dl="${i}" aria-label="Скачать: ${esc(r.t)}">${ic('download')}</button>` : ''}</div>`).join('');
+        $('#req-count').textContent = reqs.length;
+        const ready = reqs.filter((r) => r.st === 'ready').length;
+        $('#kpi-req').textContent = ready;
+        $('#kpi-req').nextElementSibling.textContent = plural(ready, ['справка готова', 'справки готовы', 'справок готово']);
+        UI.store.set('urfu-requests', JSON.stringify(reqs.slice(0, 8)));
+      }
+      $('#req-list').addEventListener('click', (e) => { if (e.target.closest('[data-dl]')) UI.toast('Справка скачана (демо)'); });
+      const qty = $('#req-qty');
+      $$('[data-qty]').forEach((b) => b.addEventListener('click', () => { qty.value = Math.max(1, Math.min(5, (+qty.value || 1) + +b.dataset.qty)); }));
+      qty.addEventListener('change', () => { qty.value = Math.max(1, Math.min(5, Math.round(+qty.value) || 1)); });
+      function order() {
+        const r = { t: $('#req-type').value, q: Math.max(1, Math.min(5, +qty.value || 1)), w: $('input[name="req-way"]:checked').value, d: now.getDate() + ' ' + MONTHS[now.getMonth()], st: 'new' };
+        reqs.unshift(r); renderReqs(true);
+        setTimeout(() => { r.st = 'work'; renderReqs(); }, 4000);
+        $('#req-to').value = '';
+      }
+      // Кнопка с data-toast показывает подтверждение; здесь добавляем заявку в список
+      $('#req-form button[type="submit"]').addEventListener('click', order);
+      $('#req-form').addEventListener('submit', (e) => e.preventDefault());
+      renderReqs();
+
+      /* Ближайшая выплата */
+      const pay = new Date(now.getFullYear(), now.getMonth(), 25);
+      if (pay < new Date(now.getFullYear(), now.getMonth(), now.getDate())) pay.setMonth(pay.getMonth() + 1);
+      const days = Math.round((pay - new Date(now.getFullYear(), now.getMonth(), now.getDate())) / 864e5);
+      const payStr = pay.toLocaleDateString('ru-RU', { day: 'numeric', month: 'long' });
+      $('#pay-when').textContent = payStr + (days ? ' · через ' + days + ' ' + plural(days, ['день', 'дня', 'дней']) : ' · сегодня');
+      $('#kpi-pay').textContent = pay.getDate() + ' ' + MONTHS[pay.getMonth()];
+
+      /* Калькулятор стипендии */
+      const G = { 5: [6450, 'Академическая с надбавкой за «отлично».'], 45: [5200, 'Академическая с надбавкой за «хорошо» и «отлично».'], 4: [3950, 'Базовая академическая стипендия.'], 3: [0, 'С тройками академическая не начисляется — но можно получать социальную.'] };
+      function sch() {
+        const [base, hint] = G[$('#sch-grade').value];
+        let sum = base; const parts = [hint];
+        if ($('#sch-social').checked) { sum += 5900; parts.push('Плюс социальная — 5 900 ₽.'); }
+        if ($('#sch-up').checked && base > 0) { sum += 12000; parts.push('Повышенная — в среднем 12 000 ₽ по итогам конкурса.'); }
+        else if ($('#sch-up').checked) parts.push('Повышенная доступна только без троек.');
+        $('#sch-out').textContent = fmt(sum) + ' ₽';
+        $('#sch-hint').textContent = parts.join(' ');
+      }
+      $('#sch-form').addEventListener('change', sch); sch();
+
+      /* Вакансии: фильтр */
+      $('#vac-chips').addEventListener('chipchange', () => {
+        const k = $('#vac-chips [aria-pressed="true"]').dataset.kind;
+        $$('#vacancies .vac').forEach((c) => { c.hidden = k !== 'all' && c.dataset.kind !== k; });
+      });
+    })();
+  </script>
+</body>
+</html>

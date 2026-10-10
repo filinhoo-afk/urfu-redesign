@@ -1,0 +1,842 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Центр помощи — УрФУ</title>
+  <meta name="description" content="Центр помощи УрФУ: ответы на частые вопросы, сценарии по ролям, документы, единый справочник контактов и чат-помощник.">
+  <link rel="icon" href="assets/logo/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="assets/css/tokens.css">
+  <link rel="stylesheet" href="assets/css/components.css">
+  <style>
+    .anchor, .faq-cat, .faq-cat details { scroll-margin-top: 56px; }
+    .s-head { display: flex; flex-wrap: wrap; gap: 8px 24px; align-items: flex-end; justify-content: space-between; margin-bottom: 24px; }
+    .s-head .hand { display: block; margin-top: 6px; }
+    .s-head p:not(.hand) { color: var(--text-2); max-width: 620px; margin-top: 10px; }
+
+    /* Герой с поиском */
+    .help-hero { padding-bottom: 56px; }
+    .help-hero__grid { display: grid; gap: 32px; grid-template-columns: minmax(0, 1fr); align-items: center; }
+    @media (min-width: 1024px) { .help-hero__grid { grid-template-columns: minmax(0, 1.6fr) minmax(0, 1fr); } }
+    .help-hero h1 { margin-top: 4px; }
+    .help-hand { display: inline-block; margin-top: 14px; transform: rotate(-2deg); color: var(--accent-strong); }
+    .help-photo { display: none; }
+    @media (min-width: 1024px) {
+      .help-photo { display: block; justify-self: end; width: 300px; height: 300px; }
+      .help-photo img { height: calc(100% - 38px); }
+      .help-photo .sticker { position: absolute; z-index: 3; left: -40px; top: 40px; --rot: -9deg; }
+    }
+    .help-search { margin-top: 18px; max-width: 720px; position: relative; }
+    .help-search .input { background: var(--surface); }
+    .help-meta { margin-top: 16px; max-width: 720px; display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+    .help-meta .chip { min-height: 36px; font-size: var(--fs-xs); }
+    .preview { margin-top: 14px; max-width: 720px; background: var(--surface); border: var(--line) solid var(--ink); border-radius: var(--r-lg); box-shadow: var(--shadow-md); padding: 8px; }
+    .preview a { display: flex; gap: 12px; align-items: flex-start; padding: 12px; border-radius: var(--r-md); }
+    .preview a:hover, .preview a:focus-visible { background: var(--lime-soft); }
+    .preview .icon-tile { width: 34px; height: 34px; border-radius: 10px; }
+    .preview .icon-tile .i { width: 17px; height: 17px; }
+    .preview small { display: block; color: var(--text-3); font-size: var(--fs-xs); }
+    .preview__foot { padding: 10px 12px 6px; font-size: var(--fs-xs); color: var(--text-3); border-top: var(--line) dashed var(--border); margin-top: 4px; }
+    mark.hit { background: var(--lime); color: #14141a; border-radius: 4px; padding: 0 2px; font-weight: 700; }
+
+    /* «Мне нужно…» — билеты */
+    .tickets { display: grid; gap: 16px; grid-template-columns: minmax(0, 1fr); margin-top: 24px; }
+    @media (min-width: 768px) { .tickets { grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr); } }
+    .ticket { position: relative; display: grid; grid-template-columns: auto minmax(0, 1fr) auto; align-items: center; gap: 18px; padding: 18px 20px; border: var(--line) solid var(--ink); border-radius: var(--r-lg); background: var(--surface); color: var(--text); transition: transform .2s var(--ease), box-shadow .2s var(--ease), background .2s; }
+    .ticket:hover { transform: translate(-3px, -3px); box-shadow: var(--shadow-md); background: var(--lime-soft); }
+    .ticket__n { font: 800 calc(26px * var(--fs-scale))/1 var(--font-display); color: var(--text-3); width: 44px; }
+    .ticket strong { display: block; font-size: var(--fs-lg); font-weight: 700; line-height: 1.2; }
+    .ticket small { color: var(--text-3); font-size: var(--fs-sm); }
+    .ticket__arrow { width: 44px; height: 44px; border-radius: 50%; border: var(--line) solid var(--ink); display: grid; place-items: center; background: var(--surface); color: var(--text); transition: transform .2s var(--ease); }
+    .ticket:hover .ticket__arrow { transform: rotate(-45deg); background: var(--ink); color: var(--bg); }
+    .ticket::before, .ticket::after { content: ""; position: absolute; left: 64px; width: 18px; height: 18px; border-radius: 50%; background: var(--bg); border: var(--line) solid var(--ink); }
+    .ticket::before { top: -10px; clip-path: inset(50% 0 0 0); }
+    .ticket::after { bottom: -10px; clip-path: inset(0 0 50% 0); }
+    .tickets .ticket:first-child { background: var(--lime); color: #14141a; }
+    .tickets .ticket:first-child :is(.ticket__n, small) { color: #45434d; }
+    .tickets .ticket:nth-child(4n+2) { transform: rotate(.6deg); } .tickets .ticket:nth-child(4n+3) { transform: rotate(-.6deg); }
+    .tickets .ticket:nth-child(n):hover { transform: translate(-3px, -3px); }
+    @media (max-width: 479px) { .ticket { gap: 12px; padding: 16px; } .ticket__n { width: 34px; font-size: calc(19px * var(--fs-scale)); } .ticket::before, .ticket::after { left: 50px; } }
+
+    /* FAQ */
+    .faq-layout { display: grid; gap: 24px; grid-template-columns: minmax(0, 1fr); }
+    @media (min-width: 1024px) { .faq-layout { grid-template-columns: 260px minmax(0, 1fr); gap: 48px; } }
+    .faq-nav { display: flex; gap: 8px; overflow-x: auto; scrollbar-width: none; padding: 4px 4px 6px; }
+    .faq-nav::-webkit-scrollbar { display: none; }
+    .faq-nav a { display: inline-flex; align-items: center; gap: 8px; white-space: nowrap; padding: 8px 14px; border-radius: var(--r-pill); border: var(--line) solid var(--ink); background: var(--surface); font-size: var(--fs-sm); font-weight: 600; color: var(--text); }
+    .faq-nav a:hover { background: var(--lime-soft); }
+    .faq-nav a.is-current { background: var(--ink); color: var(--bg); }
+    .faq-nav a.is-current .count { color: inherit; }
+    .faq-nav .count { font: 700 var(--fs-xs) var(--font-display); color: var(--text-3); }
+    .faq-nav a.is-empty { opacity: .45; }
+    @media (min-width: 1024px) {
+      .faq-aside { position: sticky; top: calc(var(--header-h) + 72px); align-self: start; padding: 10px; border: var(--line) solid var(--ink); border-radius: var(--r-lg); background: var(--surface); box-shadow: var(--shadow-sm); }
+      .faq-nav { flex-direction: column; overflow: visible; gap: 2px; padding: 0; }
+      .faq-nav a { border: none; justify-content: space-between; padding: 10px 14px; border-radius: var(--r-md); white-space: normal; }
+    }
+    .faq-cat { padding: 8px 0 28px; }
+    .faq-cat + .faq-cat { border-top: var(--line) dashed var(--border); padding-top: 32px; }
+    .faq-cat__head { display: flex; flex-wrap: wrap; align-items: center; gap: 14px; margin-bottom: 12px; }
+    .faq-cat__head .icon-tile { width: 46px; height: 46px; transform: rotate(-5deg); }
+    .faq-cat:nth-child(even) .faq-cat__head .icon-tile { transform: rotate(4deg); }
+    .faq-cat__head .sticker { margin-left: 4px; }
+    .faq-cat .acc { margin-bottom: 10px; padding: 0 18px; border: var(--line) solid var(--ink); border-radius: var(--r-md); background: var(--surface); transition: box-shadow .2s var(--ease); }
+    .faq-cat .acc:hover { box-shadow: var(--shadow-sm); }
+    .faq-cat .acc[open] { background: var(--lime-soft); box-shadow: var(--shadow-md); }
+    .faq-cat .acc summary { font-size: var(--fs-md); padding: 16px 0; }
+    .faq-cat .acc summary .i { flex: none; width: 30px; height: 30px; padding: 5px; border: var(--line) solid var(--ink); border-radius: 50%; background: var(--surface); color: var(--text); }
+    .faq-cat .acc__body { color: var(--text); }
+    .acc__body p + p, .acc__body p + ul, .acc__body ul + p { margin-top: 10px; }
+    .acc__body ul { list-style: disc; padding-left: 1.3em; }
+    .acc__body li + li { margin-top: 4px; }
+    .acc__body a { text-decoration: underline; text-decoration-color: var(--accent); text-underline-offset: 3px; }
+    .faq-cta { margin-top: 16px; }
+    .faq-empty { padding: 40px 24px; text-align: center; border: var(--line) dashed var(--ink); border-radius: var(--r-lg); display: flex; flex-direction: column; gap: 12px; align-items: center; }
+    .lang-en { font-style: italic; color: var(--text-3); font-size: var(--fs-sm); font-weight: 500; }
+
+    /* Документы — папки */
+    .docs { display: grid; gap: 28px var(--gap); grid-template-columns: repeat(auto-fit, minmax(min(100%, 320px), 1fr)); padding-top: 18px; }
+    .docs .card { position: relative; border-top-left-radius: 0; }
+    .docs .card::before { content: attr(data-tab); position: absolute; left: -2px; bottom: 100%; padding: 5px 14px 3px; border: var(--line) solid var(--ink); border-bottom: 0; border-radius: 10px 10px 0 0; background: var(--lime); color: #14141a; font: 700 calc(11px * var(--fs-scale))/1.2 var(--font-display); text-transform: uppercase; }
+    .docs .card:nth-child(2) { margin-top: 14px; } .docs .card:nth-child(2)::before { background: #ff5a36; color: #fff; }
+    .docs .card:nth-child(3)::before { background: #2747ff; color: #fff; }
+    .doc-list { display: flex; flex-direction: column; margin-top: 8px; }
+    .doc { display: flex; gap: 12px; align-items: center; padding: 12px 0; border-bottom: var(--line) dashed var(--border); }
+    .doc:last-child { border-bottom: none; }
+    .doc .icon-tile { width: 36px; height: 36px; border-radius: 10px; background: var(--surface); }
+    .doc .icon-tile .i { width: 18px; height: 18px; }
+    .doc span:nth-child(2) { flex: 1; min-width: 0; font-weight: 600; font-size: var(--fs-sm); line-height: 1.35; }
+    .doc small { display: block; font-weight: 400; color: var(--text-3); font-size: var(--fs-xs); }
+    .doc:hover span:nth-child(2) { text-decoration: underline; text-decoration-color: var(--accent); }
+    .doc:hover .icon-tile { background: var(--lime); }
+    .doc > .i { color: var(--text-3); }
+
+    /* Контакты — визитки */
+    .dir-tools { display: flex; flex-wrap: wrap; gap: 12px 24px; align-items: end; justify-content: space-between; margin-bottom: 20px; }
+    .dir-tools .field { flex: 1 1 300px; max-width: 460px; }
+    .contacts { display: grid; gap: 16px; grid-template-columns: repeat(auto-fill, minmax(min(100%, 300px), 1fr)); }
+    .contact { gap: 10px; box-shadow: var(--shadow-sm); }
+    .contact > .tag { align-self: flex-start; }
+    .contact h3 { font: 700 var(--fs-md)/1.25 var(--font-display); }
+    .contact .phone { font: 800 var(--fs-lg) var(--font-display); color: var(--text); letter-spacing: -.02em; }
+    .contact .line { display: flex; gap: 8px; align-items: center; font-size: var(--fs-sm); color: var(--text-2); }
+    .contact .line .i { width: 16px; height: 16px; color: var(--text-3); flex: none; }
+    .contact .line a { text-decoration: underline; text-decoration-color: var(--accent); text-underline-offset: 3px; }
+    .contact .card__footer .btn--icon { width: 38px; min-height: 38px; }
+    .contacts .contact:nth-child(2) { background: var(--lime-soft); }
+    .socials { display: flex; flex-wrap: wrap; gap: 8px; }
+    .socials button { min-width: 48px; height: 48px; padding: 0 16px; border-radius: var(--r-pill); border: var(--line) solid var(--ink); background: var(--surface); color: var(--text); font-weight: 700; font-size: var(--fs-sm); }
+    .socials button:hover { background: var(--lime); color: #14141a; }
+    .cc-band { display: grid; gap: 24px; grid-template-columns: minmax(0, 1fr); align-items: center; margin-top: 32px; padding-top: 28px; border-top: var(--line) dashed var(--ink); }
+    @media (min-width: 900px) { .cc-band { grid-template-columns: 1fr auto; } }
+
+    /* Чат — коралловая плашка */
+    .chat-band { position: relative; display: grid; gap: 36px; grid-template-columns: minmax(0, 1fr); align-items: start; padding: clamp(26px, 4vw, 52px); border: var(--line) solid var(--ink); border-radius: var(--r-xl); background: #ff5a36; color: #fff; box-shadow: var(--shadow-lg); }
+    @media (min-width: 1024px) { .chat-band { grid-template-columns: 1fr 1.2fr; } }
+    .chat-band > .sticker { position: absolute; top: -26px; right: 30px; --rot: 8deg; }
+    @media (min-width: 1024px) { .chat-band > .sticker { top: auto; right: auto; bottom: -34px; left: 44px; --rot: -8deg; } }
+    @media (max-width: 1023px) { .chat-band { padding-top: 90px; } .chat-band > .sticker { top: -36px; right: 12px; } }
+    .chat-band h2 { color: #fff; margin-bottom: 16px; }
+    .chat-band .lead-text { color: #fff1ec; }
+    .chat-band .hand { color: #fff; font-size: calc(24px * var(--fs-scale)); display: inline-block; margin-top: 18px; transform: rotate(-2deg); }
+    .chat-band .notice { background: #fffdf8; color: #14141a; border-color: #14141a; }
+    .chat-band .notice .muted { color: #45434d; }
+    .chat-band .notice:nth-child(2) { transform: rotate(-1deg); }
+    .chat-band .demo-note { color: #fff1ec; }
+    .chat { display: flex; flex-direction: column; height: 560px; max-height: 80vh; background: var(--surface); color: var(--text); border: var(--line) solid var(--ink); border-radius: var(--r-xl); box-shadow: 8px 8px 0 #14141a; overflow: hidden; }
+    .chat__head { display: flex; align-items: center; gap: 12px; padding: 14px 18px; border-bottom: var(--line) solid var(--ink); background: var(--lime); color: #14141a; }
+    .chat__head .avatar { background: #14141a; color: #d7ff3d; }
+    .chat__head .btn { background: #fffdf8; color: #14141a; }
+    .chat__head .status { display: inline-flex; align-items: center; gap: 6px; font-size: var(--fs-xs); color: #14141a; font-weight: 600; }
+    .chat__head .status .dot { width: 8px; height: 8px; color: #008f5a; }
+    .chat__log { flex: 1; overflow-y: auto; padding: 20px; display: flex; flex-direction: column; gap: 12px; background: var(--bg); overscroll-behavior: contain; }
+    .msg { max-width: 85%; padding: 12px 16px; border-radius: 18px; font-size: var(--fs-sm); line-height: 1.5; animation: drop .2s var(--ease); overflow-wrap: anywhere; border: var(--line) solid var(--ink); }
+    .msg--bot { align-self: flex-start; background: var(--surface); border-bottom-left-radius: 6px; }
+    .msg--me { align-self: flex-end; background: #2747ff; color: #fff; border-bottom-right-radius: 6px; }
+    .msg .links { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
+    .msg .links a { display: inline-flex; align-items: center; gap: 6px; padding: 6px 12px; border-radius: var(--r-pill); background: var(--lime-soft); border: 1.5px solid var(--ink); color: var(--text); font-weight: 650; font-size: var(--fs-xs); }
+    .msg .links a:hover { background: var(--lime); color: #14141a; }
+    .msg .links .i { width: 14px; height: 14px; }
+    .msg time { display: block; font-size: 11px; opacity: .6; margin-top: 4px; }
+    .typing { display: inline-flex; gap: 4px; padding: 14px 16px; }
+    .typing span { width: 7px; height: 7px; border-radius: 50%; background: var(--text-3); animation: blink 1s infinite; }
+    .typing span:nth-child(2) { animation-delay: .15s; }
+    .typing span:nth-child(3) { animation-delay: .3s; }
+    @keyframes blink { 0%, 60%, 100% { opacity: .25; } 30% { opacity: 1; } }
+    .chat__quick { padding: 12px 16px 0; display: flex; gap: 6px; overflow-x: auto; scrollbar-width: none; }
+    .chat__quick::-webkit-scrollbar { display: none; }
+    .chat__quick .chip { min-height: 34px; font-size: var(--fs-xs); white-space: nowrap; flex: none; }
+    .chat__form { display: flex; gap: 8px; padding: 12px 16px 16px; }
+    .chat__form .input { border-radius: var(--r-pill); border-color: var(--ink); }
+    .chat__form .btn--icon { flex: none; width: 48px; min-height: 48px; }
+
+    /* Обратная связь */
+    .fb { display: grid; gap: 40px; grid-template-columns: minmax(0, 1fr); }
+    @media (min-width: 1024px) { .fb { grid-template-columns: 1fr 1.4fr; } }
+    .fb .hand { display: block; margin-top: 6px; }
+    #fb-form { box-shadow: var(--shadow-md); }
+    .form-grid { display: grid; gap: 16px; grid-template-columns: repeat(auto-fit, minmax(min(100%, 240px), 1fr)); }
+    .form-grid .full { grid-column: 1 / -1; }
+
+    /* Версия для слабовидящих */
+    html[data-a11y] :is(.help-hand, .ticket, .faq-cat__head .icon-tile, .chat-band .hand, .chat-band .notice) { transform: none !important; }
+    html[data-a11y] .help-photo { display: none; }
+    html[data-a11y] .ticket::before, html[data-a11y] .ticket::after { display: none; }
+    html[data-a11y] .ticket { grid-template-columns: minmax(0, 1fr) auto; }
+    html[data-a11y] .ticket__n { display: none; }
+    html[data-a11y] .chat-band { padding-top: clamp(26px, 4vw, 52px); }
+    html[data-a11y] .chat-band > .sticker { position: static; justify-self: start; width: auto; height: auto; border-radius: 10px; }
+    html[data-a11y] .chat { height: 640px; }
+    html[data-a11y] .docs .card::before { position: static; display: inline-block; margin-bottom: 8px; border-bottom: var(--line) solid; border-radius: 8px; }
+    html[data-a11y] .docs .card { border-top-left-radius: var(--r-lg); }
+    html[data-a11y] .docs .card:nth-child(2) { margin-top: 0; }
+  </style>
+</head>
+<body data-page="about">
+  <div id="site-header"></div>
+
+  <main id="main">
+    <!-- Герой с поиском -->
+    <section class="page-hero page-hero--tinted help-hero">
+      <div class="container">
+        <nav class="crumbs" aria-label="Хлебные крошки"><a href="index.html">Главная</a><i data-icon="chevron-right"></i><span>Центр помощи</span></nav>
+        <div class="help-hero__grid">
+          <div>
+        <h1 class="display">Чем <span class="u-hand">помочь</span>?</h1>
+        <p class="lead">Ответы на частые вопросы, контакты всех служб и чат — в одном месте. Начни вводить вопрос, и мы сразу покажем ответы.</p>
+        <span class="hand help-hand">начни печатать — ответы появятся сразу ↓</span>
+        <div class="help-search search-xl input-icon" role="search">
+          <i data-icon="search"></i>
+          <label class="sr-only" for="faq-q">Поиск по вопросам и ответам</label>
+          <input class="input" id="faq-q" type="search" placeholder="Например: перевод, Wi‑Fi, виза, общежитие" autocomplete="off" aria-describedby="faq-status" aria-controls="faq-preview">
+        </div>
+        <div class="help-meta">
+          <span class="xs muted" id="faq-status" aria-live="polite">Часто ищут:</span>
+          <span class="cluster" id="faq-popular">
+            <button class="chip" type="button" data-q="перевод">Перевод</button>
+            <button class="chip" type="button" data-q="Wi-Fi">Wi‑Fi</button>
+            <button class="chip" type="button" data-q="психолог">Психолог</button>
+            <button class="chip" type="button" data-q="виза">Виза</button>
+            <button class="chip" type="button" data-q="диплом">Диплом</button>
+          </span>
+        </div>
+        <div class="preview" id="faq-preview" hidden></div>
+          </div>
+          <figure class="photo tape help-photo" style="--rot:3deg"><img src="assets/img/friends.jpg" alt="Студенты смеются за столом" loading="eager"><figcaption>спросили — разобрались</figcaption><span class="sticker sticker--blue" aria-hidden="true">без звонков и очередей</span></figure>
+        </div>
+      </div>
+    </section>
+
+    <!-- Мне нужно… -->
+    <section class="section--tight">
+      <div class="container">
+        <div class="s-head" style="margin-bottom:16px">
+          <div><h2 class="h2">Мне нужно…</h2><span class="hand">выбери, кто ты, — покажем частые задачи</span></div>
+        </div>
+        <div class="cluster" data-chip-group id="scen-roles" role="group" aria-label="Я —">
+          <button class="chip" aria-pressed="false" data-role="applicant">Поступаю</button>
+          <button class="chip" aria-pressed="false" data-role="student">Учусь</button>
+          <button class="chip" aria-pressed="false" data-role="staff">Работаю в УрФУ</button>
+          <button class="chip" aria-pressed="false" data-role="partner">Партнёр</button>
+          <button class="chip" aria-pressed="false" data-role="intl">International</button>
+        </div>
+        <div class="tickets" id="scen" aria-live="polite"></div>
+      </div>
+    </section>
+
+    <!-- FAQ -->
+    <section class="section section--surface" id="faq" aria-labelledby="faq-title">
+      <div class="container">
+        <div class="s-head"><div><h2 class="h2" id="faq-title">Частые вопросы по темам</h2><span class="hand">не нашёл — спроси в чате, он ниже</span></div></div>
+        <div class="faq-layout">
+          <aside class="faq-aside" aria-label="Темы вопросов">
+            <nav class="faq-nav" id="faq-nav">
+              <a href="#transfer" data-cat="transfer">Перевод и восстановление <span class="count"></span></a>
+              <a href="#it" data-cat="it">Wi‑Fi, почта, доступы <span class="count"></span></a>
+              <a href="#psy" data-cat="psy">Психологическая помощь <span class="count"></span></a>
+              <a href="#access" data-cat="access">Студентам с ОВЗ <span class="count"></span></a>
+              <a href="#safety" data-cat="safety">Безопасность <span class="count"></span></a>
+              <a href="#visa" data-cat="visa">Иностранным студентам <span class="count"></span></a>
+              <a href="#jobs" data-cat="jobs">Работа в УрФУ <span class="count"></span></a>
+              <a href="#endowment" data-cat="endowment">Эндаумент-фонд <span class="count"></span></a>
+              <a href="#alumni" data-cat="alumni">Выпускникам <span class="count"></span></a>
+            </nav>
+          </aside>
+
+          <div id="faq-list">
+            <section class="faq-cat" id="transfer" aria-labelledby="h-transfer">
+              <div class="faq-cat__head"><span class="icon-tile"><i data-icon="refresh"></i></span><h3 class="h3" id="h-transfer">Перевод и восстановление</h3></div>
+              <details class="acc" id="q-transfer-1"><summary><span class="q">Как перевестись в УрФУ из другого вуза?</span><i data-icon="plus"></i></summary><div class="acc__body">
+                <p>Заявления на перевод принимаем дважды в год: до 1 августа и до 20 января.</p>
+                <ul><li>Возьми в своём вузе справку о периоде обучения.</li><li>Подай заявление онлайн и приложи справку.</li><li>Комиссия сравнит учебные планы и назначит дату собеседования, если нужно.</li><li>После положительного решения получишь справку о переводе и отнесёшь её в свой вуз.</li></ul>
+                <p>Подробно об условиях — <a href="admission.html#apply">на странице поступления</a>.</p>
+              </div></details>
+              <details class="acc" id="q-transfer-2"><summary><span class="q">Можно ли перевестись с платного обучения на бюджет?</span><i data-icon="plus"></i></summary><div class="acc__body">
+                <p>Да, если на твоей программе есть свободные бюджетные места и ты сдал две последние сессии только на «хорошо» и «отлично». Также можно перейти на бюджет, если ты относишься к льготной категории.</p>
+                <p>Заявление подаётся в <a href="student.html#requests">кабинете студента</a>, решение — в течение 10 рабочих дней.</p>
+              </div></details>
+              <details class="acc" id="q-transfer-3"><summary><span class="q">Как восстановиться после отчисления?</span><i data-icon="plus"></i></summary><div class="acc__body">
+                <p>Восстановиться можно в течение 5 лет после отчисления. Подай заявление в студенческий офис своего института: комиссия посмотрит, какие предметы нужно досдать, и предложит график.</p>
+                <p>Если тебя отчислили не по собственному желанию, восстановление возможно только на платное место.</p>
+              </div></details>
+              <details class="acc" id="q-transfer-4"><summary><span class="q">Как сменить программу или институт внутри УрФУ?</span><i data-icon="plus"></i></summary><div class="acc__body">
+                <p>Подай заявление о переводе в <a href="student.html#requests">кабинете студента</a> и выбери новую программу. Если разница в предметах больше 10, комиссия может предложить перевод на курс ниже.</p>
+              </div></details>
+            </section>
+
+            <section class="faq-cat" id="it" aria-labelledby="h-it">
+              <div class="faq-cat__head"><span class="icon-tile"><i data-icon="wifi"></i></span><h3 class="h3" id="h-it">Wi‑Fi, почта и доступы</h3></div>
+              <details class="acc" id="q-it-1"><summary><span class="q">Как подключиться к Wi‑Fi в корпусах и общежитиях?</span><i data-icon="plus"></i></summary><div class="acc__body">
+                <p>Выбери сеть <strong>UrFU</strong> и войди с логином и паролем от личного кабинета. Для гостей есть сеть UrFU-Guest с подтверждением по номеру телефона.</p>
+                <p>Если сеть не видна или не пускает — перезагрузи Wi‑Fi на устройстве и проверь, что пароль от кабинета не истёк.</p>
+              </div></details>
+              <details class="acc" id="q-it-2"><summary><span class="q">Не работает корпоративная почта — что делать?</span><i data-icon="plus"></i></summary><div class="acc__body">
+                <ul><li>Проверь, что входишь с полным адресом вида name@urfu.me.</li><li>Сбрось пароль в личном кабинете в разделе «Безопасность».</li><li>Не помогло — напиши в IT-поддержку: ответ в течение 2 часов.</li></ul>
+              </div></details>
+              <details class="acc" id="q-it-3"><summary><span class="q">Забыл пароль от личного кабинета</span><i data-icon="plus"></i></summary><div class="acc__body">
+                <p>Нажми «Забыли пароль?» на странице входа и введи номер студенческого или e-mail. Ссылка для сброса придёт на почту, указанную при поступлении.</p>
+              </div></details>
+              <details class="acc" id="q-it-4"><summary><span class="q">Как получить доступ к электронным курсам и офисным программам?</span><i data-icon="plus"></i></summary><div class="acc__body">
+                <p>Доступ открывается автоматически после зачисления. Курсы — в разделе «Электронные сервисы» <a href="student.html#services">кабинета студента</a>, офисные программы — по корпоративной учётной записи.</p>
+              </div></details>
+              <div class="faq-cta cluster"><button class="btn btn--sm" type="button" data-toast="Заявка в IT-поддержку создана, номер 24-1057 (демо)"><i data-icon="send"></i> Создать заявку в IT-поддержку</button><a class="btn btn--sm btn--ghost" href="tel:+73433759393"><i data-icon="phone"></i> +7 (343) 375-93-93</a></div>
+            </section>
+
+            <section class="faq-cat" id="psy" aria-labelledby="h-psy">
+              <div class="faq-cat__head"><span class="icon-tile" style="background:var(--role-staff-bg);color:var(--role-staff)"><i data-icon="message"></i></span><h3 class="h3" id="h-psy">Психологическая помощь</h3><span class="sticker sticker--coral" style="--rot:4deg">линия 24/7</span></div>
+              <details class="acc" id="q-psy-1"><summary><span class="q">Как записаться к психологу?</span><i data-icon="plus"></i></summary><div class="acc__body">
+                <p>Консультации бесплатные и анонимные. Можно встретиться очно в Главном корпусе или поговорить онлайн. Запись — в кабинете студента или по телефону центра психологической помощи <a href="tel:+73433757777">+7 (343) 375-77-77</a>.</p>
+              </div></details>
+              <details class="acc" id="q-psy-2"><summary><span class="q">Что делать, если тяжело прямо сейчас?</span><i data-icon="plus"></i></summary><div class="acc__body">
+                <p>Позвони на линию поддержки студентов <a href="tel:+73433757777">+7 (343) 375-77-77</a> — она работает круглосуточно. Если есть угроза жизни, звони <a href="tel:112">112</a>.</p>
+                <p>Ты не один — к психологам УрФУ ежегодно обращаются тысячи студентов, это нормально.</p>
+              </div></details>
+              <details class="acc" id="q-psy-3"><summary><span class="q">Узнают ли о визите преподаватели или родители?</span><i data-icon="plus"></i></summary><div class="acc__body">
+                <p>Нет. Психологи соблюдают конфиденциальность и не передают информацию ни институту, ни родственникам.</p>
+              </div></details>
+            </section>
+
+            <section class="faq-cat" id="access" aria-labelledby="h-access">
+              <div class="faq-cat__head"><span class="icon-tile" style="background:var(--role-student-bg);color:var(--role-student)"><i data-icon="heart"></i></span><h3 class="h3" id="h-access">Студентам с ОВЗ</h3></div>
+              <details class="acc" id="q-access-1"><summary><span class="q">Какие условия есть для студентов с ограниченными возможностями здоровья (ОВЗ)?</span><i data-icon="plus"></i></summary><div class="acc__body">
+                <ul><li>Пандусы, лифты и доступные санузлы в основных корпусах.</li><li>Индивидуальный график сессии и адаптированные учебные материалы.</li><li>Тьютор, который сопровождает на протяжении учёбы.</li><li>Версия сайта для слабовидящих — кнопка с глазом в шапке.</li></ul>
+              </div></details>
+              <details class="acc" id="q-access-2"><summary><span class="q">Как поступить, если у меня инвалидность?</span><i data-icon="plus"></i></summary><div class="acc__body">
+                <p>Для тебя есть отдельная квота бюджетных мест, а вступительные испытания можно пройти в адаптированной форме. Подробнее — в разделе <a href="admission.html#benefits">«Льготы и особые права»</a>.</p>
+              </div></details>
+              <details class="acc" id="q-access-3"><summary><span class="q">Кто поможет с адаптацией во время учёбы?</span><i data-icon="plus"></i></summary><div class="acc__body">
+                <p>Центр инклюзивного образования: тьюторы, психолог, помощь с расписанием и доступными аудиториями. Напиши в чат или позвони в контакт-центр — свяжем со специалистом.</p>
+              </div></details>
+            </section>
+
+            <section class="faq-cat" id="safety" aria-labelledby="h-safety">
+              <div class="faq-cat__head"><span class="icon-tile" style="background:var(--accent-soft);color:var(--accent-strong)"><i data-icon="shield"></i></span><h3 class="h3" id="h-safety">Безопасность</h3></div>
+              <details class="acc" id="q-safety-1"><summary><span class="q">Куда сообщить об опасной ситуации в кампусе?</span><i data-icon="plus"></i></summary><div class="acc__body">
+                <p>Звони в дежурную часть кампуса <a href="tel:+73433759999">+7 (343) 375-99-99</a> — круглосуточно. При угрозе жизни сначала звони <a href="tel:112">112</a>.</p>
+              </div></details>
+              <details class="acc" id="q-safety-2"><summary><span class="q">Как сообщить о травле или дискриминации?</span><i data-icon="plus"></i></summary><div class="acc__body">
+                <p>Через анонимную форму обратной связи внизу страницы (тема «Безопасность») или напрямую в комиссию по этике. Каждое обращение рассматривается в течение 5 рабочих дней.</p>
+              </div></details>
+              <details class="acc" id="q-safety-3"><summary><span class="q">Потерял пропуск или студенческий — что делать?</span><i data-icon="plus"></i></summary><div class="acc__body">
+                <p>Заблокируй пропуск в кабинете студента и закажи новый в разделе <a href="student.html#requests">«Справки и заявления»</a>. Временный пропуск выдадут на посту охраны по паспорту.</p>
+              </div></details>
+              <details class="acc" id="q-safety-4"><summary><span class="q">Как провести гостя в корпус?</span><i data-icon="plus"></i></summary><div class="acc__body">
+                <p>Оформи гостевой пропуск в кабинете не позднее чем за сутки. Гость проходит по паспорту.</p>
+              </div></details>
+            </section>
+
+            <section class="faq-cat" id="visa" aria-labelledby="h-visa" lang="ru">
+              <div class="faq-cat__head"><span class="icon-tile" style="background:var(--role-intl-bg);color:var(--role-intl)"><i data-icon="id-card"></i></span><h3 class="h3" id="h-visa">Иностранным студентам · <span lang="en">International students</span></h3></div>
+              <details class="acc" id="q-visa-1"><summary><span class="q">Как получить учебную визу? <span class="lang-en" lang="en">How do I get a student visa?</span></span><i data-icon="plus"></i></summary><div class="acc__body">
+                <p>После зачисления международная служба оформит приглашение — это занимает около 20 рабочих дней. С приглашением обратись в консульство России в своей стране.</p>
+                <p lang="en">After admission, the International Office issues an invitation letter (about 20 working days). Take it to the Russian consulate in your country to apply for a student visa.</p>
+              </div></details>
+              <details class="acc" id="q-visa-2"><summary><span class="q">Что сделать после приезда? <span class="lang-en" lang="en">What to do after arrival?</span></span><i data-icon="plus"></i></summary><div class="acc__body">
+                <ul><li>Встать на миграционный учёт — в течение 7 рабочих дней, мы поможем.</li><li>Пройти медосвидетельствование и дактилоскопию.</li><li>Заселиться в общежитие и получить студенческий.</li></ul>
+                <p lang="en">Register with the migration service within 7 working days (we help with this), complete the medical check and fingerprinting, then move into the dormitory.</p>
+              </div></details>
+              <details class="acc" id="q-visa-3"><summary><span class="q">Как продлить визу? <span class="lang-en" lang="en">How do I extend my visa?</span></span><i data-icon="plus"></i></summary><div class="acc__body">
+                <p>Подай документы в международную службу не позднее чем за 40 дней до окончания визы.</p>
+                <p lang="en">Submit your documents to the International Office at least 40 days before your visa expires.</p>
+              </div></details>
+              <details class="acc" id="q-visa-4"><summary><span class="q">Нужна ли медицинская страховка? <span class="lang-en" lang="en">Do I need health insurance?</span></span><i data-icon="plus"></i></summary><div class="acc__body">
+                <p>Да, полис добровольного медицинского страхования обязателен на весь срок учёбы. Его можно оформить в университете в день приезда.</p>
+                <p lang="en">Yes, voluntary health insurance is required for the whole period of study. You can get it at the university on arrival day.</p>
+              </div></details>
+            </section>
+
+            <section class="faq-cat" id="jobs" aria-labelledby="h-jobs">
+              <div class="faq-cat__head"><span class="icon-tile" style="background:var(--role-staff-bg);color:var(--role-staff)"><i data-icon="briefcase"></i></span><h3 class="h3" id="h-jobs">Работа в УрФУ</h3></div>
+              <details class="acc" id="q-jobs-1"><summary><span class="q">Где посмотреть вакансии университета?</span><i data-icon="plus"></i></summary><div class="acc__body">
+                <p>Сейчас открыто 46 вакансий: преподаватели, научные сотрудники, IT-специалисты и административный персонал. Откликнуться можно онлайн, резюме рассматривают за 5 рабочих дней.</p>
+              </div></details>
+              <details class="acc" id="q-jobs-2"><summary><span class="q">Как оформить отпуск или справку с места работы?</span><i data-icon="plus"></i></summary><div class="acc__body">
+                <p>В HR-разделе кабинета сотрудника: заявление на отпуск согласуется онлайн, справка с места работы готовится за 1 рабочий день.</p>
+              </div></details>
+              <details class="acc" id="q-jobs-3"><summary><span class="q">Могут ли студенты работать в университете?</span><i data-icon="plus"></i></summary><div class="acc__body">
+                <p>Да — лаборантами, ассистентами в научных проектах и в студенческих офисах. Подходящие вакансии отмечены тегом «Для студентов». Другие вакансии и стажировки — <a href="student.html#career">в разделе «Карьера»</a>.</p>
+              </div></details>
+              <div class="faq-cta cluster"><button class="btn btn--sm" type="button" data-toast="Каталог вакансий откроется в HR-портале (демо)"><i data-icon="briefcase"></i> Смотреть 46 вакансий</button></div>
+            </section>
+
+            <section class="faq-cat" id="endowment" aria-labelledby="h-endowment">
+              <div class="faq-cat__head"><span class="icon-tile" style="background:var(--role-partner-bg);color:var(--role-partner)"><i data-icon="coins"></i></span><h3 class="h3" id="h-endowment">Эндаумент-фонд</h3></div>
+              <details class="acc" id="q-endowment-1"><summary><span class="q">Что такое эндаумент-фонд и на что идут деньги?</span><i data-icon="plus"></i></summary><div class="acc__body">
+                <p>Это фонд целевого капитала: пожертвования инвестируются, а доход ежегодно направляется на стипендии, лаборатории, студенческие проекты и развитие кампуса. Сам капитал не тратится — он работает на университет годами.</p>
+              </div></details>
+              <details class="acc" id="q-endowment-2"><summary><span class="q">Как сделать пожертвование?</span><i data-icon="plus"></i></summary><div class="acc__body">
+                <p>Онлайн или по реквизитам фонда. Вы можете выбрать цель: стипендии, наука, спорт или конкретный институт. Отчёт о расходовании дохода публикуется каждый год.</p>
+              </div></details>
+              <details class="acc" id="q-endowment-3"><summary><span class="q">Можно ли получить налоговый вычет?</span><i data-icon="plus"></i></summary><div class="acc__body">
+                <p>Да, частные лица могут оформить социальный налоговый вычет. По запросу пришлём документы для налоговой.</p>
+              </div></details>
+              <div class="faq-cta cluster"><button class="btn btn--sm btn--accent" type="button" data-toast="Форма пожертвования откроется на сайте фонда (демо)"><i data-icon="heart"></i> Поддержать университет</button></div>
+            </section>
+
+            <section class="faq-cat" id="alumni" aria-labelledby="h-alumni">
+              <div class="faq-cat__head"><span class="icon-tile"><i data-icon="graduation"></i></span><h3 class="h3" id="h-alumni">Выпускникам</h3></div>
+              <details class="acc" id="q-alumni-1"><summary><span class="q">Как вступить в ассоциацию выпускников?</span><i data-icon="plus"></i></summary><div class="acc__body">
+                <p>Заполни анкету — это бесплатно. Участники получают приглашения на встречи, доступ к библиотеке и скидки на дополнительное образование.</p>
+              </div></details>
+              <details class="acc" id="q-alumni-2"><summary><span class="q">Как получить дубликат диплома?</span><i data-icon="plus"></i></summary><div class="acc__body">
+                <p>Подай заявление онлайн и приложи скан паспорта. Дубликат будет готов в течение 30 дней, получить его можно лично или по доверенности.</p>
+              </div></details>
+              <details class="acc" id="q-alumni-3"><summary><span class="q">Как заказать архивную справку или копию приказа?</span><i data-icon="plus"></i></summary><div class="acc__body">
+                <p>Через форму обратной связи с темой «Архив». Укажите годы обучения и институт — справку подготовим за 10 рабочих дней.</p>
+              </div></details>
+              <div class="faq-cta cluster"><button class="btn btn--sm" type="button" data-toast="Анкета выпускника отправлена (демо)"><i data-icon="users"></i> Вступить в ассоциацию</button></div>
+            </section>
+
+            <div class="faq-empty" id="faq-empty" hidden>
+              <strong>Не нашли готового ответа</strong>
+              <span class="small muted">Задай вопрос помощнику — он ответит сразу или передаст оператору.</span>
+              <div class="cluster" style="justify-content:center"><a class="btn btn--accent" href="#chat"><i data-icon="message"></i> Спросить в чате</a><button class="btn btn--ghost" type="button" id="faq-clear">Сбросить поиск</button></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Документы -->
+    <section class="section anchor" id="docs">
+      <div class="container">
+        <div class="s-head">
+          <div><h2 class="h2">Официальная информация</h2><p>Обязательные разделы — без поиска по десяткам страниц.</p></div>
+        </div>
+        <div class="docs">
+          <div class="card" data-tab="Сведения">
+            <h3 class="h4">Сведения об образовательной организации</h3>
+            <div class="doc-list">
+              <a class="doc" href="help.html#docs" data-toast="Документ откроется в формате PDF (демо)"><span class="icon-tile"><i data-icon="file"></i></span><span>Основные сведения<small>Обновлено 1 сентября</small></span><i data-icon="download"></i></a>
+              <a class="doc" href="structure.html"><span class="icon-tile"><i data-icon="layers"></i></span><span>Структура и органы управления<small>Страница сайта</small></span><i data-icon="arrow-right"></i></a>
+              <a class="doc" href="help.html#docs" data-toast="Документ откроется в формате PDF (демо)"><span class="icon-tile"><i data-icon="file"></i></span><span>Устав и лицензия<small>PDF · 2,4 МБ</small></span><i data-icon="download"></i></a>
+              <a class="doc" href="help.html#docs" data-toast="Документ откроется в формате PDF (демо)"><span class="icon-tile"><i data-icon="file"></i></span><span>Платные образовательные услуги<small>PDF · 860 КБ</small></span><i data-icon="download"></i></a>
+              <a class="doc" href="student.html#money"><span class="icon-tile"><i data-icon="coins"></i></span><span>Стипендии и меры поддержки<small>Страница сайта</small></span><i data-icon="arrow-right"></i></a>
+            </div>
+          </div>
+          <div class="card" data-tab="Антикоррупция">
+            <h3 class="h4">Противодействие коррупции</h3>
+            <div class="doc-list">
+              <a class="doc" href="help.html#docs" data-toast="Документ откроется в формате PDF (демо)"><span class="icon-tile"><i data-icon="file"></i></span><span>Антикоррупционная политика УрФУ<small>PDF · 540 КБ</small></span><i data-icon="download"></i></a>
+              <a class="doc" href="help.html#docs" data-toast="Документ откроется в формате PDF (демо)"><span class="icon-tile"><i data-icon="file"></i></span><span>Кодекс этики сотрудников и обучающихся<small>PDF · 380 КБ</small></span><i data-icon="download"></i></a>
+              <a class="doc" href="help.html#docs" data-toast="Документ откроется в формате PDF (демо)"><span class="icon-tile"><i data-icon="file"></i></span><span>Отчёт комиссии за 2025 год<small>PDF · 1,1 МБ</small></span><i data-icon="download"></i></a>
+              <a class="doc" href="#feedback" data-topic="corruption"><span class="icon-tile"><i data-icon="shield"></i></span><span>Сообщить о коррупции<small>Анонимно, через форму</small></span><i data-icon="arrow-right"></i></a>
+            </div>
+          </div>
+          <div class="card" data-tab="Данные">
+            <h3 class="h4">Политика конфиденциальности</h3>
+            <div class="doc-list">
+              <a class="doc" href="help.html#docs" data-toast="Документ откроется в формате PDF (демо)"><span class="icon-tile"><i data-icon="lock"></i></span><span>Политика обработки персональных данных<small>PDF · 420 КБ</small></span><i data-icon="download"></i></a>
+              <a class="doc" href="help.html#docs" data-toast="Документ откроется в формате PDF (демо)"><span class="icon-tile"><i data-icon="file"></i></span><span>Согласие на обработку данных: шаблон<small>DOCX · 45 КБ</small></span><i data-icon="download"></i></a>
+              <a class="doc" href="help.html#docs" data-toast="Документ откроется в формате PDF (демо)"><span class="icon-tile"><i data-icon="file"></i></span><span>Правила использования cookie<small>PDF · 120 КБ</small></span><i data-icon="download"></i></a>
+              <a class="doc" href="concept.html"><span class="icon-tile"><i data-icon="info"></i></span><span>О концепции редизайна сайта<small>Страница сайта</small></span><i data-icon="arrow-right"></i></a>
+            </div>
+          </div>
+        </div>
+        <p class="demo-note" style="margin-top:12px">Документы демонстрационные — в прототипе не скачиваются</p>
+      </div>
+    </section>
+
+    <!-- Контакты -->
+    <section class="section section--surface anchor" id="contacts">
+      <div class="container">
+        <div class="s-head">
+          <div><h2 class="h2">Единый справочник</h2><span class="hand">все телефоны — на одной странице</span><p>Все службы университета в одном списке — ищи по названию или задаче.</p></div>
+        </div>
+        <div class="dir-tools">
+          <div class="field">
+            <label for="dir-q">Найти подразделение или задачу</label>
+            <div class="input-icon"><i data-icon="search"></i><input class="input" id="dir-q" type="search" placeholder="Например: пресс-служба, справка, виза" autocomplete="off"></div>
+          </div>
+          <span class="small muted" id="dir-count" aria-live="polite"></span>
+        </div>
+        <div class="contacts" id="dir">
+          <article class="card contact" data-text="приёмная комиссия поступление абитуриент документы баллы"><span class="tag tag--applicant">Поступление</span><h3>Приёмная комиссия</h3><a class="phone" href="tel:+73433754444">+7 (343) 375-44-44</a><div class="line"><i data-icon="mail"></i><a href="mailto:priem@urfu.ru">priem@urfu.ru</a></div><div class="line"><i data-icon="clock"></i>Пн–Пт 9:00–17:00</div><div class="line"><i data-icon="map-pin"></i>ул. Мира, 19, Главный корпус</div><div class="card__footer"><span></span><button class="btn btn--ghost btn--icon" type="button" data-copy="+7 (343) 375-44-44" aria-label="Скопировать телефон приёмной комиссии"><i data-icon="copy"></i></button></div></article>
+          <article class="card contact" data-text="контакт-центр единая линия бесплатно вопросы горячая линия"><span class="tag tag--brand">Для всех</span><h3>Контакт-центр</h3><a class="phone" href="tel:88001005044">8-800-100-50-44</a><div class="line"><i data-icon="info"></i>Бесплатно по России</div><div class="line"><i data-icon="clock"></i>Пн–Сб 8:00–20:00</div><div class="line"><i data-icon="message"></i><a href="#chat">или напиши в чат</a></div><div class="card__footer"><span></span><button class="btn btn--ghost btn--icon" type="button" data-copy="8-800-100-50-44" aria-label="Скопировать телефон контакт-центра"><i data-icon="copy"></i></button></div></article>
+          <article class="card contact" data-text="ректорат приёмная ректора руководство"><span class="tag">Руководство</span><h3>Ректорат</h3><a class="phone" href="tel:+73433754503">+7 (343) 375-45-03</a><div class="line"><i data-icon="mail"></i><a href="mailto:rector@urfu.ru">rector@urfu.ru</a></div><div class="line"><i data-icon="clock"></i>Пн–Пт 9:00–18:00</div><div class="line"><i data-icon="map-pin"></i>ул. Мира, 19, кабинет И-401</div><div class="card__footer"><span></span><button class="btn btn--ghost btn--icon" type="button" data-copy="+7 (343) 375-45-03" aria-label="Скопировать телефон ректората"><i data-icon="copy"></i></button></div></article>
+          <article class="card contact" data-text="техподдержка it wi-fi wifi почта пароль доступ кабинет"><span class="tag tag--staff">IT</span><h3>IT-техподдержка</h3><a class="phone" href="tel:+73433759393">+7 (343) 375-93-93</a><div class="line"><i data-icon="mail"></i><a href="mailto:support@urfu.ru">support@urfu.ru</a></div><div class="line"><i data-icon="clock"></i>Круглосуточно</div><div class="line"><i data-icon="wifi"></i>Wi‑Fi, почта, пароли, доступы</div><div class="card__footer"><span></span><button class="btn btn--ghost btn--icon" type="button" data-copy="+7 (343) 375-93-93" aria-label="Скопировать телефон техподдержки"><i data-icon="copy"></i></button></div></article>
+          <article class="card contact" data-text="пресс-служба сми журналисты интервью новости медиа"><span class="tag">СМИ</span><h3>Пресс-служба</h3><a class="phone" href="tel:+73433754636">+7 (343) 375-46-36</a><div class="line"><i data-icon="mail"></i><a href="mailto:press@urfu.ru">press@urfu.ru</a></div><div class="line"><i data-icon="clock"></i>Пн–Пт 9:00–18:00</div><div class="line"><i data-icon="bell"></i><a href="news.html">Новости и пресс-релизы</a></div><div class="card__footer"><span></span><button class="btn btn--ghost btn--icon" type="button" data-copy="+7 (343) 375-46-36" aria-label="Скопировать телефон пресс-службы"><i data-icon="copy"></i></button></div></article>
+          <article class="card contact" data-text="международная служба иностранные студенты виза миграция international office visa"><span class="tag tag--intl">International</span><h3>Международная служба</h3><a class="phone" href="tel:+73433754891">+7 (343) 375-48-91</a><div class="line"><i data-icon="mail"></i><a href="mailto:intl@urfu.ru">intl@urfu.ru</a></div><div class="line"><i data-icon="clock"></i>Пн–Пт 9:00–17:00</div><div class="line"><i data-icon="globe"></i>Визы, миграционный учёт · English</div><div class="card__footer"><span></span><button class="btn btn--ghost btn--icon" type="button" data-copy="+7 (343) 375-48-91" aria-label="Скопировать телефон международной службы"><i data-icon="copy"></i></button></div></article>
+          <article class="card contact" data-text="центр психологической помощи психолог поддержка тревога стресс"><span class="tag tag--staff">Поддержка</span><h3>Центр психологической помощи</h3><a class="phone" href="tel:+73433757777">+7 (343) 375-77-77</a><div class="line"><i data-icon="mail"></i><a href="mailto:psy@urfu.ru">psy@urfu.ru</a></div><div class="line"><i data-icon="clock"></i>Линия поддержки 24/7</div><div class="line"><i data-icon="lock"></i>Анонимно и бесплатно</div><div class="card__footer"><span></span><button class="btn btn--ghost btn--icon" type="button" data-copy="+7 (343) 375-77-77" aria-label="Скопировать телефон центра психологической помощи"><i data-icon="copy"></i></button></div></article>
+          <article class="card contact" data-text="студенческий офис справка студенческий билет зачётка приказ"><span class="tag tag--student">Студентам</span><h3>Студенческий офис</h3><a class="phone" href="tel:+73433754100">+7 (343) 375-41-00</a><div class="line"><i data-icon="mail"></i><a href="mailto:student@urfu.ru">student@urfu.ru</a></div><div class="line"><i data-icon="clock"></i>Пн–Пт 9:00–17:00</div><div class="line"><i data-icon="file"></i><a href="student.html#requests">Справки онлайн</a></div><div class="card__footer"><span></span><button class="btn btn--ghost btn--icon" type="button" data-copy="+7 (343) 375-41-00" aria-label="Скопировать телефон студенческого офиса"><i data-icon="copy"></i></button></div></article>
+          <article class="card contact" data-text="отдел кадров hr работа вакансии отпуск сотрудники"><span class="tag tag--staff">Сотрудникам</span><h3>Отдел кадров</h3><a class="phone" href="tel:+73433754410">+7 (343) 375-44-10</a><div class="line"><i data-icon="mail"></i><a href="mailto:hr@urfu.ru">hr@urfu.ru</a></div><div class="line"><i data-icon="clock"></i>Пн–Пт 9:00–17:00</div><div class="line"><i data-icon="briefcase"></i><a href="#jobs">Работа в УрФУ</a></div><div class="card__footer"><span></span><button class="btn btn--ghost btn--icon" type="button" data-copy="+7 (343) 375-44-10" aria-label="Скопировать телефон отдела кадров"><i data-icon="copy"></i></button></div></article>
+          <article class="card contact" data-text="дежурная часть безопасность охрана экстренно кампус"><span class="tag tag--accent">Безопасность</span><h3>Дежурная часть кампуса</h3><a class="phone" href="tel:+73433759999">+7 (343) 375-99-99</a><div class="line"><i data-icon="clock"></i>Круглосуточно</div><div class="line"><i data-icon="shield"></i>При угрозе жизни — 112</div><div class="line"><i data-icon="map-pin"></i><a href="campus.html">Карта кампуса</a></div><div class="card__footer"><span></span><button class="btn btn--ghost btn--icon" type="button" data-copy="+7 (343) 375-99-99" aria-label="Скопировать телефон дежурной части"><i data-icon="copy"></i></button></div></article>
+          <article class="card contact" data-text="центр трансфера технологий партнёрам бизнес исследования наука заказ"><span class="tag tag--partner">Партнёрам</span><h3>Центр трансфера технологий</h3><a class="phone" href="tel:+73433754848">+7 (343) 375-48-48</a><div class="line"><i data-icon="mail"></i><a href="mailto:rd@urfu.ru">rd@urfu.ru</a></div><div class="line"><i data-icon="clock"></i>Пн–Пт 9:00–18:00</div><div class="line"><i data-icon="flask"></i><a href="science.html#business">Заказать исследование</a></div><div class="card__footer"><span></span><button class="btn btn--ghost btn--icon" type="button" data-copy="+7 (343) 375-48-48" aria-label="Скопировать телефон центра трансфера технологий"><i data-icon="copy"></i></button></div></article>
+          <article class="card contact" data-text="эндаумент фонд пожертвование выпускники ассоциация alumni"><span class="tag tag--partner">Фонд и выпускники</span><h3>Эндаумент-фонд и ассоциация выпускников</h3><a class="phone" href="tel:+73433754050">+7 (343) 375-40-50</a><div class="line"><i data-icon="mail"></i><a href="mailto:fund@urfu.ru">fund@urfu.ru</a></div><div class="line"><i data-icon="clock"></i>Пн–Пт 10:00–18:00</div><div class="line"><i data-icon="heart"></i><a href="#endowment">Как поддержать</a></div><div class="card__footer"><span></span><button class="btn btn--ghost btn--icon" type="button" data-copy="+7 (343) 375-40-50" aria-label="Скопировать телефон эндаумент-фонда"><i data-icon="copy"></i></button></div></article>
+        </div>
+        <div class="faq-empty" id="dir-empty" hidden><strong>Подразделение не найдено</strong><span class="small muted">Позвони в контакт-центр — подскажем, куда обратиться.</span></div>
+        <p class="demo-note" style="margin-top:12px">Кроме приёмной комиссии и контакт-центра, телефоны и адреса демонстрационные</p>
+
+        <div class="cc-band">
+          <div>
+            <h3 class="h4">УрФУ в соцсетях</h3>
+            <p class="small muted" style="margin:6px 0 12px">Новости, трансляции событий и ответы на вопросы в комментариях.</p>
+            <div class="socials">
+              <button type="button" data-toast="Откроется сообщество УрФУ ВКонтакте (демо)" aria-label="ВКонтакте">VK</button>
+              <button type="button" data-toast="Откроется телеграм-канал УрФУ (демо)" aria-label="Telegram">Telegram</button>
+              <button type="button" data-toast="Откроется канал УрФУ на Rutube (демо)" aria-label="Rutube">Rutube</button>
+              <button type="button" data-toast="Откроется канал УрФУ в Дзене (демо)" aria-label="Дзен">Дзен</button>
+            </div>
+          </div>
+          <div class="cluster">
+            <a class="btn btn--lg" href="tel:88001005044"><i data-icon="phone"></i> 8-800-100-50-44</a>
+            <a class="btn btn--accent btn--lg" href="#chat"><i data-icon="message"></i> Написать в чат</a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Чат-бот -->
+    <section class="section anchor" id="chat">
+      <div class="container">
+       <div class="chat-band">
+        <span class="sticker sticker--round" aria-hidden="true">оператор — за 15 минут</span>
+        <div>
+          <h2 class="h2">Спроси — ответим сразу</h2>
+          <p class="lead-text">Помощник знает ответы на частые вопросы про общежития, расписание, справки и поступление. Если вопрос сложный — передаст оператору: в рабочее время мы отвечаем в течение 15 минут.</p>
+          <div class="stack" style="margin-top:24px">
+            <div class="notice"><i data-icon="clock"></i><div><strong>Операторы на связи</strong><div class="small muted">Пн–Пт 8:00–20:00, Сб 10:00–16:00</div></div></div>
+            <div class="notice"><i data-icon="lock"></i><div><strong>Мы не просим пароли</strong><div class="small muted">Никогда не отправляй в чат пароли и данные карт.</div></div></div>
+          </div>
+          <p class="demo-note" style="margin-top:12px">Демо: ответы заготовлены заранее и подбираются по ключевым словам</p>
+          <span class="hand">пиши как другу — разберёмся</span>
+        </div>
+        <div class="chat" aria-label="Чат с помощником УрФУ">
+          <div class="chat__head">
+            <span class="avatar" aria-hidden="true"><i data-icon="sparkles"></i></span>
+            <div><strong>Помощник УрФУ</strong><br><span class="status"><span class="dot" aria-hidden="true"></span>онлайн · отвечает сразу</span></div>
+            <button class="btn btn--ghost btn--icon" type="button" id="chat-reset" aria-label="Начать диалог заново" style="margin-left:auto"><i data-icon="refresh"></i></button>
+          </div>
+          <div class="chat__log" id="chat-log" role="log" aria-live="polite" aria-label="Сообщения чата" tabindex="0"></div>
+          <div class="chat__quick" id="chat-quick" role="group" aria-label="Быстрые вопросы">
+            <button class="chip" type="button">Общежитие</button>
+            <button class="chip" type="button">Расписание</button>
+            <button class="chip" type="button">Справка об обучении</button>
+            <button class="chip" type="button">Поступление</button>
+            <button class="chip" type="button">Не работает Wi‑Fi</button>
+          </div>
+          <form class="chat__form" id="chat-form">
+            <label class="sr-only" for="chat-input">Сообщение помощнику</label>
+            <input class="input" id="chat-input" type="text" placeholder="Напиши вопрос…" autocomplete="off" maxlength="300">
+            <button class="btn btn--icon" type="submit" aria-label="Отправить сообщение"><i data-icon="send"></i></button>
+          </form>
+        </div>
+       </div>
+      </div>
+    </section>
+
+    <!-- Обратная связь -->
+    <section class="section section--surface anchor" id="feedback">
+      <div class="container fb">
+        <div>
+          <h2 class="h2">Не нашли ответ? Напишите нам</h2>
+          <span class="hand" style="margin-bottom:16px">можно анонимно</span>
+          <p class="muted">Ответим на почту в течение рабочего дня. Жалобы и сообщения о нарушениях можно отправить анонимно.</p>
+          <ul class="stack-sm" style="margin-top:20px">
+            <li class="row"><span class="icon-tile" style="width:40px;height:40px"><i data-icon="clock"></i></span><span class="small">Среднее время ответа — 4 часа</span></li>
+            <li class="row"><span class="icon-tile" style="width:40px;height:40px"><i data-icon="shield"></i></span><span class="small">Обращения видит только ответственная служба</span></li>
+          </ul>
+        </div>
+        <form class="card card--pad-lg" id="fb-form" novalidate>
+          <div class="form-grid">
+            <div class="field"><label for="fb-name">Имя</label><input class="input" id="fb-name" name="name" autocomplete="given-name" placeholder="Можно оставить пустым"></div>
+            <div class="field"><label for="fb-email">E-mail для ответа *</label><input class="input" id="fb-email" name="email" type="email" required autocomplete="email" placeholder="you@example.ru"></div>
+            <div class="field full"><label for="fb-topic">Тема</label>
+              <select class="select" id="fb-topic" name="topic">
+                <option value="admission">Поступление</option>
+                <option value="study">Учёба и документы</option>
+                <option value="dorm">Общежитие и кампус</option>
+                <option value="it">IT и доступы</option>
+                <option value="safety">Безопасность</option>
+                <option value="corruption">Сообщить о коррупции</option>
+                <option value="archive">Архив и выпускники</option>
+                <option value="other" selected>Другое</option>
+              </select>
+            </div>
+            <div class="field full"><label for="fb-msg">Сообщение *</label><textarea class="textarea" id="fb-msg" name="message" required placeholder="Опишите вопрос — чем подробнее, тем быстрее ответим"></textarea></div>
+            <label class="check full"><input type="checkbox" id="fb-anon"> Отправить анонимно (без имени)</label>
+            <label class="check full"><input type="checkbox" id="fb-agree" required> Согласен на обработку данных для ответа *</label>
+          </div>
+          <p class="small" id="fb-error" role="alert" style="color:var(--danger)" hidden></p>
+          <div class="cluster">
+            <button class="btn btn--accent btn--lg" type="submit"><i data-icon="send"></i> Отправить</button>
+            <span class="xs muted">Отправка демонстрационная</span>
+          </div>
+        </form>
+      </div>
+    </section>
+  </main>
+
+  <div id="site-footer"></div>
+
+  <script src="assets/js/app.js"></script>
+  <script>
+    (function () {
+      'use strict';
+      const plural = (n, f) => f[(n % 10 === 1 && n % 100 !== 11) ? 0 : (n % 10 >= 2 && n % 10 <= 4 && (n % 100 < 10 || n % 100 >= 20)) ? 1 : 2];
+      const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+      // нормализация для поиска: регистр, ё→е, неразрывный дефис → обычный (длина строки сохраняется)
+      const norm = (s) => s.toLowerCase().replace(/ё/g, 'е').replace(/‑/g, '-');
+      const SYN = { wifi: 'wi-fi', 'вайфай': 'wi-fi', 'вай-фай': 'wi-fi', 'общага': 'общежит', 'visa': 'виз', 'пароли': 'парол', 'почта': 'почт' };
+      // упрощённая «основа» слова: убираем окончание-гласную, чтобы «виза» находила «визу» и «визы»
+      const stem = (t) => SYN[t] || (t.length >= 4 && /[а-я]/.test(t) && /[аеиоуыэюяйь]$/.test(t) ? t.slice(0, -1) : t);
+      // термин ищем только с начала слова; у коротких основ («виз») — не больше 2 букв окончания, чтобы «виза» не находила «визите»
+      const termRe = (w) => {
+        const s = stem(w); const tight = s !== w && s.length <= 3;
+        return new RegExp('(?<![a-zа-я0-9])' + s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + (tight ? '(?![а-я]{3})' : ''), 'g');
+      };
+      const has = (re, str) => { re.lastIndex = 0; return re.test(str); };
+
+      /* ---------- Сценарии «Мне нужно…» ---------- */
+      const SCEN = {
+        applicant: [['Подобрать программу по баллам', 'programs.html#calc', 'target', 'каталог и калькулятор'], ['Узнать сроки приёма', 'admission.html#dates', 'calendar', 'даты 2027 года'], ['Подать документы онлайн', 'admission.html#apply', 'send', '3 шага, 15 минут'], ['Заселиться в общежитие', 'campus.html#dorms', 'bed', 'цены и как подать заявку'], ['Перевестись из другого вуза', '#transfer', 'refresh', 'сроки и документы'], ['Поступить с ОВЗ', '#access', 'heart', 'квоты и условия']],
+        student: [['Заказать справку', 'student.html#requests', 'file', 'готово за 1 день'], ['Найти расписание', 'schedule.html', 'calendar', 'по группе или преподавателю'], ['Подключить Wi‑Fi и почту', '#it', 'wifi', 'инструкции и техподдержка'], ['Поговорить с психологом', '#psy', 'message', 'бесплатно и анонимно'], ['Перевестись или восстановиться', '#transfer', 'refresh', 'на бюджет, в другой институт'], ['Получить стипендию', 'student.html#money', 'coins', 'виды и выплаты']],
+        staff: [['Найти документы и приказы', '#docs', 'file', 'официальная информация'], ['IT-поддержка', '#it', 'wifi', 'Wi‑Fi, почта, доступы'], ['Отпуск и HR-справки', '#jobs', 'briefcase', 'в кабинете сотрудника'], ['Подать заявку на грант', 'science.html#grants', 'award', 'открытые конкурсы'], ['Справочник подразделений', '#contacts', 'phone', 'телефоны и почта'], ['Сообщить о нарушении', '#safety', 'shield', 'можно анонимно']],
+        partner: [['Заказать исследование', 'science.html#business', 'flask', 'ответ за 3 рабочих дня'], ['Найти выпускников и стажёров', 'student.html#career', 'users', 'вакансии и практика'], ['Поддержать университет', '#endowment', 'heart', 'эндаумент-фонд'], ['Лицензировать технологию', 'science.html#startups', 'rocket', 'каталог разработок'], ['Связаться с пресс-службой', '#contacts', 'bell', 'для СМИ и партнёров'], ['Реквизиты и документы', '#docs', 'file', 'сведения об организации']],
+        intl: [['Visa & migration', '#visa', 'id-card', 'invitation, registration'], ['Housing', 'campus.html#dorms', 'home', 'dorms from 1 500 ₽/month'], ['Programs in English', 'programs.html?lang=en', 'globe', 'bachelor & master'], ['Health insurance', '#q-visa-4', 'heart', 'required for all students'], ['Russian language courses', 'programs.html?level=extra', 'book', 'preparatory faculty'], ['International Office', '#contacts', 'phone', 'contacts & hours']]
+      };
+      const scenEl = document.getElementById('scen');
+      const roleGroup = document.getElementById('scen-roles');
+      function renderScen(role) {
+        if (!SCEN[role]) role = 'applicant';
+        roleGroup.querySelectorAll('.chip').forEach((c) => c.setAttribute('aria-pressed', String(c.dataset.role === role)));
+        scenEl.dataset.roleKey = role;
+        scenEl.innerHTML = SCEN[role].map(([t, u, i, d], n) => `<a class="ticket" href="${u}"><span class="ticket__n" aria-hidden="true">0${n + 1}</span><span><strong>${t}</strong><small>${d}</small></span><span class="ticket__arrow" aria-hidden="true">${UI.icon('arrow-up-right')}</span></a>`).join('');
+      }
+      roleGroup.addEventListener('chipchange', () => renderScen(roleGroup.querySelector('[aria-pressed="true"]').dataset.role));
+      document.addEventListener('rolechange', (e) => renderScen(e.detail));
+      renderScen(UI.getRole());
+
+      /* ---------- FAQ: поиск, подсветка, счётчики ---------- */
+      const qInput = document.getElementById('faq-q');
+      const statusEl = document.getElementById('faq-status');
+      const preview = document.getElementById('faq-preview');
+      const popular = document.getElementById('faq-popular');
+      const cats = [...document.querySelectorAll('.faq-cat')];
+      const items = [...document.querySelectorAll('.faq-cat details.acc')];
+      const navLinks = [...document.querySelectorAll('#faq-nav a')];
+      const CAT_ICON = { transfer: 'refresh', it: 'wifi', psy: 'message', access: 'heart', safety: 'shield', visa: 'id-card', jobs: 'briefcase', endowment: 'coins', alumni: 'graduation' };
+      let originals = null;
+      function snapshot() {
+        if (originals) return;
+        originals = new Map(items.map((d) => [d, { q: d.querySelector('.q').innerHTML, b: d.querySelector('.acc__body').innerHTML }]));
+      }
+      function highlight(root, terms) {
+        if (!terms.length) return;
+        const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT);
+        const nodes = []; while (walker.nextNode()) nodes.push(walker.currentNode);
+        nodes.forEach((node) => {
+          const text = node.nodeValue; const low = norm(text);
+          const ranges = [];
+          terms.forEach((re) => { re.lastIndex = 0; let m; while ((m = re.exec(low))) ranges.push([m.index, m.index + m[0].length]); });
+          if (!ranges.length) return;
+          ranges.sort((a, b) => a[0] - b[0]);
+          const merged = []; ranges.forEach((r) => { const last = merged[merged.length - 1]; if (last && r[0] <= last[1]) last[1] = Math.max(last[1], r[1]); else merged.push([...r]); });
+          const frag = document.createDocumentFragment(); let pos = 0;
+          merged.forEach(([s, e]) => {
+            if (s > pos) frag.appendChild(document.createTextNode(text.slice(pos, s)));
+            const m = document.createElement('mark'); m.className = 'hit'; m.textContent = text.slice(s, e); frag.appendChild(m); pos = e;
+          });
+          if (pos < text.length) frag.appendChild(document.createTextNode(text.slice(pos)));
+          node.parentNode.replaceChild(frag, node);
+        });
+      }
+      function updateCounts() {
+        navLinks.forEach((a) => {
+          const sec = document.getElementById(a.dataset.cat);
+          const n = sec.querySelectorAll('details.acc:not([hidden])').length;
+          a.querySelector('.count').textContent = n;
+          a.classList.toggle('is-empty', n === 0);
+        });
+      }
+      function search() {
+        snapshot();
+        const raw = qInput.value.trim();
+        const terms = norm(raw).split(/\s+/).filter((t) => t.length > 1).map(termRe);
+        const found = [];
+        items.forEach((d) => {
+          const o = originals.get(d);
+          const qEl = d.querySelector('.q'); const bEl = d.querySelector('.acc__body');
+          qEl.innerHTML = o.q; bEl.innerHTML = o.b;
+          if (!terms.length) { d.hidden = false; if (d.dataset.auto) { d.open = false; delete d.dataset.auto; } return; }
+          const hay = norm(qEl.textContent + ' ' + bEl.textContent);
+          const ok = terms.every((re) => has(re, hay));
+          d.hidden = !ok;
+          if (ok) {
+            highlight(qEl, terms); highlight(bEl, terms);
+            const inTitle = terms.some((re) => has(re, norm(qEl.textContent)));
+            found.push({ d, inTitle });
+            if (!d.open && raw.length >= 3) { d.open = true; d.dataset.auto = '1'; }
+          } else if (d.dataset.auto) { d.open = false; delete d.dataset.auto; }
+        });
+        cats.forEach((c) => { c.hidden = terms.length > 0 && !c.querySelector('details.acc:not([hidden])'); });
+        document.getElementById('faq-empty').hidden = !terms.length || found.length > 0;
+        updateCounts();
+        // статус и превью
+        popular.hidden = terms.length > 0;
+        if (!terms.length) { statusEl.textContent = 'Часто ищут:'; preview.hidden = true; preview.innerHTML = ''; return; }
+        statusEl.textContent = found.length ? `Нашли ${found.length} ${plural(found.length, ['ответ', 'ответа', 'ответов'])} — ниже в разделе «Вопросы и ответы»` : 'Готового ответа нет — спроси в чате';
+        found.sort((a, b) => b.inTitle - a.inTitle);
+        preview.hidden = false;
+        preview.innerHTML = found.length
+          ? found.slice(0, 5).map(({ d }) => {
+            const cat = d.closest('.faq-cat');
+            return `<a href="#${d.id}"><span class="icon-tile">${UI.icon(CAT_ICON[cat.id] || 'help')}</span><span><strong>${d.querySelector('.q').innerHTML}</strong><small>${esc(cat.querySelector('h3').textContent)}</small></span></a>`;
+          }).join('') + (found.length > 5 ? `<div class="preview__foot">И ещё ${found.length - 5} — смотри в списке ниже</div>` : '')
+          : `<a href="#chat"><span class="icon-tile">${UI.icon('message')}</span><span><strong>Спросить помощника в чате</strong><small>ответит сразу или передаст оператору</small></span></a>`;
+      }
+      let t; qInput.addEventListener('input', () => { clearTimeout(t); t = setTimeout(search, 120); });
+      qInput.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') { e.preventDefault(); const first = preview.querySelector('a'); if (first) first.click(); }
+        if (e.key === 'Escape' && qInput.value) { e.stopPropagation(); qInput.value = ''; search(); }
+      });
+      popular.querySelectorAll('[data-q]').forEach((c) => c.addEventListener('click', () => { qInput.value = c.dataset.q; search(); qInput.focus(); }));
+      document.getElementById('faq-clear').addEventListener('click', () => { qInput.value = ''; search(); qInput.focus(); });
+      updateCounts();
+
+      /* ---------- Якорь → раскрыть нужный ответ ---------- */
+      function openFromHash(scroll) {
+        const id = decodeURIComponent(location.hash.slice(1));
+        if (!id) return;
+        const el = document.getElementById(id);
+        if (!el) return;
+        let d = el.closest('details.acc') || (el.matches('.faq-cat, .anchor') ? el.querySelector('details.acc') : null);
+        if (d && d.hidden) { qInput.value = ''; search(); }
+        if (d) d.open = true;
+        navLinks.forEach((a) => a.classList.toggle('is-current', a.dataset.cat === (el.closest('.faq-cat') || {}).id));
+        if (scroll) requestAnimationFrame(() => el.scrollIntoView({ block: 'start', behavior: scroll === 'instant' ? 'instant' : 'smooth' }));
+      }
+      window.addEventListener('hashchange', () => openFromHash(false));
+      // ссылки на текущую страницу с тем же хэшем не вызывают hashchange — обрабатываем клик
+      document.addEventListener('click', (e) => {
+        const a = e.target.closest('a[href^="#"]');
+        if (a && a.getAttribute('href') === location.hash) setTimeout(() => openFromHash(true), 0);
+      });
+      openFromHash(false);
+      // после отрисовки шапки и загрузки шрифтов вёрстка сдвигается — повторяем переход к якорю
+      let touched = false;
+      ['wheel', 'touchstart', 'keydown', 'mousedown'].forEach((ev) => window.addEventListener(ev, () => { touched = true; }, { once: true, passive: true }));
+      const land = () => { if (location.hash.length > 1 && !touched) openFromHash('instant'); };
+      window.addEventListener('load', land);
+      if (document.fonts && document.fonts.ready) document.fonts.ready.then(land);
+
+      /* ---------- Справочник контактов ---------- */
+      const dirQ = document.getElementById('dir-q');
+      const dirCards = [...document.querySelectorAll('#dir .contact')];
+      function filterDir() {
+        const v = norm(dirQ.value.trim());
+        const words = v.split(/\s+/).filter(Boolean).map(stem);
+        let n = 0;
+        dirCards.forEach((c) => {
+          const hay = norm(c.dataset.text + ' ' + c.textContent);
+          const ok = !words.length || words.every((w) => hay.includes(w));
+          c.hidden = !ok; if (ok) n++;
+        });
+        document.getElementById('dir-empty').hidden = n > 0;
+        document.getElementById('dir-count').textContent = words.length ? `Найдено: ${n} из ${dirCards.length}` : `${dirCards.length} ${plural(dirCards.length, ['служба', 'службы', 'служб'])}`;
+      }
+      dirQ.addEventListener('input', filterDir);
+      filterDir();
+      document.querySelectorAll('[data-copy]').forEach((b) => b.addEventListener('click', async () => {
+        try { await navigator.clipboard.writeText(b.dataset.copy); UI.toast('Скопировано: ' + b.dataset.copy); }
+        catch (e) { UI.toast(b.dataset.copy); }
+      }));
+
+      /* ---------- Чат-бот (демо) ---------- */
+      const log = document.getElementById('chat-log');
+      const form = document.getElementById('chat-form');
+      const input = document.getElementById('chat-input');
+      const L = (t, u, i = 'arrow-right') => `<a href="${u}">${UI.icon(i)}${t}</a>`;
+      const RULES = [
+        { re: /общеж|общаг|засел|жиль|комнат|dorm|housing/, a: 'Про общежития: цены, адреса и как заселиться — на странице кампуса. Заявку на место подаёшь в кабинете студента сразу после зачисления.', l: [['Общежития и цены', 'campus.html#dorms', 'bed'], ['Подать заявку', 'student.html#requests', 'file']] },
+        { re: /распис|(^|[^а-я])пар[аыу]?(?![а-я])|занят|аудитор/, a: 'Расписание можно найти по номеру группы, преподавателю или аудитории — и добавить пары в календарь телефона.', l: [['Открыть расписание', 'schedule.html', 'calendar']] },
+        { re: /справк|документ об обуч|зачётк|зачетк/, a: 'Справку об обучении заказывают в кабинете студента — электронная готова сразу, бумажная за 1 рабочий день.', l: [['Заказать справку', 'student.html#requests', 'file']] },
+        { re: /поступ|абитур|балл|при[её]м|егэ|программ/, a: 'Поступление — это 3 шага: выбрать программы, подать документы онлайн и следить за рейтингом. Начни с подбора программ по баллам.', l: [['Как поступить', 'admission.html#steps', 'route'], ['Подбор по баллам', 'programs.html#calc', 'target']] },
+        { re: /wi-?fi|вай-?фай|интернет|почт|парол|кабинет не/, a: 'Вот инструкции по Wi‑Fi, почте и паролям. Если не поможет — техподдержка работает круглосуточно: +7 (343) 375-93-93.', l: [['Wi‑Fi, почта, доступы', '#it', 'wifi']] },
+        { re: /психолог|тревож|стресс|плохо|депресс|выгора/, a: 'Мне жаль, что тебе непросто. Психологи УрФУ помогают бесплатно и анонимно, линия поддержки работает круглосуточно: +7 (343) 375-77-77. Если есть угроза жизни — звони 112.', l: [['Психологическая помощь', '#psy', 'heart']] },
+        { re: /(^|[^а-я])виз(?!ит)|visa|миграц|migration|регистрац/, a: 'Про визы и миграционный учёт — в разделе для иностранных студентов. Visa and migration info is available in English too.', l: [['Visa & migration', '#visa', 'id-card']] },
+        { re: /перевод|перевест|восстанов/, a: 'Перевод и восстановление: сроки, документы и как перейти на бюджет — собрали в одном разделе.', l: [['Перевод и восстановление', '#transfer', 'refresh']] },
+        { re: /стипенд|выплат|деньг/, a: 'Стипендии начисляются 25-го числа. Виды стипендий и как получить повышенную — в кабинете студента.', l: [['Стипендии и выплаты', 'student.html#money', 'coins']] },
+        { re: /^(привет|здравств|добр(ый|ое|ого)|hello|hi)(?![a-zа-я])/, a: 'Привет! Я помощник УрФУ. Спроси про общежитие, расписание, справки или поступление — или выбери быстрый вопрос ниже.', l: [] },
+        { re: /спасибо|благодар|thank/, a: 'Рад помочь! Если появятся ещё вопросы — я здесь.', l: [] }
+      ];
+      const time = () => new Date().toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' });
+      function add(html, who) {
+        const m = document.createElement('div');
+        m.className = 'msg msg--' + who;
+        m.innerHTML = html + `<time>${time()}</time>`;
+        log.appendChild(m); log.scrollTop = log.scrollHeight;
+        return m;
+      }
+      function botSay(text, links) {
+        const typing = document.createElement('div');
+        typing.className = 'msg msg--bot typing'; typing.setAttribute('aria-label', 'Помощник печатает');
+        typing.innerHTML = '<span></span><span></span><span></span>';
+        log.appendChild(typing); log.scrollTop = log.scrollHeight;
+        setTimeout(() => {
+          typing.remove();
+          add(esc(text) + (links && links.length ? `<div class="links">${links.map(([t, u, i]) => L(t, u, i)).join('')}</div>` : ''), 'bot');
+        }, 650);
+      }
+      function reply(q) {
+        const n = norm(q);
+        const rule = RULES.find((r) => r.re.test(n));
+        if (rule) botSay(rule.a, rule.l);
+        else botSay('Передал вопрос оператору (демо). В рабочее время отвечаем за 15 минут — ответ придёт сюда и на почту. А пока посмотри частые вопросы или справочник контактов.', [['Частые вопросы', '#faq', 'help'], ['Контакты служб', '#contacts', 'phone']]);
+      }
+      function send(text) {
+        const v = text.trim(); if (!v) return;
+        add(esc(v), 'me');
+        reply(v);
+      }
+      function greet() {
+        log.innerHTML = '';
+        add('Привет! Я помощник УрФУ. Подскажу про общежитие, расписание, справки и поступление. Что тебя интересует?', 'bot');
+      }
+      form.addEventListener('submit', (e) => { e.preventDefault(); send(input.value); input.value = ''; input.focus(); });
+      document.getElementById('chat-quick').addEventListener('click', (e) => { const c = e.target.closest('.chip'); if (c) send(c.textContent); });
+      document.getElementById('chat-reset').addEventListener('click', greet);
+      greet();
+
+      /* ---------- Обратная связь ---------- */
+      const fb = document.getElementById('fb-form');
+      const fbErr = document.getElementById('fb-error');
+      document.querySelectorAll('[data-topic]').forEach((a) => a.addEventListener('click', () => { document.getElementById('fb-topic').value = a.dataset.topic; }));
+      document.getElementById('fb-anon').addEventListener('change', (e) => { const n = document.getElementById('fb-name'); n.disabled = e.target.checked; if (e.target.checked) n.value = ''; });
+      fb.addEventListener('submit', (e) => {
+        e.preventDefault();
+        const email = document.getElementById('fb-email'); const msg = document.getElementById('fb-msg'); const agree = document.getElementById('fb-agree');
+        const problems = [];
+        if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.value.trim())) problems.push([email, 'укажите корректный e-mail']);
+        if (!msg.value.trim()) problems.push([msg, 'напишите сообщение']);
+        if (!agree.checked) problems.push([agree, 'отметьте согласие на обработку данных']);
+        [email, msg, agree].forEach((f) => f.setAttribute('aria-invalid', String(problems.some((p) => p[0] === f))));
+        if (problems.length) { fbErr.hidden = false; fbErr.textContent = 'Проверьте форму: ' + problems.map((p) => p[1]).join(', ') + '.'; problems[0][0].focus(); return; }
+        fbErr.hidden = true;
+        UI.toast('Сообщение отправлено — ответим на почту в течение рабочего дня (демо)');
+        fb.reset(); document.getElementById('fb-name').disabled = false;
+      });
+    })();
+  </script>
+</body>
+</html>

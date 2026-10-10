@@ -1,0 +1,813 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Каталог программ — УрФУ</title>
+  <meta name="description" content="Все программы УрФУ: фильтры по уровню, области и форме обучения, подбор по баллам ЕГЭ и сравнение.">
+  <link rel="icon" href="assets/logo/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="assets/css/tokens.css">
+  <link rel="stylesheet" href="assets/css/components.css">
+  <style>
+    main [id] { scroll-margin-top: 140px; }
+    .calc-band > *, .layout-aside > *, .pg-hero__grid > *, .pick > * { min-width: 0; }
+    .presets { margin-top: 24px; }
+    .presets .chip { min-height: 36px; font-size: var(--fs-xs); }
+    .presets .hand { font-size: calc(22px * var(--fs-scale)); color: var(--text-2); margin-right: 4px; }
+
+    /* ---------- Герой ---------- */
+    .pg-hero__grid { display: grid; gap: 32px; grid-template-columns: 1fr; align-items: center; }
+    @media (min-width: 1024px) { .pg-hero__grid { grid-template-columns: 1fr 360px; gap: 48px; } }
+    .pg-hero h1 { margin-top: 18px; }
+    .pg-hero .lead { color: var(--text-2); }
+    .pg-hero__note { display: inline-block; margin-top: 8px; transform: rotate(var(--rot)); --rot: -2deg; }
+    #hero-eyebrow { --rot: -3deg; }
+    .pg-stack { position: relative; height: 300px; }
+    .pg-stack .photo { position: absolute; }
+    .pg-stack .p1 { left: 0; top: 10px; width: 66%; height: 230px; --rot: -4deg; z-index: 1; }
+    .pg-stack .p2 { right: 0; bottom: 0; width: 58%; height: 200px; --rot: 3deg; z-index: 2; }
+    .pg-stack .photo img { height: calc(100% - 34px); }
+    .pg-stack .sticker { position: absolute; right: 6px; top: 0; z-index: 3; --rot: 8deg; }
+    @media (max-width: 1023px) { .pg-stack { display: none; } }
+
+    /* ---------- Подбор по баллам: синяя плашка ---------- */
+    .calc-band { position: relative; display: grid; gap: 36px; grid-template-columns: 1fr; padding: clamp(24px, 4vw, 52px); border: var(--line) solid var(--ink); border-radius: var(--r-xl); box-shadow: var(--shadow-lg); background: #2747ff; color: #fff; }
+    @media (min-width: 1024px) { .calc-band { grid-template-columns: 1fr 1.15fr; gap: 48px; align-items: center; } }
+    .calc-band h2 { color: #fff; max-width: 15ch; }
+    .calc-band__text > p { color: #e3e8ff; margin-top: 14px; max-width: 520px; }
+    .calc-band .hand { color: #d7ff3d; display: inline-block; margin-top: 18px; transform: rotate(var(--rot)); --rot: -3deg; }
+    .calc-band .demo-note { color: #c9d2ff; }
+    .calc-card { position: relative; background: var(--surface); color: var(--text); border: var(--line) solid var(--ink); border-radius: var(--r-lg); padding: clamp(20px, 3vw, 30px); box-shadow: var(--shadow-md); transform: rotate(var(--rot)); --rot: 1deg; }
+    .calc-card > .sticker { position: absolute; top: -18px; right: 18px; --rot: 6deg; }
+    .calc-rows { display: flex; flex-direction: column; gap: 12px; }
+    .calc-row { display: grid; grid-template-columns: 1fr 110px; gap: 12px; align-items: end; }
+    .calc-total { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; padding: 14px 18px; border-radius: var(--r-md); background: var(--lime-soft); border: var(--line) dashed var(--ink); flex-wrap: wrap; }
+    .calc-total b { font: 800 calc(44px * var(--fs-scale))/1 var(--font-display); letter-spacing: -.03em; }
+    .calc-summary { display: grid; gap: 10px; grid-template-columns: repeat(3, 1fr); }
+    .calc-summary div { border-radius: var(--r-md); padding: 12px 8px; text-align: center; background: #fffdf8; color: #14141a; border: var(--line) solid #14141a; }
+    .calc-summary div:nth-child(2) { transform: rotate(var(--rot)); --rot: -2deg; }
+    .calc-summary b { display: block; font: 800 var(--fs-xl)/1.1 var(--font-display); }
+    .calc-summary span { font-size: var(--fs-xs); color: #45434d; }
+    .calc-summary .ok b { color: #0a7a4a; }
+    .calc-summary .warn b { color: #b45309; }
+    .calc-summary .bad b { color: #d0341a; }
+    .form-error { color: var(--danger); font-size: var(--fs-xs); font-weight: 600; min-height: 1.2em; }
+
+    /* ---------- Фильтры ---------- */
+    .filters { background: var(--surface); border: var(--line) solid var(--ink); border-radius: var(--r-lg); padding: 20px; }
+    .filters__toggle { width: 100%; justify-content: space-between; }
+    .filters__body { margin-top: 8px; }
+    @media (min-width: 1024px) { .filters__toggle { display: none; } .filters__body { margin-top: 0; } .filters { max-height: calc(100vh - 170px); overflow-y: auto; } }
+    @media (max-width: 1023px) { .filters:not(.is-open) .filters__body { display: none; } .filters { padding: 12px; } .filters.sticky { position: static; } }
+    .fgroup { border: none; margin: 0; padding: 16px 0; border-bottom: 1.5px dashed var(--border); }
+    .fgroup:last-of-type { border-bottom: none; }
+    .fgroup legend { font: 700 var(--fs-xs)/1.2 var(--font-display); text-transform: uppercase; letter-spacing: .04em; color: var(--text); padding: 0; margin-bottom: 10px; float: left; width: 100%; }
+    .fgroup legend + * { clear: both; }
+    .fopt { padding: 6px 0; }
+    .fopt span:first-of-type { flex: 1; }
+    .fcount { font-size: var(--fs-xs); color: var(--text-3); font-variant-numeric: tabular-nums; }
+    .fopt.is-zero { color: var(--text-3); }
+    .fopt.is-extra { display: none; }
+    .fgroup.show-extra .fopt.is-extra { display: flex; }
+    .more-btn { border: none; background: none; padding: 6px 0; color: var(--brand); font-weight: 650; font-size: var(--fs-sm); display: inline-flex; gap: 6px; align-items: center; }
+    .switch { display: flex; align-items: center; justify-content: space-between; gap: 12px; font-size: var(--fs-sm); font-weight: 600; cursor: pointer; }
+    .switch input { appearance: none; -webkit-appearance: none; width: 48px; height: 28px; border-radius: var(--r-pill); background: var(--surface-2); border: var(--line) solid var(--ink); position: relative; cursor: pointer; flex: none; transition: background .2s; margin: 0; }
+    .switch input::after { content: ""; position: absolute; top: 2px; left: 2px; width: 20px; height: 20px; border-radius: 50%; background: var(--ink); transition: transform .2s var(--ease); }
+    .switch input:checked { background: var(--lime); }
+    .switch input:checked::after { transform: translateX(20px); }
+    .switch input:focus-visible { box-shadow: var(--focus); }
+
+    /* ---------- Панель каталога ---------- */
+    .toolbar { display: grid; gap: 12px; grid-template-columns: 1fr; margin-bottom: 16px; }
+    @media (min-width: 700px) { .toolbar { grid-template-columns: 1fr 230px auto; align-items: end; } }
+    .view-toggle { display: flex; gap: 4px; padding: 4px; background: var(--surface); border: var(--line) solid var(--ink); border-radius: var(--r-pill); }
+    .view-toggle button { width: 40px; height: 40px; border-radius: 50%; border: none; background: transparent; color: var(--text-2); display: grid; place-items: center; }
+    .view-toggle button[aria-pressed="true"] { background: var(--ink); color: var(--bg); }
+    .active-filters { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin-bottom: 20px; min-height: 8px; }
+    .active-filters .chip { min-height: 32px; padding: 0 12px; font-size: var(--fs-xs); background: var(--lime-soft); color: var(--text); }
+    .active-filters .chip .i { width: 14px; height: 14px; }
+    .result-count { font: 700 var(--fs-md)/1.2 var(--font-display); }
+
+    /* ---------- Карточки программ: разная фактура по области ---------- */
+    .results { display: grid; gap: 22px 18px; grid-template-columns: repeat(auto-fill, minmax(min(100%, 280px), 1fr)); padding-top: 8px; }
+    .prog-card { position: relative; padding: 20px; gap: 10px; transform: rotate(var(--rot, 0deg)); }
+    .results:not(.is-list) .prog-card:nth-child(4n+2) { --rot: .7deg; }
+    .results:not(.is-list) .prog-card:nth-child(4n+3) { --rot: -.6deg; }
+    .prog-card:hover { box-shadow: var(--shadow-md); }
+    .prog-card--it { background-color: var(--surface); }
+    .prog-card--eng { background-color: var(--surface); background-image: linear-gradient(var(--border) 1px, transparent 1px), linear-gradient(90deg, var(--border) 1px, transparent 1px); background-size: 20px 20px; }
+    .prog-card--nat { background-color: var(--lime-soft); }
+    .prog-card--econ { background-color: var(--surface); border-style: dashed; }
+    .prog-card--hum { background-color: var(--surface); background-image: repeating-linear-gradient(180deg, transparent 0 27px, var(--border) 27px 28px); }
+    .prog-card--art { background-color: var(--accent-soft); }
+    .prog-card--sport { background-color: var(--brand-soft); }
+    .prog-card .icon-tile { width: 40px; height: 40px; }
+    .prog-card .icon-tile .i { width: 20px; height: 20px; }
+    .prog-card > .sticker { position: absolute; top: -14px; right: 14px; z-index: 3; padding: 6px 11px; font-size: calc(11px * var(--fs-scale)); --rot: 5deg; }
+    .prog-card > .sticker--paper { --rot: -4deg; }
+    .prog-card__head { display: flex; gap: 12px; align-items: center; justify-content: space-between; }
+    .prog-card__head .cluster { gap: 6px; justify-content: flex-end; }
+    .prog-card .card__title { font: 700 var(--fs-lg)/1.2 var(--font-display); letter-spacing: -.01em; }
+    .prog-card .card__title a:hover { color: var(--brand); }
+    .prog-facts { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin: 4px 0 0; padding: 12px 0 0; border-top: var(--line) solid var(--ink); }
+    .prog-facts div { min-width: 0; }
+    .prog-facts dt { font-size: calc(12px * var(--fs-scale)); color: var(--text-3); }
+    .prog-facts dd { margin: 0; font-weight: 700; font-size: var(--fs-sm); overflow-wrap: break-word; }
+    .prog-card__foot { margin-top: auto; padding-top: 8px; display: flex; align-items: center; justify-content: space-between; gap: 8px; flex-wrap: wrap; }
+    .cmp-btn { position: relative; z-index: 2; background: var(--surface); }
+    .cmp-btn[aria-pressed="true"] { background: var(--ink); color: var(--bg); border-color: var(--ink); }
+    .chance { position: relative; z-index: 2; }
+    .prog-card.is-ok { box-shadow: inset 0 0 0 3px var(--ok); }
+    .tag--danger { color: var(--danger); background: transparent; }
+    .tag--warn { background: var(--role-partner-bg); color: var(--role-partner); }
+
+    @media (min-width: 768px) {
+      .results.is-list .prog-card { display: grid; grid-template-columns: 40px minmax(0, 1fr) minmax(0, 270px) auto; grid-template-rows: auto auto; align-items: center; gap: 6px 20px; }
+      .results.is-list .prog-card__head { display: contents; }
+      .results.is-list .prog-card__head .cluster { grid-column: 2; grid-row: 1; justify-content: flex-start; }
+      .results.is-list .prog-card .icon-tile { grid-column: 1; grid-row: 1 / 3; }
+      .results.is-list .prog-card__main { grid-column: 2; grid-row: 2; }
+      .results.is-list .prog-facts { grid-column: 3; grid-row: 1 / 3; border-top: none; padding: 0; margin: 0; }
+      .results.is-list .prog-card__foot { grid-column: 4; grid-row: 1 / 3; flex-direction: column; align-items: flex-end; padding: 0; }
+    }
+
+    .empty { text-align: center; padding: 48px 24px; border: var(--line) dashed var(--ink); border-radius: var(--r-lg); }
+    .empty .hand { display: block; margin-bottom: 8px; }
+
+    /* ---------- Плашка сравнения ---------- */
+    .cmp-bar { position: fixed; left: 50%; bottom: 16px; transform: translateX(-50%); z-index: 90; width: min(720px, calc(100% - 32px)); background: var(--surface); border: var(--line) solid var(--ink); border-radius: var(--r-pill); box-shadow: var(--shadow-md); padding: 8px 8px 8px 20px; display: flex; align-items: center; gap: 12px; animation: drop .25s var(--ease); }
+    .cmp-bar__names { flex: 1; min-width: 0; font-size: var(--fs-sm); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: var(--text-2); }
+    @media (max-width: 560px) { .cmp-bar { border-radius: var(--r-lg); padding: 8px; } .cmp-bar__names { display: none; } .cmp-bar .btn { flex: 1; } }
+    body.has-cmp main { padding-bottom: 88px; }
+
+    dialog.cmp-dialog { border: var(--line) solid var(--ink); padding: 0; border-radius: var(--r-lg); width: min(1000px, calc(100% - 24px)); max-height: calc(100vh - 48px); background: var(--surface); color: var(--text); box-shadow: var(--shadow-lg); }
+    dialog.cmp-dialog::backdrop { background: rgba(13, 17, 26, .5); }
+    .cmp-dialog__head { position: sticky; top: 0; z-index: 2; display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 20px 24px; background: var(--surface); border-bottom: var(--line) solid var(--ink); }
+    .cmp-dialog__body { padding: 20px 24px 24px; }
+    .cmp-table th[scope="row"] { width: 170px; }
+    .cmp-table td.best { color: var(--ok); font-weight: 750; }
+    .cmp-table thead th { text-transform: none; letter-spacing: 0; font-size: var(--fs-sm); color: var(--text); vertical-align: top; min-width: 180px; }
+    .cmp-table thead th .xs { font-weight: 500; color: var(--text-3); display: block; margin-top: 2px; }
+    .cmp-x { float: right; width: 28px; height: 28px; border-radius: 50%; border: none; background: var(--surface); color: var(--text-3); display: grid; place-items: center; margin-left: 8px; }
+    .cmp-x:hover { color: var(--danger); }
+    .cmp-x .i { width: 16px; height: 16px; }
+
+    /* ---------- Не можешь выбрать: неровная раскладка ---------- */
+    .s-head { display: flex; align-items: end; justify-content: space-between; gap: 16px 24px; flex-wrap: wrap; margin-bottom: 32px; }
+    .s-head p { color: var(--text-2); margin-top: 10px; max-width: 620px; }
+    .s-head .hand { display: inline-block; margin-top: 6px; transform: rotate(var(--rot)); --rot: -2deg; }
+    .pick { display: grid; gap: 22px; grid-template-columns: 1fr; }
+    @media (min-width: 900px) { .pick { grid-template-columns: 1.25fr 1fr; } .pick__big { grid-row: span 2; } }
+    .pick .card p { font-size: var(--fs-sm); color: var(--text-2); }
+    .pick__big { position: relative; display: flex; flex-direction: column; gap: 12px; }
+    .pick__big .photo { height: 280px; margin: 4px 4px 10px; --rot: -1.5deg; }
+    .pick__big .photo img { height: calc(100% - 34px); }
+    .pick__big .sticker { position: absolute; top: 18px; right: 18px; z-index: 2; --rot: 7deg; }
+    .pick__big .card__title { font: 800 var(--fs-2xl)/1.1 var(--font-display); letter-spacing: -.02em; }
+    .pick__test { background: var(--lime-soft); transform: rotate(var(--rot)); --rot: .8deg; }
+    .pick__day { display: flex; gap: 18px; align-items: flex-start; }
+    .tear__day { flex: none; width: calc(96px * var(--fs-scale)); background: #fffdf8; color: #14141a; border: var(--line) solid #14141a; border-radius: 10px; overflow: hidden; text-align: center; box-shadow: 3px 3px 0 #14141a; transform: rotate(var(--rot)); --rot: -3deg; }
+    .tear__day b { display: block; background: #ff5a36; color: #fff; font: 700 calc(12px * var(--fs-scale))/1 var(--font-display); text-transform: uppercase; padding: 7px 0; }
+    .tear__day strong { display: block; font: 800 calc(40px * var(--fs-scale))/1 var(--font-display); padding: 10px 0 2px; }
+    .tear__day span { display: block; font-size: calc(12px * var(--fs-scale)); padding: 0 8px 10px; color: #45434d; line-height: 1.2; }
+
+    /* ---------- Что дальше: билеты ---------- */
+    .tickets { display: grid; gap: 14px; grid-template-columns: 1fr; }
+    @media (min-width: 768px) { .tickets { grid-template-columns: 1.25fr 1fr; } .tickets a:first-child { grid-row: span 2; } }
+    .ticket { position: relative; display: grid; grid-template-columns: auto 1fr auto; align-items: center; gap: 18px; padding: 20px 22px; border: var(--line) solid var(--ink); border-radius: var(--r-lg); background: var(--surface); transition: transform .2s var(--ease), box-shadow .2s var(--ease), background .2s; }
+    .ticket:hover { transform: translate(-3px, -3px); box-shadow: var(--shadow-md); background: var(--lime-soft); }
+    .ticket__n { font: 800 calc(28px * var(--fs-scale))/1 var(--font-display); color: var(--text-3); min-width: 44px; white-space: nowrap; }
+    .ticket strong { display: block; font-size: var(--fs-lg); font-weight: 700; line-height: 1.2; }
+    .ticket small { color: var(--text-3); font-size: var(--fs-sm); }
+    .ticket__arrow { width: 44px; height: 44px; border-radius: 50%; border: var(--line) solid var(--ink); display: grid; place-items: center; background: var(--surface); transition: transform .2s var(--ease); }
+    .ticket:hover .ticket__arrow { transform: rotate(-45deg); background: var(--ink); color: var(--bg); }
+    .ticket::before, .ticket::after { content: ""; position: absolute; left: 64px; width: 18px; height: 18px; border-radius: 50%; background: var(--bg); border: var(--line) solid var(--ink); }
+    .ticket::before { top: -10px; clip-path: inset(50% 0 0 0); }
+    .ticket::after { bottom: -10px; clip-path: inset(0 0 50% 0); }
+    .tickets a:first-child { background: var(--lime); }
+    .tickets a:first-child .ticket__n, .tickets a:first-child small { color: #45434d; }
+    .tickets a:first-child, .tickets a:first-child strong { color: #14141a; }
+    .tickets a:first-child strong { font: 800 var(--fs-2xl)/1.1 var(--font-display); }
+
+    /* ---------- Версия для слабовидящих ---------- */
+    html[data-a11y] :is(.calc-card, .pick__test, .calc-summary div, .prog-card) { transform: none !important; }
+    html[data-a11y] .ticket::before, html[data-a11y] .ticket::after { display: none; }
+    html[data-a11y] :is(.calc-card, .pick__big, .prog-card) > .sticker { position: static; align-self: flex-start; justify-self: start; margin-bottom: 4px; }
+    html[data-a11y] .pick__big .photo { height: auto; }
+    html[data-a11y] .pick__big .photo img { height: 220px; }
+    html[data-a11y] .pick__day { flex-direction: column; }
+    html[data-a11y] .tear__day { width: auto; min-width: 8em; }
+    html[data-a11y] .calc-summary { grid-template-columns: 1fr; }
+    html[data-a11y] .calc-row { grid-template-columns: 1fr; }
+    html[data-a11y] :is(.prog-card--eng, .prog-card--hum) { background-image: none; }
+  </style>
+</head>
+<body data-page="admission">
+  <div id="site-header"></div>
+
+  <main id="main">
+    <!-- 1. Герой -->
+    <section class="page-hero page-hero--tinted pg-hero">
+      <div class="container">
+        <nav class="crumbs" aria-label="Хлебные крошки"><a href="index.html">Главная</a><i data-icon="chevron-right"></i><a href="admission.html">Поступление</a><i data-icon="chevron-right"></i><span>Каталог программ</span></nav>
+        <div class="pg-hero__grid">
+          <div>
+            <span class="sticker sticker--blue" id="hero-eyebrow">Приём-2027 · все уровни</span>
+            <h1 class="h1">Каталог <span class="u-hand">программ</span></h1>
+            <span class="hand pg-hero__note">введи баллы — покажем, куда проходишь ↓</span>
+            <p class="lead" style="margin-top:14px">Отфильтруй по уровню и интересам, введи баллы ЕГЭ — и сразу увидишь свои шансы. Понравившиеся программы можно сравнить.</p>
+            <div class="cluster presets" role="group" aria-label="Готовые подборки">
+              <span class="hand">подборки:</span>
+              <button class="chip" data-preset="it-budget">IT на бюджете</button>
+              <button class="chip" data-preset="en">Обучение на английском</button>
+              <button class="chip" data-preset="eng">Инженерия</button>
+              <button class="chip" data-preset="noege">Без ЕГЭ — колледж</button>
+              <button class="chip" data-preset="master-flex">Магистратура без отрыва от работы</button>
+              <button class="chip" data-preset="extra">Короткие курсы</button>
+            </div>
+          </div>
+          <div class="pg-stack" aria-hidden="true">
+            <figure class="photo tape p1"><img src="assets/img/lecture.jpg" alt="" loading="eager"><figcaption>первая пара</figcaption></figure>
+            <figure class="photo tape--corner p2"><img src="assets/img/robotics.jpg" alt="" loading="eager"><figcaption>а это уже 3 курс</figcaption></figure>
+            <span class="sticker sticker--coral">выбирай смело</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 2. Подбор по баллам — ключевой сценарий на синей плашке -->
+    <section class="section--tight" id="calc">
+      <div class="container">
+        <div class="calc-band">
+          <div class="calc-band__text">
+            <h2 class="h2">Узнай, куда проходишь на бюджет</h2>
+            <p>Выбери предметы и введи баллы ЕГЭ — сравним сумму с проходными прошлого года и отметим каждую программу бакалавриата в каталоге.</p>
+            <span class="hand">30 секунд — и всё понятно</span>
+            <div class="calc-summary" style="margin-top:20px" aria-live="polite" id="calc-summary">
+              <div class="ok"><b id="cs-ok">—</b><span>проходишь</span></div>
+              <div class="warn"><b id="cs-warn">—</b><span>на грани</span></div>
+              <div class="bad"><b id="cs-bad">—</b><span>не хватает</span></div>
+            </div>
+            <p class="demo-note" style="margin-top:12px">«На грани» — разница с проходным не больше 5 баллов. Проходные демонстрационные.</p>
+          </div>
+          <form class="stack calc-card" id="calc-form" novalidate>
+            <span class="sticker sticker--paper" aria-hidden="true">проходные-2026</span>
+            <div class="calc-rows">
+              <div class="calc-row">
+                <div class="field"><label for="s1">Предмет 1</label><select class="select" id="s1"></select></div>
+                <div class="field"><label for="v1">Баллы</label><input class="input" id="v1" type="number" inputmode="numeric" min="0" max="100" placeholder="0–100"></div>
+              </div>
+              <div class="calc-row">
+                <div class="field"><label for="s2">Предмет 2</label><select class="select" id="s2"></select></div>
+                <div class="field"><label for="v2">Баллы</label><input class="input" id="v2" type="number" inputmode="numeric" min="0" max="100" placeholder="0–100"></div>
+              </div>
+              <div class="calc-row">
+                <div class="field"><label for="s3">Предмет 3</label><select class="select" id="s3"></select></div>
+                <div class="field"><label for="v3">Баллы</label><input class="input" id="v3" type="number" inputmode="numeric" min="0" max="100" placeholder="0–100"></div>
+              </div>
+              <div class="calc-row calc-row--ind">
+                <div class="field"><label for="vi">Индивидуальные достижения</label><span class="xs muted">медаль, ГТО, волонтёрство — до 10 баллов</span></div>
+                <div class="field"><label for="vi" class="sr-only">Баллы за достижения</label><input class="input" id="vi" type="number" inputmode="numeric" min="0" max="10" placeholder="0–10"></div>
+              </div>
+            </div>
+            <span class="form-error" id="calc-err" aria-live="polite"></span>
+            <div class="calc-total"><span class="label">Сумма с достижениями</span><b id="calc-sum">0</b></div>
+            <div class="cluster">
+              <button class="btn btn--accent" type="submit"><i data-icon="check"></i> Показать, куда прохожу</button>
+              <button class="btn btn--ghost" type="button" id="calc-example">Подставить пример</button>
+              <button class="btn btn--ghost btn--icon" type="button" id="calc-reset" aria-label="Очистить баллы"><i data-icon="refresh"></i></button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </section>
+
+    <!-- 3. Каталог -->
+    <section class="section" style="padding-top:clamp(24px,3vw,40px)" id="catalog">
+      <div class="container layout-aside">
+        <aside class="filters sticky" id="filters" aria-label="Фильтры">
+          <button class="btn btn--ghost filters__toggle" type="button" id="filters-toggle" aria-expanded="false" aria-controls="filters-body"><span class="row" style="gap:8px"><i data-icon="sliders"></i> Фильтры <span class="tag tag--brand" id="filters-n" hidden></span></span><i data-icon="chevron-down"></i></button>
+          <div class="filters__body" id="filters-body">
+            <fieldset class="fgroup" id="f-l"><legend>Уровень</legend><div></div></fieldset>
+            <fieldset class="fgroup" id="f-a"><legend>Область</legend><div></div><button type="button" class="more-btn" id="more-areas" aria-expanded="false">Ещё 2 <i data-icon="chevron-down"></i></button></fieldset>
+            <fieldset class="fgroup" id="f-f"><legend>Форма обучения</legend><div></div></fieldset>
+            <fieldset class="fgroup">
+              <legend>Язык обучения</legend>
+              <div class="cluster" data-chip-group id="f-lang">
+                <button type="button" class="chip" aria-pressed="true" data-lang="all">Любой</button>
+                <button type="button" class="chip" aria-pressed="false" data-lang="ru">Русский</button>
+                <button type="button" class="chip" aria-pressed="false" data-lang="en">English</button>
+              </div>
+            </fieldset>
+            <fieldset class="fgroup">
+              <legend class="sr-only">Бюджетные места</legend>
+              <label class="switch" for="f-budget">Только с бюджетом<input type="checkbox" id="f-budget" role="switch"></label>
+            </fieldset>
+            <button class="btn btn--ghost btn--block btn--sm" type="button" id="reset-all" style="margin-top:12px"><i data-icon="refresh"></i> Сбросить всё</button>
+          </div>
+        </aside>
+
+        <div>
+          <div class="toolbar">
+            <div class="field">
+              <label for="q">Поиск по названию, институту или коду</label>
+              <div class="input-icon"><i data-icon="search"></i><input class="input" id="q" type="search" placeholder="Например, «информатика» или 09.03.04" autocomplete="off"></div>
+            </div>
+            <div class="field">
+              <label for="sort">Сортировка</label>
+              <select class="select" id="sort">
+                <option value="pop">Сначала популярные</option>
+                <option value="chance">По моим шансам</option>
+                <option value="pass-desc">Проходной: выше</option>
+                <option value="pass-asc">Проходной: ниже</option>
+                <option value="budget">Больше бюджетных мест</option>
+                <option value="price">Дешевле</option>
+                <option value="name">По алфавиту</option>
+              </select>
+            </div>
+            <div class="view-toggle" role="group" aria-label="Вид списка">
+              <button type="button" data-view="grid" aria-pressed="true" aria-label="Плиткой"><i data-icon="grid"></i></button>
+              <button type="button" data-view="list" aria-pressed="false" aria-label="Списком"><i data-icon="list"></i></button>
+            </div>
+          </div>
+          <div class="row between" style="flex-wrap:wrap;margin-bottom:12px">
+            <p class="result-count" id="count" aria-live="polite">Найдено программ: 0</p>
+            <p class="demo-note">Проходные баллы 2026 и стоимость — демонстрационные</p>
+          </div>
+          <div class="active-filters" id="active"></div>
+          <div class="results" id="results"></div>
+          <div class="empty" id="empty" hidden>
+            <span class="hand">хм, пусто…</span>
+            <h3 class="h3">Ничего не нашлось</h3>
+            <p class="muted" style="margin:8px auto 20px;max-width:440px" id="empty-hint">Попробуй убрать часть фильтров или поискать другое слово — например, по коду направления.</p>
+            <div class="cluster" style="justify-content:center">
+              <button class="btn" type="button" id="empty-reset"><i data-icon="refresh"></i> Сбросить фильтры</button>
+              <a class="btn btn--ghost" href="help.html#chat"><i data-icon="message"></i> Спросить консультанта</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 4. Не можешь выбрать -->
+    <section class="section section--surface grid-paper">
+      <div class="container">
+        <div class="s-head">
+          <div>
+            <h2 class="h2">Не можешь выбрать? Это нормально</h2>
+            <span class="hand">вот что помогает чаще всего</span>
+          </div>
+        </div>
+        <div class="pick">
+          <a class="card card--pad-lg pick__big" href="help.html#chat">
+            <span class="sticker sticker--coral" aria-hidden="true">онлайн</span>
+            <figure class="photo tape"><img src="assets/img/friends.jpg" alt="Студенты смеются за столом" loading="lazy"><figcaption>спроси нас, мы честно</figcaption></figure>
+            <h3 class="card__title">Спроси студентов</h3>
+            <p>Студенты-амбассадоры честно расскажут про учёбу, нагрузку и жизнь в кампусе.</p>
+            <span class="arrow-link">Написать амбассадору <i data-icon="arrow-right"></i></span>
+          </a>
+          <div class="card card--pad-lg pick__test">
+            <h3 class="card__title">Пройди профтест</h3>
+            <p style="margin-top:6px">15 вопросов о том, что тебе нравится, — и подборка из 5 подходящих программ.</p>
+            <div class="card__footer"><button class="btn btn--sm" data-toast="Профтест откроется в новом окне (демо)">Начать тест</button><span class="hand" style="font-size:calc(22px * var(--fs-scale))">7 минут</span></div>
+          </div>
+          <a class="card card--pad-lg pick__day" href="news.html">
+            <div class="tear__day" aria-hidden="true"><b>октябрь</b><strong>12</strong><span>ИРИТ-РтФ</span></div>
+            <div>
+              <h3 class="card__title">Приходи на день открытых дверей</h3>
+              <p style="margin-top:6px">Познакомься с преподавателями и загляни в лаборатории. Ближайший — 12 октября в ИРИТ-РтФ.</p>
+              <span class="arrow-link small" style="margin-top:10px">Вся афиша <i data-icon="arrow-right"></i></span>
+            </div>
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <!-- 5. Как поступить -->
+    <section class="section">
+      <div class="container">
+        <div class="s-head">
+          <div>
+            <h2 class="h2">Выбрал программу? Осталось два шага</h2>
+            <span class="hand">а потом — студенческий!</span>
+          </div>
+          <a class="arrow-link" href="admission.html">Всё о поступлении <i data-icon="arrow-right"></i></a>
+        </div>
+        <div class="tickets">
+          <a class="ticket" href="admission.html#dates"><span class="ticket__n">01</span><span><strong>Сроки приёма 2027</strong><small>Старт — 20 июня, последний день по ЕГЭ — 25 июля</small></span><span class="ticket__arrow"><i data-icon="arrow-right"></i></span></a>
+          <a class="ticket" href="admission.html#apply"><span class="ticket__n">02</span><span><strong>Подать документы</strong><small>Через Госуслуги, личный кабинет или лично</small></span><span class="ticket__arrow"><i data-icon="arrow-right"></i></span></a>
+          <a class="ticket" href="admission.html#lists"><span class="ticket__n">03</span><span><strong>Следить за рейтингом</strong><small>Найди себя по СНИЛС — списки обновляются каждый час</small></span><span class="ticket__arrow"><i data-icon="arrow-right"></i></span></a>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Плашка сравнения -->
+  <div class="cmp-bar" id="cmp-bar" hidden>
+    <span class="cmp-bar__names" id="cmp-names"></span>
+    <button class="btn btn--ghost btn--sm" type="button" id="cmp-clear">Очистить</button>
+    <button class="btn btn--sm" type="button" id="cmp-open"><i data-icon="layers"></i> <span id="cmp-label">Сравнить (0)</span></button>
+  </div>
+
+  <dialog class="cmp-dialog" id="cmp-dialog" aria-labelledby="cmp-title">
+    <div class="cmp-dialog__head">
+      <h2 class="h3" id="cmp-title">Сравнение программ</h2>
+      <button class="tool-btn" type="button" id="cmp-close" aria-label="Закрыть сравнение"><i data-icon="x"></i></button>
+    </div>
+    <div class="cmp-dialog__body">
+      <div class="table-wrap"><table class="table cmp-table" id="cmp-table"></table></div>
+      <p class="demo-note" style="margin-top:12px">Зелёным отмечены лучшие значения. Данные демонстрационные.</p>
+    </div>
+  </dialog>
+
+  <div id="site-footer"></div>
+
+  <script src="assets/js/app.js"></script>
+  <script>
+    (function () {
+      const $ = (s, r = document) => r.querySelector(s);
+      const $$ = (s, r = document) => [...r.querySelectorAll(s)];
+      const ic = (n) => UI.icon(n);
+      const fmt = (n) => Math.round(n).toLocaleString('ru-RU');
+      const plural = (n, f) => f[(n % 10 === 1 && n % 100 !== 11) ? 0 : (n % 10 >= 2 && n % 10 <= 4 && (n % 100 < 10 || n % 100 >= 20)) ? 1 : 2];
+      const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+
+      /* ---------- Справочники ---------- */
+      const LEVELS = { bachelor: 'Бакалавриат', master: 'Магистратура', phd: 'Аспирантура', college: 'Колледж', extra: 'Доп. образование' };
+      const AREAS = { it: 'IT и цифровые технологии', eng: 'Инженерия', nat: 'Естественные науки', econ: 'Экономика и управление', hum: 'Гуманитарные науки', art: 'Искусство и дизайн', sport: 'Спорт' };
+      const FORMS = { full: 'Очная', mixed: 'Очно-заочная', part: 'Заочная' };
+      const SUBJ = { math: 'Математика (профиль)', rus: 'Русский язык', inf: 'Информатика', phys: 'Физика', chem: 'Химия', bio: 'Биология', soc: 'Обществознание', hist: 'История', lit: 'Литература', eng: 'Иностранный язык', geo: 'География' };
+      const SHORT = { math: 'математика', rus: 'русский', inf: 'информатика', phys: 'физика', chem: 'химия', bio: 'биология', soc: 'обществознание', hist: 'история', lit: 'литература', eng: 'иностранный', geo: 'география', creative: 'творческий экзамен', prof: 'экзамен по физподготовке' };
+
+      /* ---------- Программы (демо-данные) ---------- */
+      // n — название, i — институт, c — код, l — уровень, a — область, f — форма, lang, b — бюджетные места,
+      // pass — проходной 2026, price — ₽ в год (для ДПО — за курс), d — срок, ex — экзамены (слоты с альтернативами), ic — иконка
+      const STD = [['math'], ['inf', 'phys'], ['rus']];
+      const P = [
+        { id: 'se', n: 'Программная инженерия', i: 'ИРИТ-РтФ', c: '09.03.04', l: 'bachelor', a: 'it', f: 'full', lang: 'ru', b: 120, pass: 262, price: 289000, d: '4 года', ex: STD, ic: 'cpu' },
+        { id: 'pi', n: 'Прикладная информатика', i: 'ИРИТ-РтФ', c: '09.03.03', l: 'bachelor', a: 'it', f: 'full', lang: 'ru', b: 75, pass: 248, price: 265000, d: '4 года', ex: STD, ic: 'layers' },
+        { id: 'ib', n: 'Информационная безопасность', i: 'ИРИТ-РтФ', c: '10.03.01', l: 'bachelor', a: 'it', f: 'full', lang: 'ru', b: 60, pass: 255, price: 270000, d: '4 года', ex: STD, ic: 'shield' },
+        { id: 'mkn', n: 'Математика и компьютерные науки', i: 'ИЕНиМ', c: '02.03.01', l: 'bachelor', a: 'it', f: 'full', lang: 'ru', b: 50, pass: 251, price: 255000, d: '4 года', ex: STD, ic: 'chart' },
+        { id: 'cse', n: 'Computer Science and Engineering', i: 'ИРИТ-РтФ', c: '09.03.01', l: 'bachelor', a: 'it', f: 'full', lang: 'en', b: 20, pass: 240, price: 310000, d: '4 года', ex: [['math'], ['inf', 'phys'], ['eng']], ic: 'globe' },
+        { id: 'ms', n: 'Машиностроение', i: 'ИНМиТ', c: '15.03.01', l: 'bachelor', a: 'eng', f: 'full', lang: 'ru', b: 90, pass: 198, price: 235000, d: '4 года', ex: [['math'], ['phys', 'inf', 'chem'], ['rus']], ic: 'sliders' },
+        { id: 'ee', n: 'Электроэнергетика и электротехника', i: 'УралЭНИН', c: '13.03.02', l: 'bachelor', a: 'eng', f: 'full', lang: 'ru', b: 140, pass: 205, price: 240000, d: '4 года', ex: [['math'], ['phys', 'inf'], ['rus']], ic: 'zap' },
+        { id: 'st', n: 'Строительство', i: 'ИСА', c: '08.03.01', l: 'bachelor', a: 'eng', f: 'full', lang: 'ru', b: 110, pass: 196, price: 240000, d: '4 года', ex: [['math'], ['phys', 'inf', 'chem'], ['rus']], ic: 'building' },
+        { id: 'ht', n: 'Химическая технология', i: 'ХТИ', c: '18.03.01', l: 'bachelor', a: 'nat', f: 'full', lang: 'ru', b: 70, pass: 190, price: 245000, d: '4 года', ex: [['math'], ['chem', 'phys', 'inf'], ['rus']], ic: 'flask' },
+        { id: 'ph', n: 'Физика', i: 'ИЕНиМ', c: '03.03.02', l: 'bachelor', a: 'nat', f: 'full', lang: 'ru', b: 55, pass: 215, price: 250000, d: '4 года', ex: [['math'], ['phys', 'inf'], ['rus']], ic: 'activity' },
+        { id: 'bio', n: 'Биология', i: 'ИЕНиМ', c: '06.03.01', l: 'bachelor', a: 'nat', f: 'full', lang: 'ru', b: 35, pass: 228, price: 245000, d: '4 года', ex: [['bio'], ['chem', 'math'], ['rus']], ic: 'leaf' },
+        { id: 'ec', n: 'Экономика', i: 'ИнЭУ', c: '38.03.01', l: 'bachelor', a: 'econ', f: 'full', lang: 'ru', b: 40, pass: 268, price: 265000, d: '4 года', ex: [['math'], ['soc', 'inf', 'eng'], ['rus']], ic: 'trending' },
+        { id: 'mg', n: 'Менеджмент', i: 'ИнЭУ', c: '38.03.02', l: 'bachelor', a: 'econ', f: 'mixed', lang: 'ru', b: 25, pass: 241, price: 185000, d: '4,5 года', ex: [['math'], ['soc', 'inf', 'eng'], ['rus']], ic: 'briefcase' },
+        { id: 'bi', n: 'Бизнес-информатика', i: 'ИнЭУ', c: '38.03.05', l: 'bachelor', a: 'econ', f: 'full', lang: 'ru', b: 30, pass: 256, price: 265000, d: '4 года', ex: [['math'], ['inf', 'soc'], ['rus']], ic: 'chart' },
+        { id: 'jr', n: 'Журналистика', i: 'УГИ', c: '42.03.02', l: 'bachelor', a: 'hum', f: 'full', lang: 'ru', b: 25, pass: 255, price: 240000, d: '4 года', ex: [['rus'], ['lit', 'soc'], ['creative']], ic: 'edit' },
+        { id: 'ln', n: 'Лингвистика', i: 'УГИ', c: '45.03.02', l: 'bachelor', a: 'hum', f: 'full', lang: 'ru', b: 30, pass: 270, price: 255000, d: '4 года', ex: [['eng'], ['rus'], ['hist', 'soc']], ic: 'message' },
+        { id: 'mo', n: 'Международные отношения', i: 'УГИ', c: '41.03.05', l: 'bachelor', a: 'hum', f: 'full', lang: 'ru', b: 15, pass: 278, price: 270000, d: '4 года', ex: [['hist'], ['rus'], ['eng', 'soc']], ic: 'globe' },
+        { id: 'ds', n: 'Дизайн', i: 'ИСА', c: '54.03.01', l: 'bachelor', a: 'art', f: 'full', lang: 'ru', b: 12, pass: 250, price: 290000, d: '4 года', ex: [['rus'], ['lit', 'hist'], ['creative']], ic: 'palette' },
+        { id: 'fk', n: 'Физическая культура', i: 'ИФКСиМП', c: '49.03.01', l: 'bachelor', a: 'sport', f: 'full', lang: 'ru', b: 40, pass: 205, price: 210000, d: '4 года', ex: [['bio'], ['rus'], ['prof']], ic: 'activity' },
+        { id: 'ai', nw: 1, n: 'Инженерия искусственного интеллекта', i: 'ИРИТ-РтФ', c: '09.04.01', l: 'master', a: 'it', f: 'full', lang: 'ru', b: 40, pass: 78, price: 320000, d: '2 года', ic: 'sparkles' },
+        { id: 'swe', n: 'Software Engineering', i: 'ИРИТ-РтФ', c: '09.04.04', l: 'master', a: 'it', f: 'full', lang: 'en', b: 15, pass: 72, price: 350000, d: '2 года', ic: 'cpu' },
+        { id: 'res', n: 'Возобновляемая энергетика', i: 'УралЭНИН', c: '13.04.02', l: 'master', a: 'eng', f: 'mixed', lang: 'ru', b: 25, pass: 65, price: 230000, d: '2,5 года', ic: 'sun' },
+        { id: 'ibm', n: 'International Business Management', i: 'ИнЭУ', c: '38.04.02', l: 'master', a: 'econ', f: 'full', lang: 'en', b: 10, pass: 70, price: 340000, d: '2 года', ic: 'briefcase' },
+        { id: 'mc', n: 'Медиакоммуникации', i: 'УГИ', c: '42.04.05', l: 'master', a: 'hum', f: 'part', lang: 'ru', b: 8, pass: 74, price: 190000, d: '2,5 года', ic: 'music' },
+        { id: 'mm', n: 'Математическое моделирование и численные методы', i: 'ИЕНиМ', c: '1.2.2', l: 'phd', a: 'it', f: 'full', lang: 'ru', b: 12, pass: 85, price: 300000, d: '4 года', ic: 'chart' },
+        { id: 'hs', n: 'Отечественная история', i: 'УГИ', c: '5.6.1', l: 'phd', a: 'hum', f: 'full', lang: 'ru', b: 6, pass: 82, price: 260000, d: '3 года', ic: 'book' },
+        { id: 'isp', n: 'Информационные системы и программирование', i: 'Колледж УрФУ', c: '09.02.07', l: 'college', a: 'it', f: 'full', lang: 'ru', b: 25, pass: 4.6, price: 150000, d: '3 года 10 мес.', ic: 'cpu' },
+        { id: 'tm', n: 'Технология металлообработки', i: 'Колледж УрФУ', c: '15.02.16', l: 'college', a: 'eng', f: 'full', lang: 'ru', b: 25, pass: 4.1, price: 130000, d: '3 года 10 мес.', ic: 'sliders' },
+        { id: 'py', n: 'Python-разработчик', i: 'Центр доп. образования', c: 'ДПО', l: 'extra', a: 'it', f: 'part', lang: 'ru', b: 0, pass: null, price: 59000, d: '6 месяцев', ic: 'cpu' },
+        { id: 'ux', nw: 1, n: 'UX/UI-дизайн интерфейсов', i: 'Центр доп. образования', c: 'ДПО', l: 'extra', a: 'art', f: 'part', lang: 'ru', b: 0, pass: null, price: 64000, d: '5 месяцев', ic: 'palette' },
+        { id: 'eap', n: 'English for Academic Purposes', i: 'Центр доп. образования', c: 'ДПО', l: 'extra', a: 'hum', f: 'mixed', lang: 'en', b: 0, pass: null, price: 38000, d: '4 месяца', ic: 'globe' }
+      ];
+      const byId = Object.fromEntries(P.map((p) => [p.id, p]));
+
+      const passText = (p) => p.pass == null ? 'без экзаменов'
+        : p.l === 'bachelor' ? String(p.pass)
+        : p.l === 'college' ? String(p.pass).replace('.', ',') + ' (аттестат)'
+        : p.pass + ' из 100';
+      const passNorm = (p) => p.pass == null ? 0 : p.l === 'bachelor' ? p.pass / 300 : p.l === 'college' ? p.pass / 5 : p.pass / 100;
+      const priceText = (p, short) => short ? (p.price >= 100000 ? Math.round(p.price / 1000) + ' тыс ₽' : fmt(p.price) + ' ₽') : fmt(p.price) + ' ₽' + (p.l === 'extra' ? ' за курс' : ' в год');
+
+      /* ---------- Состояние ---------- */
+      const state = { q: '', l: new Set(), a: new Set(), f: new Set(), lang: 'all', b: false, onlyPass: false, sort: 'pop', view: 'grid' };
+      const calc = { active: false, scores: {}, ind: 0, sum: 0 };
+      let compare = [];
+      try { compare = JSON.parse(UI.store.get('urfu-compare', '[]')).filter((id) => byId[id]).slice(0, 3); } catch (e) { compare = []; }
+
+      /* URL-параметры: ?level=bachelor|master|phd|college|extra, ?lang=en, ?q= */
+      const params = new URLSearchParams(location.search);
+      (params.get('level') || '').split(',').forEach((v) => { if (LEVELS[v]) state.l.add(v); });
+      if (params.get('lang') === 'en' || params.get('lang') === 'ru') state.lang = params.get('lang');
+      if (params.get('q')) state.q = params.get('q').toLowerCase();
+      if (params.get('budget') === '1') state.b = true;
+
+      /* ---------- Шансы по баллам ---------- */
+      function chance(p) {
+        if (!calc.active || p.l !== 'bachelor' || !p.ex) return null;
+        const used = new Set(); let sum = 0; let special = null; const missing = [];
+        for (const slot of p.ex) {
+          if (slot[0] === 'creative' || slot[0] === 'prof') { special = slot[0]; continue; }
+          let best = null;
+          slot.forEach((s) => { if (calc.scores[s] != null && !used.has(s) && (best === null || calc.scores[s] > calc.scores[best])) best = s; });
+          if (best === null) missing.push(slot.map((s) => SHORT[s]).join(' или ')); else { used.add(best); sum += calc.scores[best]; }
+        }
+        if (missing.length) return { k: 'need', t: 'Нужен ЕГЭ: ' + missing[0] };
+        if (special) return { k: 'need', t: 'Плюс ' + SHORT[special] };
+        sum += calc.ind;
+        const diff = sum - p.pass;
+        if (diff >= 5) return { k: 'ok', t: 'Проходишь', diff, sum };
+        if (diff >= -5) return { k: 'warn', t: 'На грани', diff, sum };
+        return { k: 'bad', t: `Не хватает ${-diff} ${plural(-diff, ['балла', 'баллов', 'баллов'])}`, diff, sum };
+      }
+      const chanceTag = (ch) => !ch ? '' : `<span class="tag chance ${{ ok: 'tag--ok', warn: 'tag--warn', bad: 'tag--danger', need: '' }[ch.k]}">${ch.k === 'ok' ? ic('check') : ''}${ch.t}</span>`;
+
+      /* ---------- Фильтрация ---------- */
+      function match(p, skip) {
+        if (state.q && !(p.n + ' ' + p.i + ' ' + p.c + ' ' + AREAS[p.a]).toLowerCase().includes(state.q)) return false;
+        if (skip !== 'l' && state.l.size && !state.l.has(p.l)) return false;
+        if (skip !== 'a' && state.a.size && !state.a.has(p.a)) return false;
+        if (skip !== 'f' && state.f.size && !state.f.has(p.f)) return false;
+        if (skip !== 'lang' && state.lang !== 'all' && p.lang !== state.lang) return false;
+        if (skip !== 'b' && state.b && !p.b) return false;
+        if (state.onlyPass) { const ch = chance(p); if (!ch || (ch.k !== 'ok' && ch.k !== 'warn')) return false; }
+        return true;
+      }
+      const SORTS = {
+        pop: () => 0,
+        chance: (a, b) => { const ca = chance(a), cb = chance(b); return ((cb && cb.diff != null) ? cb.diff : -999) - ((ca && ca.diff != null) ? ca.diff : -999); },
+        'pass-desc': (a, b) => passNorm(b) - passNorm(a),
+        'pass-asc': (a, b) => passNorm(a) - passNorm(b),
+        budget: (a, b) => b.b - a.b,
+        price: (a, b) => a.price - b.price,
+        name: (a, b) => a.n.localeCompare(b.n, 'ru')
+      };
+
+      /* ---------- Фильтры: разметка ---------- */
+      function buildGroup(key, dict, extraFrom) {
+        const box = $('#f-' + key + ' > div');
+        box.innerHTML = Object.entries(dict).map(([k, v], idx) =>
+          `<label class="check fopt${extraFrom != null && idx >= extraFrom ? ' is-extra' : ''}"><input type="checkbox" data-group="${key}" value="${k}"><span>${v}</span><span class="fcount" data-count="${key}:${k}"></span></label>`).join('');
+      }
+      buildGroup('l', LEVELS); buildGroup('a', AREAS, 5); buildGroup('f', FORMS);
+
+      function syncInputs() {
+        $$('#filters-body input[data-group]').forEach((inp) => { inp.checked = state[inp.dataset.group].has(inp.value); });
+        $$('#f-lang .chip').forEach((c) => c.setAttribute('aria-pressed', String(c.dataset.lang === state.lang)));
+        $('#f-budget').checked = state.b;
+        $('#q').value = state.q;
+        $('#sort').value = state.sort;
+        // если выбрана скрытая область — раскрываем «Ещё»
+        if ([...state.a].some((k) => Object.keys(AREAS).indexOf(k) >= 5)) toggleMore(true);
+      }
+      function updateCounts() {
+        $$('[data-count]').forEach((el) => {
+          const [key, val] = el.dataset.count.split(':');
+          const n = P.filter((p) => p[key] === val && match(p, key)).length;
+          el.textContent = n;
+          el.closest('.fopt').classList.toggle('is-zero', n === 0);
+        });
+        const n = state.l.size + state.a.size + state.f.size + (state.lang !== 'all') + state.b;
+        $('#filters-n').hidden = !n; $('#filters-n').textContent = n;
+      }
+
+      /* ---------- Карточка ---------- */
+      function card(p) {
+        const ch = chance(p);
+        const inCmp = compare.includes(p.id);
+        return `<article class="card prog-card prog-card--${p.a}${ch && ch.k === 'ok' ? ' is-ok' : ''}">
+          ${p.nw ? '<span class="sticker sticker--coral">новая</span>' : p.b >= 100 ? '<span class="sticker sticker--paper" aria-hidden="true">бюджет 100+</span>' : ''}
+          <div class="prog-card__head">
+            <span class="icon-tile">${ic(p.ic)}</span>
+            <div class="cluster"><span class="tag tag--brand">${LEVELS[p.l]}</span>${p.lang === 'en' ? '<span class="tag tag--intl">English</span>' : ''}${p.f !== 'full' ? `<span class="tag">${FORMS[p.f]}</span>` : ''}</div>
+          </div>
+          <div class="prog-card__main">
+            <h3 class="card__title"><a class="stretched" href="program.html">${esc(p.n)}</a></h3>
+            <p class="xs muted" style="margin-top:4px">${p.c} · ${p.i} · ${p.d}</p>
+          </div>
+          <dl class="prog-facts">
+            <div><dt>Бюджет</dt><dd>${p.b ? p.b + ' мест' : 'платно'}</dd></div>
+            <div><dt>Проходной</dt><dd title="${passText(p)}">${passText(p)}</dd></div>
+            <div><dt>${p.l === 'extra' ? 'За курс' : 'В год'}</dt><dd>${priceText(p, true)}</dd></div>
+          </dl>
+          <div class="prog-card__foot">
+            ${chanceTag(ch) || `<span class="xs muted">${FORMS[p.f]} · ${p.lang === 'en' ? 'English' : 'русский'}</span>`}
+            <button class="btn btn--sm btn--ghost cmp-btn" type="button" data-cmp="${p.id}" aria-pressed="${inCmp}" aria-label="${inCmp ? 'Убрать из сравнения' : 'Добавить к сравнению'}: ${esc(p.n)}">${ic(inCmp ? 'check' : 'plus')} ${inCmp ? 'В сравнении' : 'Сравнить'}</button>
+          </div>
+        </article>`;
+      }
+
+      /* ---------- Рендер ---------- */
+      function renderActive() {
+        const chips = [];
+        if (state.q) chips.push(['q', '', `«${esc(state.q)}»`]);
+        state.l.forEach((v) => chips.push(['l', v, LEVELS[v]]));
+        state.a.forEach((v) => chips.push(['a', v, AREAS[v]]));
+        state.f.forEach((v) => chips.push(['f', v, FORMS[v]]));
+        if (state.lang !== 'all') chips.push(['lang', '', state.lang === 'en' ? 'English' : 'Русский']);
+        if (state.b) chips.push(['b', '', 'С бюджетом']);
+        if (state.onlyPass) chips.push(['onlyPass', '', 'Прохожу по баллам']);
+        $('#active').innerHTML = chips.map(([k, v, t]) => `<button type="button" class="chip" data-rm="${k}" data-v="${v}" aria-label="Убрать фильтр: ${t}">${t} ${ic('x')}</button>`).join('')
+          + (chips.length > 1 ? '<button type="button" class="more-btn" data-rm="all">Сбросить всё</button>' : '');
+      }
+      function syncURL() {
+        try {
+          const u = new URLSearchParams();
+          if (state.l.size) u.set('level', [...state.l].join(','));
+          if (state.lang !== 'all') u.set('lang', state.lang);
+          if (state.q) u.set('q', state.q);
+          if (state.b) u.set('budget', '1');
+          const s = u.toString();
+          history.replaceState(null, '', location.pathname + (s ? '?' + s : '') + location.hash);
+        } catch (e) { /* file:// и приватный режим */ }
+      }
+      function render() {
+        const list = P.filter((p) => match(p));
+        if (state.sort !== 'pop') list.sort(SORTS[state.sort]);
+        $('#results').innerHTML = list.map(card).join('');
+        $('#results').classList.toggle('is-list', state.view === 'list');
+        $('#count').textContent = `Найдено: ${list.length} ${plural(list.length, ['программа', 'программы', 'программ'])}`;
+        $('#empty').hidden = list.length > 0;
+        $('#results').hidden = list.length === 0;
+        if (!list.length) {
+          $('#empty-hint').textContent = state.onlyPass
+            ? 'С такими баллами в выбранных фильтрах вариантов нет. Убери фильтр «Прохожу по баллам» — покажем программы, где не хватает совсем немного.'
+            : 'Попробуй убрать часть фильтров или поискать другое слово — например, по коду направления.';
+        }
+        updateCounts(); renderActive(); syncURL();
+        const lv = [...state.l];
+        $('#hero-eyebrow').textContent = 'Приём-2027 · ' + (lv.length === 1 ? LEVELS[lv[0]] : 'все уровни');
+      }
+
+      /* ---------- События фильтров ---------- */
+      $('#filters-body').addEventListener('change', (e) => {
+        const inp = e.target;
+        if (inp.dataset.group) { state[inp.dataset.group][inp.checked ? 'add' : 'delete'](inp.value); render(); }
+        if (inp.id === 'f-budget') { state.b = inp.checked; render(); }
+      });
+      $('#f-lang').addEventListener('chipchange', () => { state.lang = $('#f-lang [aria-pressed="true"]').dataset.lang; render(); });
+      $('#q').addEventListener('input', (e) => { state.q = e.target.value.trim().toLowerCase(); render(); });
+      $('#sort').addEventListener('change', (e) => {
+        state.sort = e.target.value;
+        if (state.sort === 'chance' && !calc.active) UI.toast('Введи баллы ЕГЭ в блоке «Подбор по баллам» — отсортируем по шансам');
+        render();
+      });
+      $$('.view-toggle button').forEach((b) => b.addEventListener('click', () => {
+        state.view = b.dataset.view;
+        $$('.view-toggle button').forEach((x) => x.setAttribute('aria-pressed', String(x === b)));
+        UI.store.set('urfu-programs-view', state.view);
+        render();
+      }));
+      function resetAll() {
+        state.q = ''; state.l.clear(); state.a.clear(); state.f.clear(); state.lang = 'all'; state.b = false; state.onlyPass = false;
+        syncInputs(); render();
+      }
+      $('#reset-all').addEventListener('click', resetAll);
+      $('#empty-reset').addEventListener('click', resetAll);
+      $('#active').addEventListener('click', (e) => {
+        const b = e.target.closest('[data-rm]'); if (!b) return;
+        const k = b.dataset.rm, v = b.dataset.v;
+        if (k === 'all') return resetAll();
+        if (k === 'q') state.q = '';
+        else if (k === 'lang') state.lang = 'all';
+        else if (k === 'b') state.b = false;
+        else if (k === 'onlyPass') state.onlyPass = false;
+        else state[k].delete(v);
+        syncInputs(); render();
+      });
+      function toggleMore(force) {
+        const g = $('#f-a'), btn = $('#more-areas');
+        const open = force != null ? force : !g.classList.contains('show-extra');
+        g.classList.toggle('show-extra', open);
+        btn.setAttribute('aria-expanded', String(open));
+        btn.innerHTML = (open ? 'Свернуть ' + ic('chevron-down').replace('class="i ', 'style="transform:rotate(180deg)" class="i ') : 'Ещё 2 ' + ic('chevron-down'));
+      }
+      $('#more-areas').addEventListener('click', () => toggleMore());
+      $('#filters-toggle').addEventListener('click', () => {
+        const f = $('#filters'); const open = !f.classList.contains('is-open');
+        f.classList.toggle('is-open', open); $('#filters-toggle').setAttribute('aria-expanded', String(open));
+      });
+
+      /* Подборки */
+      const PRESETS = {
+        'it-budget': { l: ['bachelor'], a: ['it'], b: true },
+        en: { lang: 'en' },
+        eng: { a: ['eng'] },
+        noege: { l: ['college'] },
+        'master-flex': { l: ['master'], f: ['mixed', 'part'] },
+        extra: { l: ['extra'] }
+      };
+      $$('[data-preset]').forEach((btn) => btn.addEventListener('click', () => {
+        const pr = PRESETS[btn.dataset.preset];
+        state.q = ''; state.l = new Set(pr.l || []); state.a = new Set(pr.a || []); state.f = new Set(pr.f || []);
+        state.lang = pr.lang || 'all'; state.b = !!pr.b; state.onlyPass = false;
+        syncInputs(); render();
+        $('#catalog').scrollIntoView({ behavior: 'smooth' });
+      }));
+
+      /* ---------- Калькулятор ---------- */
+      const DEF = ['math', 'inf', 'rus'];
+      [1, 2, 3].forEach((n, i) => { $('#s' + n).innerHTML = Object.entries(SUBJ).map(([k, v]) => `<option value="${k}"${k === DEF[i] ? ' selected' : ''}>${v}</option>`).join(''); });
+      function readCalc() {
+        const err = $('#calc-err'); err.textContent = '';
+        calc.scores = {}; let total = 0, any = false; const seen = new Set();
+        [1, 2, 3].forEach((n) => {
+          const s = $('#s' + n).value; const raw = $('#v' + n).value;
+          if (raw === '') return;
+          let v = Math.round(+raw);
+          if (v > 100 || v < 0) { err.textContent = 'Баллы ЕГЭ — от 0 до 100'; v = Math.max(0, Math.min(100, v)); }
+          if (seen.has(s)) err.textContent = 'Предметы повторяются — выбери три разных';
+          seen.add(s);
+          calc.scores[s] = Math.max(calc.scores[s] || 0, v); total += v; any = true;
+        });
+        let ind = $('#vi').value === '' ? 0 : Math.round(+$('#vi').value);
+        if (ind > 10 || ind < 0) { err.textContent = 'За достижения можно получить от 0 до 10 баллов'; ind = Math.max(0, Math.min(10, ind)); }
+        calc.ind = ind; calc.active = any; calc.sum = total + ind;
+        $('#calc-sum').textContent = calc.sum;
+        const bach = P.filter((p) => p.l === 'bachelor').map(chance).filter(Boolean);
+        const cnt = (k) => bach.filter((c) => c.k === k).length;
+        $('#cs-ok').textContent = any ? cnt('ok') : '—';
+        $('#cs-warn').textContent = any ? cnt('warn') : '—';
+        $('#cs-bad').textContent = any ? cnt('bad') : '—';
+        UI.store.set('urfu-ege', JSON.stringify({ s: [1, 2, 3].map((n) => [$('#s' + n).value, $('#v' + n).value]), i: $('#vi').value }));
+      }
+      // восстановить баллы
+      try {
+        const sv = JSON.parse(UI.store.get('urfu-ege', 'null'));
+        if (sv) { sv.s.forEach(([s, v], i) => { $('#s' + (i + 1)).value = s; $('#v' + (i + 1)).value = v; }); $('#vi').value = sv.i || ''; }
+      } catch (e) { /* пусто */ }
+      $('#calc-form').addEventListener('input', () => { readCalc(); if (!calc.active) state.onlyPass = false; render(); });
+      $('#calc-form').addEventListener('change', () => { readCalc(); render(); });
+      $('#calc-form').addEventListener('submit', (e) => {
+        e.preventDefault(); readCalc();
+        if (!calc.active) { $('#calc-err').textContent = 'Введи баллы хотя бы по одному предмету'; $('#v1').focus(); return; }
+        state.onlyPass = true; state.sort = 'chance'; state.l.add('bachelor');
+        syncInputs(); render();
+        $('#catalog').scrollIntoView({ behavior: 'smooth' });
+      });
+      $('#calc-example').addEventListener('click', () => {
+        [['math', 82], ['inf', 88], ['rus', 90]].forEach(([s, v], i) => { $('#s' + (i + 1)).value = s; $('#v' + (i + 1)).value = v; });
+        $('#vi').value = 5; readCalc(); render();
+      });
+      $('#calc-reset').addEventListener('click', () => {
+        ['#v1', '#v2', '#v3', '#vi'].forEach((s) => { $(s).value = ''; });
+        state.onlyPass = false; if (state.sort === 'chance') state.sort = 'pop';
+        readCalc(); syncInputs(); render();
+      });
+
+      /* ---------- Сравнение ---------- */
+      function saveCmp() { UI.store.set('urfu-compare', JSON.stringify(compare)); }
+      function renderBar() {
+        const bar = $('#cmp-bar');
+        bar.hidden = compare.length === 0;
+        document.body.classList.toggle('has-cmp', compare.length > 0);
+        $('#cmp-label').textContent = `Сравнить (${compare.length})`;
+        $('#cmp-names').textContent = compare.map((id) => byId[id].n).join(' · ');
+      }
+      function toggleCmp(id) {
+        const i = compare.indexOf(id);
+        if (i > -1) compare.splice(i, 1);
+        else if (compare.length >= 3) { UI.toast('Сравнить можно до 3 программ — убери одну из списка'); return; }
+        else compare.push(id);
+        saveCmp(); renderBar(); render();
+        if ($('#cmp-dialog').open) renderTable();
+      }
+      $('#results').addEventListener('click', (e) => { const b = e.target.closest('[data-cmp]'); if (b) toggleCmp(b.dataset.cmp); });
+      $('#cmp-clear').addEventListener('click', () => { compare = []; saveCmp(); renderBar(); render(); });
+
+      function renderTable() {
+        const items = compare.map((id) => byId[id]);
+        if (!items.length) { $('#cmp-dialog').close(); return; }
+        const bestBudget = Math.max(...items.map((p) => p.b));
+        const bestPrice = Math.min(...items.map((p) => p.price));
+        const row = (label, fn, best) => `<tr><th scope="row">${label}</th>${items.map((p) => `<td class="${best && best(p) && items.length > 1 ? 'best' : ''}">${fn(p)}</td>`).join('')}</tr>`;
+        const exText = (p) => p.ex ? p.ex.map((s) => s.map((x) => SHORT[x]).join(' / ')).join(', ') : (p.l === 'college' ? 'конкурс аттестатов' : p.l === 'extra' ? 'без экзаменов' : 'профильный экзамен + портфолио');
+        $('#cmp-table').innerHTML = `<thead><tr><th scope="col"><span class="sr-only">Параметр</span></th>${items.map((p) => `<th scope="col"><button class="cmp-x" type="button" data-cmp-x="${p.id}" aria-label="Убрать из сравнения: ${esc(p.n)}">${ic('x')}</button>${esc(p.n)}<span class="xs">${p.c} · ${p.i}</span></th>`).join('')}</tr></thead><tbody>
+          ${row('Уровень', (p) => LEVELS[p.l])}
+          ${row('Форма', (p) => FORMS[p.f])}
+          ${row('Язык', (p) => p.lang === 'en' ? 'English' : 'Русский')}
+          ${row('Срок', (p) => p.d)}
+          ${row('Бюджетные места', (p) => p.b || '—', (p) => p.b === bestBudget && p.b > 0)}
+          ${row('Проходной 2026', passText)}
+          ${row('Стоимость', (p) => priceText(p), (p) => p.price === bestPrice)}
+          ${row('Экзамены', exText)}
+          ${row('Твои шансы', (p) => chanceTag(chance(p)) || '<span class="muted">введи баллы в подборе</span>')}
+          <tr><th scope="row"><span class="sr-only">Подробнее</span></th>${items.map(() => '<td><a class="arrow-link small" href="program.html">Подробнее ' + ic('arrow-right') + '</a></td>').join('')}</tr>
+        </tbody>`;
+      }
+      $('#cmp-open').addEventListener('click', () => {
+        if (compare.length < 2) { UI.toast('Добавь ещё хотя бы одну программу для сравнения'); return; }
+        renderTable();
+        const d = $('#cmp-dialog');
+        if (typeof d.showModal === 'function') d.showModal(); else d.setAttribute('open', '');
+      });
+      $('#cmp-close').addEventListener('click', () => $('#cmp-dialog').close());
+      $('#cmp-dialog').addEventListener('click', (e) => {
+        if (e.target === e.currentTarget) e.currentTarget.close();
+        const x = e.target.closest('[data-cmp-x]'); if (x) toggleCmp(x.dataset.cmpX);
+      });
+
+      /* ---------- Старт ---------- */
+      state.view = UI.store.get('urfu-programs-view', 'grid') === 'list' ? 'list' : 'grid';
+      $$('.view-toggle button').forEach((x) => x.setAttribute('aria-pressed', String(x.dataset.view === state.view)));
+      syncInputs(); readCalc(); renderBar(); render();
+    })();
+  </script>
+</body>
+</html>

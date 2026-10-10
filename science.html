@@ -1,0 +1,711 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Наука и лаборатории — УрФУ</title>
+  <meta name="description" content="Наука УрФУ: приоритетные направления, каталог лабораторий, проекты, гранты, журналы, студенческая наука и исследования для бизнеса.">
+  <link rel="icon" href="assets/logo/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="assets/css/tokens.css">
+  <link rel="stylesheet" href="assets/css/components.css">
+  <style>
+    /* ---------- Герой: текст + коллаж из лабораторий ---------- */
+    .sci-hero { position: relative; overflow: hidden; }
+    .sci-hero__grid { display: grid; gap: 32px; grid-template-columns: 1fr; align-items: center; }
+    .sci-hero__grid > * { min-width: 0; }
+    @media (min-width: 1024px) { .sci-hero__grid { grid-template-columns: 1.1fr .9fr; } }
+    .sci-hero .cluster.ctas { margin-top: 28px; gap: 12px; align-items: center; }
+    .sci-hero .ctas .hand { transform: rotate(-4deg); display: inline-block; }
+    .sci-pics { position: relative; height: 400px; }
+    .sci-pics .photo { position: absolute; }
+    .sci-pics .p1 { left: 0; top: 20px; width: 64%; height: 300px; --rot: -3deg; z-index: 2; }
+    .sci-pics .p2 { right: 0; top: 110px; width: 48%; height: 250px; --rot: 4deg; z-index: 1; }
+    .sci-pics .photo img { height: calc(100% - 34px); }
+    .sci-pics .s1 { position: absolute; right: 8%; top: 40px; z-index: 3; --rot: 8deg; width: 132px; height: 132px; }
+    .sci-pics .s2 { position: absolute; left: 30%; bottom: 0; z-index: 3; --rot: -6deg; }
+    @media (max-width: 1023px) {
+      .sci-pics { height: auto; display: grid; grid-template-columns: 1.2fr 1fr; gap: 14px; padding: 18px 4px 8px; }
+      .sci-pics .photo { position: relative; inset: auto; width: auto; height: auto; }
+      .sci-pics .photo img { height: 190px; }
+      .sci-pics .s1 { right: -4px; top: 0; }
+      .sci-pics .s2 { display: none; }
+    }
+    .jump { margin-top: 20px; }
+    .jump .chip { min-height: 36px; font-size: var(--fs-xs); }
+    .jump .chip .i { width: 16px; height: 16px; }
+    @media (max-width: 767px) { .jump { flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; margin-right: calc(-1 * var(--gutter)); padding-right: var(--gutter); } .jump::-webkit-scrollbar { display: none; } .jump .chip { flex: none; } }
+    /* Цифры: огромные, контурные через одну */
+    .sci-stats { display: grid; gap: 4px 32px; grid-template-columns: repeat(auto-fit, minmax(min(100%, 230px), 1fr)); margin-top: 48px; }
+    .sci-stats .num { padding: 16px 0; border-top: var(--line) solid var(--ink); }
+    .sci-stats .big-num { display: block; font-size: calc(clamp(44px, 5.2vw, 76px) * var(--fs-scale)); white-space: nowrap; }
+    .sci-stats .big-num small { font-size: .46em; letter-spacing: -.02em; }
+    .sci-stats .num:nth-child(even) .big-num { color: transparent; -webkit-text-stroke: 2px var(--ink); }
+    .sci-stats .num span:last-child { display: block; margin-top: 8px; color: var(--text-2); font-size: var(--fs-sm); }
+    .anchor { scroll-margin-top: 56px; }
+    .role-hint { margin-top: 28px; max-width: 760px; }
+    .role-hint .notice { align-items: center; flex-wrap: wrap; }
+    .role-hint .notice > div { flex: 1 1 260px; }
+    .sec-head { display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: 12px 24px; margin-bottom: 32px; }
+    .sec-head > div { max-width: 720px; }
+    .sec-head p { color: var(--text-2); margin-top: 10px; }
+    .sec-head .hand { display: inline-block; transform: rotate(-3deg); }
+
+    /* ---------- Направления: бенто с крупной плиткой ---------- */
+    .dirs { display: grid; gap: 18px; grid-template-columns: repeat(auto-fit, minmax(min(100%, 260px), 1fr)); }
+    @media (min-width: 900px) { .dirs { grid-template-columns: repeat(3, 1fr); grid-auto-rows: 250px; } .dirs .dir--big { grid-column: span 2; grid-row: span 2; } }
+    @media (min-width: 900px) and (max-width: 1279px) { .dir:not(.dir--big) .cap > span:not(.tag) { display: none; } }
+    .dir { position: relative; display: block; border: var(--line) solid var(--ink); border-radius: var(--r-lg); overflow: hidden; min-height: 230px; color: #fff; transition: transform .2s var(--ease), box-shadow .2s; }
+    .dir:hover { transform: translate(-3px, -3px); box-shadow: var(--shadow-md); }
+    .dir img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+    .dir::after { content: ""; position: absolute; inset: 0; background: linear-gradient(180deg, transparent 30%, rgba(10, 10, 14, .85)); }
+    @media (max-width: 767px) { .dir::after { background: linear-gradient(180deg, rgba(10, 10, 14, .35), rgba(10, 10, 14, .88) 60%); } }
+    .dir .cap { position: absolute; left: 20px; right: 20px; bottom: 18px; z-index: 2; display: flex; flex-direction: column; gap: 6px; }
+    .dir .cap strong { font: 700 var(--fs-xl)/1.1 var(--font-display); }
+    .dir--big .cap strong { font-size: calc(clamp(26px, 3vw, 40px) * var(--fs-scale)); }
+    .dir .cap span { font-size: var(--fs-sm); opacity: .92; max-width: 440px; }
+    .dir .cap .tag { align-self: flex-start; color: #d7ff3d; border-color: #d7ff3d; background: rgba(10, 10, 14, .4); opacity: 1; }
+    .dir .sticker { position: absolute; top: 14px; left: 14px; z-index: 2; --rot: -4deg; }
+    .dir--text { background: var(--lime); color: #14141a; }
+    .dir--text::after { display: none; }
+    .dir--text .cap .tag { color: #14141a; border-color: #14141a; background: transparent; }
+    .dir--text .big-num { position: absolute; right: 14px; top: 6px; font-size: calc(72px * var(--fs-scale)); color: transparent; -webkit-text-stroke: 2px #14141a; }
+
+    /* ---------- Каталог лабораторий: оглавление вместо одинаковых карточек ---------- */
+    .lab-tools { display: grid; gap: 16px; grid-template-columns: 1fr; margin-bottom: 20px; }
+    @media (min-width: 900px) { .lab-tools { grid-template-columns: minmax(260px, 380px) 1fr; align-items: end; } }
+    .lab-tools__row { display: flex; flex-wrap: wrap; gap: 12px 20px; align-items: center; justify-content: space-between; margin-bottom: 20px; }
+    .labs { display: grid; gap: 0 40px; grid-template-columns: repeat(auto-fill, minmax(min(100%, 380px), 1fr)); counter-reset: lab; }
+    .lab { counter-increment: lab; display: grid; grid-template-columns: 64px 1fr; gap: 6px 16px; padding: 22px 0; border-top: var(--line) solid var(--ink); }
+    .lab::before { content: counter(lab, decimal-leading-zero); grid-row: span 4; font: 800 calc(40px * var(--fs-scale))/1 var(--font-display); color: transparent; -webkit-text-stroke: 1.5px var(--ink); }
+    .lab:nth-child(3n+1)::before { color: var(--accent); -webkit-text-stroke: 0; }
+    .lab h3 { font-family: var(--font); font-size: var(--fs-lg); font-weight: 700; line-height: 1.25; margin-top: 6px; }
+    .lab__lead { display: flex; gap: 10px; align-items: center; font-size: var(--fs-sm); }
+    .lab__equip { display: flex; flex-wrap: wrap; gap: 6px; }
+    .lab__foot { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; justify-content: space-between; margin-top: 6px; }
+    .lab mark, .hit { background: var(--lime); color: #14141a; border-radius: 4px; padding: 0 2px; }
+    .empty { padding: 40px 24px; text-align: center; border: var(--line) dashed var(--ink); border-radius: var(--r-lg); color: var(--text-2); display: flex; flex-direction: column; gap: 12px; align-items: center; }
+    .tone-energy { background: var(--role-partner-bg); color: var(--role-partner); }
+    .tone-materials { background: var(--brand-soft); color: var(--brand); }
+    .tone-ai { background: var(--role-staff-bg); color: var(--role-staff); }
+    .tone-eco { background: var(--role-student-bg); color: var(--role-student); }
+    .tone-bio { background: var(--role-intl-bg); color: var(--role-intl); }
+    .tone-hum { background: var(--accent-soft); color: var(--accent-strong); }
+
+    /* ---------- Проекты: первый — широкий ---------- */
+    .projects { display: grid; gap: 28px var(--gap); grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr)); }
+    @media (min-width: 1100px) { .projects { grid-template-columns: repeat(3, 1fr); } .project:first-child { grid-column: 1 / -1; display: grid; grid-template-columns: 1.25fr 1fr; } .project:first-child .photo { height: 100%; min-height: 320px; border-width: 0 var(--line) 0 0; border-radius: calc(var(--r-lg) - 2px) 0 0 calc(var(--r-lg) - 2px); } }
+    .project { position: relative; padding: 0; gap: 0; }
+    .project .photo { height: 200px; border-width: 0 0 var(--line); border-radius: calc(var(--r-lg) - 2px) calc(var(--r-lg) - 2px) 0 0; }
+    .project .photo img { height: 100%; }
+    .project > .sticker { position: absolute; top: -14px; right: 16px; z-index: 2; --rot: 5deg; }
+    .project__body { padding: 22px 24px 26px; display: flex; flex-direction: column; gap: 14px; }
+    .project__facts { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; border-top: var(--line) solid var(--ink); padding-top: 12px; }
+    .project__facts b { display: block; font: 800 var(--fs-md)/1.2 var(--font-display); }
+    .project__facts span { font-size: var(--fs-xs); color: var(--text-3); }
+    .progress { height: 16px; border-radius: 6px; background: var(--surface-2); border: var(--line) solid var(--ink); overflow: hidden; }
+    .progress > span { display: block; height: 100%; background: var(--lime); border-right: var(--line) solid var(--ink); transition: width 1.2s var(--ease); }
+    .progress-row { display: flex; justify-content: space-between; gap: 10px; font-size: var(--fs-xs); color: var(--text-2); margin-bottom: 8px; font-weight: 600; }
+
+    /* ---------- Гранты ---------- */
+    .deadline { display: inline-flex; align-items: center; gap: 6px; white-space: nowrap; }
+    .tag--hot { background: #ff5a36; color: #fff; border-color: #14141a; }
+    .tag--warn { background: var(--role-partner-bg); color: var(--role-partner); }
+    .grants-table td:first-child { min-width: 240px; }
+    .grants-table td { white-space: normal; }
+    .grants-table .nowrap { white-space: nowrap; }
+
+    /* ---------- Студенческая наука: синяя плашка ---------- */
+    .stud-grid { display: grid; gap: 32px var(--gap); grid-template-columns: minmax(0, 1fr); align-items: start; }
+    @media (min-width: 1024px) { .stud-grid { grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr); } }
+    .sno { position: relative; display: flex; flex-direction: column; gap: 22px; padding: clamp(24px, 3.4vw, 40px); border: var(--line) solid var(--ink); border-radius: var(--r-xl); box-shadow: var(--shadow-lg); background: #2747ff; color: #fff; }
+    .sno h3 { color: #fff; max-width: 14ch; font-size: calc(clamp(26px, 2.4vw, 34px) * var(--fs-scale)); overflow-wrap: break-word; }
+    .sno p { color: #e3e8ff; }
+    .sno .photo { position: absolute; right: -18px; top: -30px; width: 170px; height: 190px; --rot: 6deg; }
+    .sno .photo img { height: calc(100% - 30px); }
+    @media (max-width: 639px) { .sno .photo { display: none; } }
+    @media (min-width: 640px) { .sno h3, .sno .stack-sm > p { margin-right: 150px; } }
+    .sno .sticker { align-self: flex-start; --rot: -3deg; }
+    .sno__stats { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; border-top: 1px solid rgba(255, 255, 255, .35); padding-top: 16px; }
+    .sno__stats b { display: block; font: 800 calc(clamp(24px, 6vw, 40px) * var(--fs-scale))/1 var(--font-display); color: #fff; }
+    .sno__stats span { font-size: var(--fs-xs); color: #e3e8ff; }
+    .sno .btn--line { background: transparent; color: #fff; border-color: #fff; box-shadow: 3px 3px 0 #14141a; }
+    .conf { display: flex; flex-wrap: wrap; gap: 12px 16px; align-items: center; padding: 16px 0; border-bottom: var(--line) solid var(--ink); }
+    .conf:last-child { border-bottom: none; }
+    .conf__date { flex: none; width: 64px; background: #fffdf8; color: #14141a; border: var(--line) solid #14141a; border-radius: 8px; overflow: hidden; text-align: center; box-shadow: 3px 3px 0 #14141a; }
+    .conf:nth-child(2) .conf__date { transform: rotate(2deg); } .conf:nth-child(3) .conf__date { transform: rotate(-2deg); }
+    .conf__date span { display: block; background: #ff5a36; color: #fff; font: 700 11px/1 var(--font-display); text-transform: uppercase; padding: 5px 0; }
+    .conf__date b { display: block; font: 800 26px/1 var(--font-display); padding: 6px 0 8px; }
+    .conf > div:nth-child(2) { flex: 1 1 180px; min-width: 0; }
+
+    /* ---------- Журналы: обложки-корешки ---------- */
+    .journals { display: flex; flex-direction: column; border-top: var(--line) solid var(--ink); }
+    .journal { display: grid; gap: 12px 24px; grid-template-columns: 1fr; padding: 20px 0; border-bottom: var(--line) solid var(--ink); align-items: center; }
+    @media (min-width: 900px) { .journal { grid-template-columns: 64px 1fr auto; } }
+    .journal__cover { width: 60px; height: 80px; border-radius: 4px 8px 8px 4px; border: var(--line) solid var(--ink); box-shadow: var(--shadow-sm); display: grid; place-items: center; font: 800 13px/1 var(--font-display); transform: rotate(-3deg); border-left-width: 6px; }
+    .journal:nth-child(even) .journal__cover { transform: rotate(2deg); }
+    .journal h3 { font-family: var(--font); font-size: var(--fs-lg); font-weight: 700; }
+
+    /* ---------- Для бизнеса ---------- */
+    .biz { display: grid; gap: 32px var(--gap); grid-template-columns: 1fr; margin-top: 32px; }
+    @media (min-width: 1024px) { .biz { grid-template-columns: 1.3fr 1fr; align-items: start; } }
+    #biz-form { position: relative; }
+    #biz-form > .sticker { position: absolute; top: -16px; right: 20px; --rot: 5deg; }
+    .form-grid { display: grid; gap: 16px; grid-template-columns: repeat(auto-fit, minmax(min(100%, 240px), 1fr)); }
+    .form-grid .full { grid-column: 1 / -1; }
+    .offer li { display: flex; gap: 12px; padding: 12px 0; border-bottom: var(--line) solid var(--ink); align-items: flex-start; }
+    .offer li:last-child { border-bottom: none; }
+    .offer .i { color: var(--accent); margin-top: 3px; }
+    .ttc { transform: rotate(1.2deg); background: var(--lime-soft); border: var(--line) solid var(--ink); box-shadow: var(--shadow-sm); }
+    .ttc .hand { font-size: calc(28px * var(--fs-scale)); color: var(--text); }
+    .step h3 { margin-bottom: 6px; }
+
+    /* ---------- Стартапы: карточки «вразнобой» ---------- */
+    .startups { display: grid; gap: 24px; grid-template-columns: repeat(auto-fill, minmax(min(100%, 300px), 1fr)); }
+    @media (min-width: 900px) { .startups .card:nth-child(3n+1) { transform: rotate(-.8deg); } .startups .card:nth-child(3n+2) { margin-top: 22px; } .startups .card:nth-child(3n) { transform: rotate(.8deg); } }
+    .startups .card:hover { transform: translate(-3px, -3px); }
+    #st-list .card__footer { flex-wrap: wrap; }
+    #st-list .card__footer .tag { white-space: nowrap; }
+    .trl { display: flex; gap: 3px; }
+    .trl span { flex: 1; height: 10px; border-radius: 2px; background: var(--surface-2); border: 1.5px solid var(--ink); }
+    .trl span.on { background: var(--lime); }
+
+    /* ---------- Версия для слабовидящих ---------- */
+    html[data-a11y] :is(.sci-hero .ctas .hand, .sec-head .hand, .conf__date, .journal__cover, .ttc, .startups .card) { transform: none !important; }
+    html[data-a11y] .startups .card { margin-top: 0 !important; }
+    html[data-a11y] .sci-pics { height: auto; display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 200px), 1fr)); gap: 16px; }
+    html[data-a11y] .sci-pics .photo { position: relative; inset: auto; width: auto; height: auto; }
+    html[data-a11y] .sci-pics .photo img { height: 200px; }
+    html[data-a11y] .sci-pics :is(.s1, .s2) { position: static; display: inline-flex; justify-self: start; }
+    html[data-a11y] .sci-stats .big-num { white-space: normal; font-size: var(--fs-2xl) !important; }
+    html[data-a11y] .dirs { grid-auto-rows: auto; }
+    html[data-a11y] .dirs .dir--big { grid-column: auto; grid-row: auto; }
+    html[data-a11y] .dir { display: flex; flex-direction: column; min-height: 0; color: var(--text); background: var(--surface); }
+    html[data-a11y] .dir img { position: static; height: 180px; }
+    html[data-a11y] .dir::after { display: none; }
+    html[data-a11y] :is(.dir .cap, .dir .sticker, .dir--text .big-num) { position: static; padding: 16px 18px 0; }
+    html[data-a11y] .dir .cap { padding-bottom: 16px; }
+    html[data-a11y] .dir .cap span { opacity: 1; }
+    html[data-a11y] .dir .cap > span:not(.tag) { display: block !important; }
+    html[data-a11y] .dir .cap .tag { color: var(--text); border-color: var(--ink); background: transparent; }
+    html[data-a11y] .dir .sticker { align-self: flex-start; margin: 14px 0 0 16px; padding: 9px 14px; }
+    html[data-a11y] .dir--text .big-num { font-size: var(--fs-2xl) !important; color: var(--text); -webkit-text-stroke: 0; }
+    html[data-a11y] .lab { grid-template-columns: 1fr; }
+    html[data-a11y] .lab::before { grid-row: auto; font-size: var(--fs-lg); color: var(--text); -webkit-text-stroke: 0; }
+    html[data-a11y] .project:first-child { display: flex; }
+    html[data-a11y] .project > .sticker, html[data-a11y] #biz-form > .sticker { position: static; align-self: flex-start; margin: 16px 0 0 20px; }
+    html[data-a11y] #biz-form > .sticker { margin: 0 0 12px; }
+    html[data-a11y] .sno .photo { display: none; }
+    html[data-a11y] .sno :is(h3, .stack-sm > p) { margin-right: 0; }
+  </style>
+</head>
+<body data-page="science">
+  <div id="site-header"></div>
+
+  <main id="main">
+    <!-- Герой -->
+    <section class="page-hero page-hero--tinted sci-hero">
+      <div class="container">
+        <nav class="crumbs" aria-label="Хлебные крошки"><a href="index.html">Главная</a><i data-icon="chevron-right"></i><span>Наука</span></nav>
+        <div class="sci-hero__grid">
+          <div>
+            <h1 class="h1" style="max-width:880px">Исследования, которые <span class="u-hand">работают</span> в реальности</h1>
+            <p class="lead">Лаборатории, проекты и гранты в одном месте. Студентам — как попасть в науку, учёным — где взять финансирование, бизнесу — как заказать исследование.</p>
+            <div class="cluster ctas">
+              <a class="btn btn--accent btn--lg" href="#business"><i data-icon="briefcase"></i> Заказать исследование</a>
+              <a class="btn btn--ghost btn--lg" href="#labs"><i data-icon="search"></i> Найти лабораторию</a>
+              <span class="hand" aria-hidden="true">консультация бесплатно</span>
+            </div>
+            <nav class="cluster jump" aria-label="Разделы страницы">
+              <a class="chip" href="#labs"><i data-icon="flask"></i> Лаборатории</a>
+              <a class="chip" href="#projects"><i data-icon="rocket"></i> Проекты</a>
+              <a class="chip" href="#grants"><i data-icon="award"></i> Гранты</a>
+              <a class="chip" href="#students"><i data-icon="graduation"></i> Студенческая наука</a>
+              <a class="chip" href="#journals"><i data-icon="book"></i> Журналы</a>
+              <a class="chip" href="#startups"><i data-icon="lightbulb"></i> Стартапы</a>
+            </nav>
+          </div>
+          <div class="sci-pics">
+            <figure class="photo tape p1"><img src="assets/img/lab.jpg" alt="Исследователь у микроскопа в лаборатории" loading="eager"><figcaption>микроскоп ждёт тебя</figcaption></figure>
+            <figure class="photo tape tape--corner p2"><img src="assets/img/robotics.jpg" alt="Студенты собирают устройство в лаборатории" loading="eager"><figcaption>прототип №3, почти</figcaption></figure>
+            <span class="sticker sticker--round sticker--coral s1" aria-hidden="true">120+ лабораторий</span>
+            <span class="sticker sticker--blue s2" aria-hidden="true"><i data-icon="flask"></i>наука с 1 курса</span>
+          </div>
+        </div>
+
+        <div class="role-hint">
+          <div class="notice" data-for-role="applicant student"><i data-icon="sparkles"></i><div><strong>Хочешь в науку уже на 1–2 курсе?</strong><div class="small muted">Собрали, как найти руководителя и получить первый грант.</div></div><a class="btn btn--sm" href="#students">Студенческая наука</a></div>
+          <div class="notice" data-for-role="staff" hidden><i data-icon="award"></i><div><strong>Открытые конкурсы и гранты</strong><div class="small muted">Дедлайны, суммы и требования в одной таблице.</div></div><a class="btn btn--sm" href="#grants">К грантам</a></div>
+          <div class="notice notice--accent" data-for-role="partner" hidden><i data-icon="briefcase"></i><div><strong>Решим инженерную задачу вашей компании</strong><div class="small muted">Эксперт свяжется с вами в течение 3 рабочих дней.</div></div><a class="btn btn--sm btn--accent" href="#business">Оставить заявку</a></div>
+          <div class="notice" data-for-role="intl" hidden><i data-icon="globe"></i><div><strong>Research in English</strong><div class="small muted">Most labs welcome international PhD students and interns.</div></div><a class="btn btn--sm" href="#labs">Find a lab</a></div>
+        </div>
+
+        <div class="sci-stats">
+          <div class="num"><span class="big-num">120+</span><span>лабораторий и научных центров</span></div>
+          <div class="num"><span class="big-num">3,2<small> млрд</small></span><span>рублей — объём исследований и разработок в год</span></div>
+          <div class="num"><span class="big-num">300+</span><span>компаний-заказчиков</span></div>
+          <div class="num"><span class="big-num">2 400</span><span>статей в международных журналах за год</span></div>
+        </div>
+        <p class="demo-note" style="margin-top:12px">Цифры демонстрационные</p>
+      </div>
+    </section>
+
+    <!-- Направления -->
+    <section class="section">
+      <div class="container">
+        <div class="sec-head">
+          <div><h2 class="h2">6 направлений, в которых мы сильнее всего</h2><p>Нажми на направление — покажем его лаборатории в каталоге ниже.</p></div>
+          <span class="hand" aria-hidden="true">жми на любое ↓</span>
+        </div>
+        <div class="dirs">
+          <a class="dir dir--big" href="#labs" data-dir="materials"><img src="assets/img/lab.jpg" alt="" loading="lazy"><span class="sticker" aria-hidden="true">батареи для −40 °C</span><span class="cap"><strong>Новые материалы</strong><span>Металлургия, аддитивные технологии, материалы для батарей и Арктики.</span><span class="tag" data-dir-count="materials"></span></span></a>
+          <a class="dir" href="#labs" data-dir="ai"><img src="assets/img/robotics.jpg" alt="" loading="lazy"><span class="cap"><strong>ИИ и цифровые технологии</strong><span>Компьютерное зрение, цифровые двойники заводов, обработка языка.</span><span class="tag" data-dir-count="ai"></span></span></a>
+          <a class="dir" href="#labs" data-dir="energy"><img src="assets/img/city.jpg" alt="" loading="lazy"><span class="cap"><strong>Энергетика будущего</strong><span>Водород, накопители энергии и умные электросети.</span><span class="tag" data-dir-count="energy"></span></span></a>
+          <a class="dir" href="#labs" data-dir="eco"><img src="assets/img/winter.jpg" alt="" loading="lazy"><span class="cap"><strong>Экология и климат</strong><span>Мониторинг воздуха и воды, переработка отходов, зелёная химия.</span><span class="tag" data-dir-count="eco"></span></span></a>
+          <a class="dir dir--text" href="#labs" data-dir="bio"><span class="big-num" aria-hidden="true">05</span><span class="cap"><strong>Медицина и биотех</strong><span>Радиофармпрепараты, биосенсоры и клеточные технологии.</span><span class="tag" data-dir-count="bio"></span></span></a>
+          <a class="dir" href="#labs" data-dir="hum"><img src="assets/img/library.jpg" alt="" loading="lazy"><span class="cap"><strong>Гуманитарные исследования</strong><span>История и урбанистика Урала, экономика регионов.</span><span class="tag" data-dir-count="hum"></span></span></a>
+        </div>
+      </div>
+    </section>
+
+    <!-- Каталог лабораторий -->
+    <section class="section section--surface anchor" id="labs">
+      <div class="container">
+        <div class="sec-head">
+          <div><h2 class="h2">Каталог лабораторий</h2><p>Ищи по названию, оборудованию или руководителю. Отметка «Для бизнеса» — лаборатория принимает заказы компаний.</p></div>
+        </div>
+        <div class="lab-tools">
+          <div class="field">
+            <label for="lab-q">Поиск по лабораториям</label>
+            <div class="input-icon"><i data-icon="search"></i><input class="input" id="lab-q" type="search" placeholder="Например, микроскоп или водород" autocomplete="off"></div>
+          </div>
+          <div class="cluster" data-chip-group id="lab-dir" role="group" aria-label="Направление">
+            <button class="chip" aria-pressed="true" data-dir="all">Все</button>
+            <button class="chip" aria-pressed="false" data-dir="energy">Энергетика</button>
+            <button class="chip" aria-pressed="false" data-dir="materials">Материалы</button>
+            <button class="chip" aria-pressed="false" data-dir="ai">ИИ</button>
+            <button class="chip" aria-pressed="false" data-dir="eco">Экология</button>
+            <button class="chip" aria-pressed="false" data-dir="bio">Медицина</button>
+            <button class="chip" aria-pressed="false" data-dir="hum">Гуманитарные</button>
+          </div>
+        </div>
+        <div class="lab-tools__row">
+          <label class="check"><input type="checkbox" id="lab-biz"> Только принимающие заказы бизнеса</label>
+          <span class="small muted" id="lab-count" aria-live="polite"></span>
+        </div>
+        <div class="labs" id="lab-list"></div>
+        <div class="empty" id="lab-empty" hidden><strong>Ничего не нашли</strong><span class="small">Попробуй другое слово или сбрось фильтры.</span><button class="btn btn--soft btn--sm" type="button" id="lab-reset"><i data-icon="refresh"></i> Сбросить фильтры</button></div>
+        <p class="demo-note" style="margin-top:16px">Руководители и состав оборудования — вымышленные</p>
+      </div>
+    </section>
+
+    <!-- Проекты -->
+    <section class="section anchor" id="projects">
+      <div class="container">
+        <div class="sec-head">
+          <div><h2 class="h2">Большие задачи, над которыми работаем сейчас</h2><p>Межинститутские проекты с индустриальными партнёрами. В каждый можно прийти студентом-исследователем.</p></div>
+          <span class="hand" aria-hidden="true">студентов тоже берут!</span>
+        </div>
+        <div class="projects">
+          <article class="card project">
+            <span class="sticker sticker--coral" aria-hidden="true">флагман</span>
+            <figure class="photo photo--flat"><img src="assets/img/winter.jpg" alt="Екатеринбург на закате, вид на замёрзший пруд" loading="lazy"></figure>
+            <div class="project__body">
+              <div class="card__meta"><span class="tag tone-energy">Энергетика</span><span><i data-icon="calendar"></i>2023–2027</span></div>
+              <h3 class="h3">«Водородная долина Урала»</h3>
+              <p class="small muted">Пилотная установка по производству «зелёного» водорода и топливные элементы для городского транспорта.</p>
+              <div><div class="progress-row"><span>Этап 3 из 4 · испытания установки</span><span>65%</span></div><div class="progress" role="progressbar" aria-label="Готовность проекта «Водородная долина Урала»" aria-valuenow="65" aria-valuemin="0" aria-valuemax="100"><span data-w="65"></span></div></div>
+              <div class="project__facts"><div><b>1,2 млрд ₽</b><span>бюджет</span></div><div><b>4</b><span>промышленных партнёра</span></div><div><b>46</b><span>исследователей</span></div></div>
+            </div>
+          </article>
+          <article class="card project">
+            <figure class="photo photo--flat"><img src="assets/img/robotics.jpg" alt="Студенты собирают устройство в лаборатории" loading="lazy"></figure>
+            <div class="project__body">
+              <div class="card__meta"><span class="tag tone-ai">ИИ</span><span><i data-icon="calendar"></i>2024–2028</span></div>
+              <h3 class="h3">«Цифровой завод»</h3>
+              <p class="small muted">Цифровые двойники металлургических цехов: предсказываем поломки оборудования за 2 недели.</p>
+              <div><div class="progress-row"><span>Этап 2 из 5 · пилот на 2 предприятиях</span><span>40%</span></div><div class="progress" role="progressbar" aria-label="Готовность проекта «Цифровой завод»" aria-valuenow="40" aria-valuemin="0" aria-valuemax="100"><span data-w="40"></span></div></div>
+              <div class="project__facts"><div><b>780 млн ₽</b><span>бюджет</span></div><div><b>6</b><span>заводов-участников</span></div><div><b>58</b><span>исследователей</span></div></div>
+            </div>
+          </article>
+          <article class="card project">
+            <figure class="photo photo--flat"><img src="assets/img/city.jpg" alt="Заснеженный Екатеринбург с высоты" loading="lazy"></figure>
+            <div class="project__body">
+              <div class="card__meta"><span class="tag tone-eco">Экология</span><span><i data-icon="calendar"></i>2022–2026</span></div>
+              <h3 class="h3">«Чистый Урал»</h3>
+              <p class="small muted">Сеть из 300 датчиков качества воздуха и открытая карта загрязнений для жителей региона.</p>
+              <div><div class="progress-row"><span>Финальный этап · передача городу</span><span>90%</span></div><div class="progress" role="progressbar" aria-label="Готовность проекта «Чистый Урал»" aria-valuenow="90" aria-valuemin="0" aria-valuemax="100"><span data-w="90"></span></div></div>
+              <div class="project__facts"><div><b>210 млн ₽</b><span>бюджет</span></div><div><b>300</b><span>датчиков</span></div><div><b>12</b><span>городов</span></div></div>
+            </div>
+          </article>
+          <article class="card project">
+            <figure class="photo photo--flat"><img src="assets/img/lab.jpg" alt="Исследователь у микроскопа в лаборатории" loading="lazy"></figure>
+            <div class="project__body">
+              <div class="card__meta"><span class="tag tone-materials">Материалы</span><span><i data-icon="calendar"></i>2025–2029</span></div>
+              <h3 class="h3">«Батарея для Арктики»</h3>
+              <p class="small muted">Твердотельные аккумуляторы, которые сохраняют ёмкость при −40 °C, для техники Севера.</p>
+              <div><div class="progress-row"><span>Этап 1 из 4 · лабораторные образцы</span><span>20%</span></div><div class="progress" role="progressbar" aria-label="Готовность проекта «Батарея для Арктики»" aria-valuenow="20" aria-valuemin="0" aria-valuemax="100"><span data-w="20"></span></div></div>
+              <div class="project__facts"><div><b>540 млн ₽</b><span>бюджет</span></div><div><b>3</b><span>партнёра</span></div><div><b>31</b><span>исследователь</span></div></div>
+            </div>
+          </article>
+        </div>
+        <p class="demo-note" style="margin-top:16px">Проекты и показатели демонстрационные</p>
+      </div>
+    </section>
+
+    <!-- Гранты -->
+    <section class="section section--surface anchor" id="grants">
+      <div class="container">
+        <div class="sec-head">
+          <div><h2 class="h2">Гранты и конкурсы</h2><p>Отсортировано по дедлайну: сверху то, что горит. <span class="hand" aria-hidden="true">горит →</span></p></div>
+          <div class="cluster" data-chip-group id="grant-aud" role="group" aria-label="Для кого">
+            <button class="chip" aria-pressed="true" data-aud="all">Все</button>
+            <button class="chip" aria-pressed="false" data-aud="student">Студентам</button>
+            <button class="chip" aria-pressed="false" data-aud="young">Молодым учёным</button>
+            <button class="chip" aria-pressed="false" data-aud="staff">Сотрудникам</button>
+          </div>
+        </div>
+        <div class="table-wrap">
+          <table class="table grants-table">
+            <caption class="sr-only">Открытые гранты и конкурсы с дедлайнами</caption>
+            <thead><tr><th scope="col">Конкурс</th><th scope="col">Для кого</th><th scope="col">Поддержка</th><th scope="col">Дедлайн</th><th scope="col"><span class="sr-only">Действие</span></th></tr></thead>
+            <tbody id="grant-body"></tbody>
+          </table>
+        </div>
+        <p class="demo-note" style="margin-top:12px">Конкурсы и суммы демонстрационные, сроки считаются от сегодняшней даты</p>
+      </div>
+    </section>
+
+    <!-- Студенческая наука -->
+    <section class="section anchor" id="students">
+      <div class="container">
+        <div class="sec-head">
+          <div><h2 class="h2">Начни исследовать уже на первом курсе</h2><p>Научный руководитель, первая статья и грант — без «приходи после магистратуры».</p></div>
+        </div>
+        <div class="stud-grid">
+          <div class="sno">
+            <figure class="photo tape"><img src="assets/img/friends.jpg" alt="Студенты смеются за столом" loading="lazy"><figcaption>четверг, 18:00</figcaption></figure>
+            <span class="sticker" aria-hidden="true">СНО УрФУ</span>
+            <div class="stack-sm">
+              <h3 class="h2">Студенческое научное общество</h3>
+              <p>Поможем найти тему и руководителя, научим писать статьи и выступать на конференциях. Встречи каждый четверг.</p>
+            </div>
+            <div class="sno__stats">
+              <div><b>1 400</b><span>участников</span></div>
+              <div><b>90+</b><span>научных кружков</span></div>
+              <div><b>35</b><span>грантов в год</span></div>
+            </div>
+            <div class="cluster">
+              <button class="btn btn--soft" type="button" data-toast="Заявка в СНО отправлена — ответим в течение 2 дней (демо)">Вступить в СНО</button>
+              <button class="btn btn--line" type="button" data-toast="Подбор научного руководителя откроется в кабинете студента (демо)">Найти руководителя</button>
+            </div>
+            <p class="demo-note" style="color:#e3e8ff">Цифры демонстрационные</p>
+          </div>
+          <div class="stack">
+            <div class="steps">
+              <div class="step"><h3 class="h4">Выбери тему</h3><p class="small muted">Посмотри каталог лабораторий или приходи на встречу СНО.</p></div>
+              <div class="step"><h3 class="h4">Найди руководителя</h3><p class="small muted">Напиши преподавателю или используй подбор в кабинете.</p></div>
+              <div class="step"><h3 class="h4">Выступи и опубликуйся</h3><p class="small muted">Первая конференция — внутри УрФУ, дальше — всероссийские.</p></div>
+            </div>
+            <div class="card">
+              <div class="row between"><h3 class="h4">Ближайшие конференции</h3><a class="arrow-link small" href="news.html#events">Все события</a></div>
+              <div>
+                <div class="conf"><div class="conf__date"><b>14</b><span>ноя</span></div><div><strong>«Уральский вектор» — конференция молодых учёных</strong><div class="xs muted">Все направления · приём тезисов до 1 ноября</div></div><button class="btn btn--sm btn--soft" type="button" data-toast="Форма подачи тезисов откроется в кабинете (демо)">Подать тезисы</button></div>
+                <div class="conf"><div class="conf__date"><b>3</b><span>дек</span></div><div><strong>Школа «Наука за 48 часов»</strong><div class="xs muted">Для 1–2 курсов · интенсив в лабораториях</div></div><button class="btn btn--sm btn--soft" type="button" data-toast="Ты записан на школу (демо)">Записаться</button></div>
+                <div class="conf"><div class="conf__date"><b>16</b><span>апр</span></div><div><strong>Неделя студенческой науки УрФУ</strong><div class="xs muted">40 секций · лучшие доклады получают гранты</div></div><button class="btn btn--sm btn--soft" type="button" data-toast="Напомним о старте регистрации (демо)">Напомнить</button></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Журналы -->
+    <section class="section section--surface anchor" id="journals">
+      <div class="container">
+        <div class="sec-head">
+          <div><h2 class="h2">Журналы университета</h2><p>Открытый доступ ко всем статьям. Подача рукописей — онлайн.</p></div>
+        </div>
+        <div class="journals">
+          <article class="journal"><span class="journal__cover tone-materials" aria-hidden="true">UML</span><div><h3>Urals Materials Letters</h3><div class="cluster" style="margin-top:6px"><span class="tag tag--brand">Scopus Q2</span><span class="tag">ВАК</span><span class="xs muted">Материаловедение · на английском · 6 номеров в год</span></div></div><div class="cluster"><button class="btn btn--sm btn--ghost" type="button" data-toast="Архив номеров откроется на сайте журнала (демо)">Архив</button><button class="btn btn--sm" type="button" data-toast="Форма подачи рукописи откроется на сайте журнала (демо)">Подать статью</button></div></article>
+          <article class="journal"><span class="journal__cover tone-energy" aria-hidden="true">ЭУ</span><div><h3>Энергетика Урала</h3><div class="cluster" style="margin-top:6px"><span class="tag">ВАК К1</span><span class="tag">РИНЦ</span><span class="xs muted">Энергетика и электротехника · 4 номера в год</span></div></div><div class="cluster"><button class="btn btn--sm btn--ghost" type="button" data-toast="Архив номеров откроется на сайте журнала (демо)">Архив</button><button class="btn btn--sm" type="button" data-toast="Форма подачи рукописи откроется на сайте журнала (демо)">Подать статью</button></div></article>
+          <article class="journal"><span class="journal__cover tone-ai" aria-hidden="true">ЦТ</span><div><h3>Цифровые технологии и общество</h3><div class="cluster" style="margin-top:6px"><span class="tag">ВАК К2</span><span class="tag">РИНЦ</span><span class="xs muted">IT и цифровая экономика · 4 номера в год</span></div></div><div class="cluster"><button class="btn btn--sm btn--ghost" type="button" data-toast="Архив номеров откроется на сайте журнала (демо)">Архив</button><button class="btn btn--sm" type="button" data-toast="Форма подачи рукописи откроется на сайте журнала (демо)">Подать статью</button></div></article>
+          <article class="journal"><span class="journal__cover tone-eco" aria-hidden="true">ЭИ</span><div><h3>Экологические исследования Урала</h3><div class="cluster" style="margin-top:6px"><span class="tag tag--brand">Scopus Q3</span><span class="tag">ВАК</span><span class="xs muted">Экология и химия · 6 номеров в год</span></div></div><div class="cluster"><button class="btn btn--sm btn--ghost" type="button" data-toast="Архив номеров откроется на сайте журнала (демо)">Архив</button><button class="btn btn--sm" type="button" data-toast="Форма подачи рукописи откроется на сайте журнала (демо)">Подать статью</button></div></article>
+          <article class="journal"><span class="journal__cover tone-hum" aria-hidden="true">ИК</span><div><h3>История и культура Урала</h3><div class="cluster" style="margin-top:6px"><span class="tag">ВАК К1</span><span class="tag">Web of Science ESCI</span><span class="xs muted">Гуманитарные науки · 4 номера в год</span></div></div><div class="cluster"><button class="btn btn--sm btn--ghost" type="button" data-toast="Архив номеров откроется на сайте журнала (демо)">Архив</button><button class="btn btn--sm" type="button" data-toast="Форма подачи рукописи откроется на сайте журнала (демо)">Подать статью</button></div></article>
+          <article class="journal"><span class="journal__cover tone-bio" aria-hidden="true">BM</span><div><h3>Biomedical Engineering Urals</h3><div class="cluster" style="margin-top:6px"><span class="tag">РИНЦ</span><span class="tag tag--ok">Новый журнал</span><span class="xs muted">Биотех и медицинская физика · на английском · 2 номера в год</span></div></div><div class="cluster"><button class="btn btn--sm btn--ghost" type="button" data-toast="Архив номеров откроется на сайте журнала (демо)">Архив</button><button class="btn btn--sm" type="button" data-toast="Форма подачи рукописи откроется на сайте журнала (демо)">Подать статью</button></div></article>
+        </div>
+        <p class="demo-note" style="margin-top:12px">Названия журналов и индексация — демонстрационные</p>
+      </div>
+    </section>
+
+    <!-- Для бизнеса -->
+    <section class="section anchor" id="business">
+      <div class="container">
+        <div class="sec-head">
+          <div><h2 class="h2">Как заказать исследование</h2><p>От заявки до результата — с одним менеджером проекта. Первая консультация бесплатна.</p></div>
+        </div>
+        <div class="steps">
+          <div class="step"><h3 class="h4">Оставьте заявку</h3><p class="small muted">Опишите задачу своими словами — без технического задания.</p></div>
+          <div class="step"><h3 class="h4">Встреча с экспертом</h3><p class="small muted">За 3 рабочих дня подберём лабораторию и проведём встречу.</p></div>
+          <div class="step"><h3 class="h4">Договор и план работ</h3><p class="small muted">Согласуем сроки, бюджет и права на результат.</p></div>
+          <div class="step"><h3 class="h4">Результат и внедрение</h3><p class="small muted">Передаём отчёт, прототип или технологию и сопровождаем запуск.</p></div>
+        </div>
+
+        <div class="biz">
+          <form class="card card--pad-lg" id="biz-form" novalidate>
+            <span class="sticker sticker--blue" aria-hidden="true">ответ за 3 дня</span>
+            <h3 class="h3">Заявка на исследование</h3>
+            <p class="small muted">Поля со звёздочкой обязательны. Ответим в течение 3 рабочих дней.</p>
+            <div class="form-grid">
+              <div class="field"><label for="biz-company">Компания *</label><input class="input" id="biz-company" name="company" required autocomplete="organization" placeholder="ООО «Пример»"></div>
+              <div class="field"><label for="biz-dir">Направление</label>
+                <select class="select" id="biz-dir" name="dir">
+                  <option value="">Пока не знаю — подскажите</option>
+                  <option value="energy">Энергетика</option>
+                  <option value="materials">Новые материалы</option>
+                  <option value="ai">ИИ и цифровые технологии</option>
+                  <option value="eco">Экология</option>
+                  <option value="bio">Медицина и биотех</option>
+                  <option value="hum">Гуманитарные исследования</option>
+                </select>
+              </div>
+              <div class="field full"><label for="biz-task">Задача *</label><textarea class="textarea" id="biz-task" name="task" required placeholder="Например: нужно снизить брак при литье деталей на 20%"></textarea></div>
+              <div class="field"><label for="biz-budget">Ориентировочный бюджет</label>
+                <select class="select" id="biz-budget" name="budget">
+                  <option>Пока не знаю</option>
+                  <option>До 1 млн ₽</option>
+                  <option>1–5 млн ₽</option>
+                  <option>5–20 млн ₽</option>
+                  <option>Более 20 млн ₽</option>
+                </select>
+              </div>
+              <div class="field"><label for="biz-contact">E-mail или телефон *</label><input class="input" id="biz-contact" name="contact" required autocomplete="email" placeholder="name@company.ru"></div>
+              <label class="check full"><input type="checkbox" id="biz-agree" required> Согласен на обработку данных для ответа на заявку</label>
+            </div>
+            <p class="small" id="biz-error" role="alert" style="color:var(--danger)" hidden></p>
+            <div class="cluster">
+              <button class="btn btn--accent btn--lg" type="submit"><i data-icon="send"></i> Отправить заявку</button>
+              <span class="xs muted">Отправка демонстрационная</span>
+            </div>
+          </form>
+          <aside class="stack">
+            <div class="card">
+              <h3 class="h4">Что можно заказать</h3>
+              <ul class="offer">
+                <li><i data-icon="flask"></i><span><strong>НИОКР под задачу</strong><span class="small muted" style="display:block">от идеи до опытного образца</span></span></li>
+                <li><i data-icon="check"></i><span><strong>Испытания и экспертиза</strong><span class="small muted" style="display:block">40+ аккредитованных методик</span></span></li>
+                <li><i data-icon="users"></i><span><strong>Обучение сотрудников</strong><span class="small muted" style="display:block">корпоративные программы и стажировки</span></span></li>
+                <li><i data-icon="building"></i><span><strong>Совместная лаборатория</strong><span class="small muted" style="display:block">ваше направление на базе университета</span></span></li>
+              </ul>
+            </div>
+            <div class="card ttc">
+              <span class="hand">Центр трансфера технологий</span>
+              <p class="small muted">Руководитель центра и менеджеры проектов отвечают на вопросы о сотрудничестве.</p>
+              <a class="arrow-link" href="tel:+73433754848"><i data-icon="phone"></i> +7 (343) 375-48-48</a>
+              <a class="arrow-link" href="mailto:rd@urfu.ru"><i data-icon="mail"></i> rd@urfu.ru</a>
+              <p class="demo-note">Контакты демонстрационные</p>
+            </div>
+          </aside>
+        </div>
+      </div>
+    </section>
+
+    <!-- Стартапы -->
+    <section class="section section--surface anchor" id="startups">
+      <div class="container">
+        <div class="sec-head">
+          <div><h2 class="h2">Готовые разработки для вашей компании</h2><p>Стартапы ищут инвесторов и пилотных заказчиков, технологии доступны по лицензии.</p></div>
+          <div class="cluster" data-chip-group id="st-filter" role="group" aria-label="Тип разработки">
+            <button class="chip" aria-pressed="true" data-type="all">Все</button>
+            <button class="chip" aria-pressed="false" data-type="startup">Стартапы</button>
+            <button class="chip" aria-pressed="false" data-type="license">Для лицензирования</button>
+          </div>
+        </div>
+        <div class="startups" id="st-list">
+          <article class="card" data-type="startup"><div class="card__meta"><span class="tag tag--accent"><i data-icon="rocket"></i>Стартап</span><span>ИИ · пилот на 3 заводах</span></div><h3 class="card__title">«НейроКонтроль»</h3><p class="small muted">Камеры с нейросетью находят дефекты проката на скорости линии и снижают брак до 30%.</p><div><div class="progress-row"><span>Уровень готовности</span><span>TRL 7</span></div><div class="trl" aria-hidden="true" data-trl="7"></div></div><div class="card__footer"><span class="tag">Ищут инвестиции</span><button class="btn btn--sm btn--soft" type="button" data-toast="Запрос презентации отправлен команде стартапа (демо)">Запросить презентацию</button></div></article>
+          <article class="card" data-type="startup"><div class="card__meta"><span class="tag tag--accent"><i data-icon="rocket"></i>Стартап</span><span>Экология</span></div><h3 class="card__title">«ВодаЧек»</h3><p class="small muted">Портативный анализатор воды: 12 показателей за 5 минут прямо на месте отбора пробы.</p><div><div class="progress-row"><span>Уровень готовности</span><span>TRL 6</span></div><div class="trl" aria-hidden="true" data-trl="6"></div></div><div class="card__footer"><span class="tag">Ищут пилотного заказчика</span><button class="btn btn--sm btn--soft" type="button" data-toast="Запрос презентации отправлен команде стартапа (демо)">Запросить презентацию</button></div></article>
+          <article class="card" data-type="startup"><div class="card__meta"><span class="tag tag--accent"><i data-icon="rocket"></i>Стартап</span><span>Радиоэлектроника</span></div><h3 class="card__title">«СнегоРадар»</h3><p class="small muted">Радарный датчик толщины снега на крышах и ЛЭП — предупреждает об опасной нагрузке.</p><div><div class="progress-row"><span>Уровень готовности</span><span>TRL 5</span></div><div class="trl" aria-hidden="true" data-trl="5"></div></div><div class="card__footer"><span class="tag">Ищут инвестиции</span><button class="btn btn--sm btn--soft" type="button" data-toast="Запрос презентации отправлен команде стартапа (демо)">Запросить презентацию</button></div></article>
+          <article class="card" data-type="license"><div class="card__meta"><span class="tag tag--partner"><i data-icon="file"></i>Лицензия</span><span>Материалы · патент</span></div><h3 class="card__title">Керамическое покрытие для лопаток турбин</h3><p class="small muted">Увеличивает ресурс деталей в 1,8 раза при рабочих температурах до 1 100 °C.</p><div><div class="progress-row"><span>Уровень готовности</span><span>TRL 6</span></div><div class="trl" aria-hidden="true" data-trl="6"></div></div><div class="card__footer"><span class="tag">Неисключительная лицензия</span><button class="btn btn--sm btn--soft" type="button" data-toast="Запрос условий лицензии отправлен (демо)">Узнать условия</button></div></article>
+          <article class="card" data-type="license"><div class="card__meta"><span class="tag tag--partner"><i data-icon="file"></i>Лицензия</span><span>Экология · ноу-хау</span></div><h3 class="card__title">Биоразлагаемая упаковка из отходов</h3><p class="small muted">Плёнка из отходов пищевой промышленности, разлагается за 90 дней.</p><div><div class="progress-row"><span>Уровень готовности</span><span>TRL 5</span></div><div class="trl" aria-hidden="true" data-trl="5"></div></div><div class="card__footer"><span class="tag">Лицензия или СП</span><button class="btn btn--sm btn--soft" type="button" data-toast="Запрос условий лицензии отправлен (демо)">Узнать условия</button></div></article>
+          <article class="card" data-type="license"><div class="card__meta"><span class="tag tag--partner"><i data-icon="file"></i>Лицензия</span><span>Энергетика · программа для ЭВМ</span></div><h3 class="card__title">Прогноз нагрузки электросетей</h3><p class="small muted">Алгоритм прогнозирует потребление на сутки вперёд с точностью 97% и снижает потери.</p><div><div class="progress-row"><span>Уровень готовности</span><span>TRL 8</span></div><div class="trl" aria-hidden="true" data-trl="8"></div></div><div class="card__footer"><span class="tag">Готово к внедрению</span><button class="btn btn--sm btn--soft" type="button" data-toast="Запрос условий лицензии отправлен (демо)">Узнать условия</button></div></article>
+        </div>
+        <p class="demo-note" style="margin-top:16px">Разработки и показатели демонстрационные. TRL — уровень готовности технологии от 1 до 9.</p>
+      </div>
+    </section>
+  </main>
+
+  <div id="site-footer"></div>
+
+  <script src="assets/js/app.js"></script>
+  <script>
+    (function () {
+      'use strict';
+      const plural = (n, f) => f[(n % 10 === 1 && n % 100 !== 11) ? 0 : (n % 10 >= 2 && n % 10 <= 4 && (n % 100 < 10 || n % 100 >= 20)) ? 1 : 2];
+      const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+
+      /* ---------- Данные лабораторий (демо, руководители вымышленные) ---------- */
+      const DIRS = {
+        energy: { t: 'Энергетика', i: 'zap' }, materials: { t: 'Материалы', i: 'layers' }, ai: { t: 'ИИ', i: 'cpu' },
+        eco: { t: 'Экология', i: 'leaf' }, bio: { t: 'Медицина и биотех', i: 'heart' }, hum: { t: 'Гуманитарные', i: 'book' }
+      };
+      const LABS = [
+        { n: 'Водородная энергетика и топливные элементы', d: 'energy', h: 'Ирина Соколова', p: 'д.х.н., профессор', e: ['Электрохимические стенды', 'Газовый хроматограф', 'Климатическая камера'], b: true },
+        { n: 'Умные электросети', d: 'energy', h: 'Олег Миронов', p: 'к.т.н., доцент', e: ['Симулятор сетей реального времени', 'Стенд релейной защиты'], b: true },
+        { n: 'Аддитивные технологии и металлы', d: 'materials', h: 'Татьяна Белкина', p: 'д.т.н., профессор', e: ['3D-принтер по металлу', 'Электронный микроскоп', 'Рентгеновский дифрактометр'], b: true },
+        { n: 'Твердотельные аккумуляторы', d: 'materials', h: 'Сергей Ланской', p: 'к.х.н., ведущий научный сотрудник', e: ['Перчаточный бокс', 'Импедансный спектрометр', 'Климатическая камера'], b: true },
+        { n: 'Компьютерное зрение для промышленности', d: 'ai', h: 'Анна Ветрова', p: 'к.т.н., доцент', e: ['GPU-кластер', 'Промышленные камеры', 'Стенд конвейера'], b: true },
+        { n: 'Цифровые двойники производств', d: 'ai', h: 'Максим Дёмин', p: 'к.ф.-м.н., доцент', e: ['Суперкомпьютер', 'ПО для инженерного моделирования'], b: true },
+        { n: 'Обработка естественного языка', d: 'ai', h: 'Ксения Рябова', p: 'к.филол.н., научный сотрудник', e: ['GPU-кластер', 'Корпуса текстов на русском'], b: false },
+        { n: 'Экологический мониторинг Урала', d: 'eco', h: 'Роман Устинов', p: 'к.г.н., доцент', e: ['Дроны с мультиспектральными камерами', 'Масс-спектрометр'], b: true },
+        { n: 'Зелёная химия и переработка', d: 'eco', h: 'Ольга Тимофеева', p: 'д.х.н., профессор', e: ['Пилотная установка переработки', 'Газовый хроматограф'], b: true },
+        { n: 'Медицинская физика и радиофармпрепараты', d: 'bio', h: 'Вадим Кольцов', p: 'д.ф.-м.н., профессор', e: ['Радиохимический бокс', 'Гамма-спектрометр'], b: false },
+        { n: 'Биосенсоры и клеточные технологии', d: 'bio', h: 'Дарья Голубева', p: 'к.б.н., старший научный сотрудник', e: ['Конфокальный микроскоп', 'Биореактор', 'Электронный микроскоп'], b: true },
+        { n: 'Цифровая история и урбанистика Урала', d: 'hum', h: 'Илья Савельев', p: 'к.и.н., доцент', e: ['Студия оцифровки архивов', 'VR-студия', 'ГИС-платформа'], b: false },
+        { n: 'Экономика регионов', d: 'hum', h: 'Светлана Жукова', p: 'д.э.н., профессор', e: ['Базы данных регионов', 'Центр опросов'], b: true }
+      ];
+
+      // Счётчики на карточках направлений
+      document.querySelectorAll('[data-dir-count]').forEach((el) => {
+        const n = LABS.filter((l) => l.d === el.dataset.dirCount).length;
+        el.textContent = `${n} ${plural(n, ['лаборатория', 'лаборатории', 'лабораторий'])} в каталоге`;
+      });
+
+      /* ---------- Каталог лабораторий ---------- */
+      const list = document.getElementById('lab-list');
+      const qInput = document.getElementById('lab-q');
+      const dirGroup = document.getElementById('lab-dir');
+      const bizBox = document.getElementById('lab-biz');
+      const countEl = document.getElementById('lab-count');
+      const initials = (name) => name.split(' ').map((w) => w[0]).join('');
+      function mark(text, q) {
+        const safe = esc(text);
+        if (!q) return safe;
+        const re = new RegExp('(' + q.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + ')', 'gi');
+        return safe.replace(re, '<mark>$1</mark>');
+      }
+      function renderLabs() {
+        const q = qInput.value.trim();
+        const ql = q.toLowerCase();
+        const dir = dirGroup.querySelector('[aria-pressed="true"]').dataset.dir;
+        const onlyBiz = bizBox.checked;
+        const items = LABS.filter((l) =>
+          (dir === 'all' || l.d === dir) && (!onlyBiz || l.b) &&
+          (!ql || [l.n, l.h, l.p, DIRS[l.d].t, ...l.e].join(' ').toLowerCase().includes(ql)));
+        list.innerHTML = items.map((l) => `
+          <article class="lab">
+            <div><span class="tag tone-${l.d}">${DIRS[l.d].t}</span><h3>${mark(l.n, q)}</h3></div>
+            <div class="lab__lead"><span class="muted">Руководитель:</span><span><strong>${mark(l.h, q)}</strong>, <span class="muted">${esc(l.p)}</span></span></div>
+            <div class="lab__equip">${l.e.map((e) => `<span class="tag">${mark(e, q)}</span>`).join('')}</div>
+            <div class="lab__foot">
+              ${l.b ? `<span class="tag tag--ok">${UI.icon('check')}Для бизнеса: да</span>` : `<span class="tag">Для бизнеса: нет</span>`}
+              ${l.b ? `<a class="btn btn--sm btn--soft" href="#business" data-lab="${esc(l.n)}" data-lab-dir="${l.d}">Обсудить задачу</a>` : `<a class="btn btn--sm btn--ghost" href="#students">Стать исследователем</a>`}
+            </div>
+          </article>`).join('');
+        document.getElementById('lab-empty').hidden = items.length > 0;
+        countEl.textContent = `Найдено: ${items.length} ${plural(items.length, ['лаборатория', 'лаборатории', 'лабораторий'])} из ${LABS.length}`;
+      }
+      qInput.addEventListener('input', renderLabs);
+      bizBox.addEventListener('change', renderLabs);
+      dirGroup.addEventListener('chipchange', renderLabs);
+      const setDir = (d) => dirGroup.querySelectorAll('.chip').forEach((c) => c.setAttribute('aria-pressed', String(c.dataset.dir === d)));
+      document.getElementById('lab-reset').addEventListener('click', () => { qInput.value = ''; bizBox.checked = false; setDir('all'); renderLabs(); qInput.focus(); });
+      // Клик по направлению — фильтр каталога
+      document.querySelectorAll('.dir[data-dir]').forEach((a) => a.addEventListener('click', () => { setDir(a.dataset.dir); qInput.value = ''; renderLabs(); }));
+      // «Обсудить задачу» — предзаполняем заявку
+      list.addEventListener('click', (e) => {
+        const a = e.target.closest('[data-lab]');
+        if (!a) return;
+        document.getElementById('biz-dir').value = a.dataset.labDir;
+        const task = document.getElementById('biz-task');
+        if (!task.value.trim()) task.value = `Интересует сотрудничество с лабораторией «${a.dataset.lab}». Задача: `;
+        setTimeout(() => document.getElementById('biz-company').focus({ preventScroll: true }), 500);
+      });
+      renderLabs();
+
+      /* ---------- Гранты: дедлайны от сегодняшней даты ---------- */
+      const AUD = { student: ['Студентам', 'tag--student'], young: ['Молодым учёным', 'tag--applicant'], staff: ['Сотрудникам', 'tag--staff'] };
+      const GRANTS = [
+        { t: 'Поддержка участия в конференциях', s: 'Компенсация поездки и взноса', a: ['student', 'young'], m: 'до 80 000 ₽', days: 4 },
+        { t: 'Конкурс молодёжных научных проектов УрФУ', s: 'Проекты команд до 35 лет', a: ['student', 'young'], m: 'до 500 000 ₽', days: 9 },
+        { t: 'Стратегические проекты «Приоритет-2030»', s: 'Междисциплинарные научные группы', a: ['staff'], m: 'до 15 млн ₽', days: 21 },
+        { t: 'Стажировки в ведущих лабораториях страны', s: 'От 1 до 3 месяцев', a: ['young'], m: 'оплата поездки и проживания', days: 30 },
+        { t: 'Грант на студенческий стартап', s: 'Прототип и выход на рынок', a: ['student'], m: 'до 1 млн ₽', days: 45 },
+        { t: 'Премия за публикацию в журнале первого квартиля', s: 'Статьи текущего года', a: ['staff', 'young'], m: '150 000 ₽', days: 62 },
+        { t: 'Машинное время на суперкомпьютере', s: 'Для расчётных задач', a: ['student', 'young', 'staff'], m: 'до 50 000 ядро-часов', days: 95 }
+      ];
+      const fmt = new Intl.DateTimeFormat('ru-RU', { day: 'numeric', month: 'long' });
+      const today = new Date(); today.setHours(0, 0, 0, 0);
+      const audGroup = document.getElementById('grant-aud');
+      function renderGrants() {
+        const aud = audGroup.querySelector('[aria-pressed="true"]').dataset.aud;
+        const rows = GRANTS.filter((g) => aud === 'all' || g.a.includes(aud)).sort((a, b) => a.days - b.days);
+        document.getElementById('grant-body').innerHTML = rows.map((g) => {
+          const d = new Date(today); d.setDate(d.getDate() + g.days);
+          const cls = g.days <= 7 ? 'tag--hot' : g.days <= 21 ? 'tag--warn' : 'tag--ok';
+          return `<tr>
+            <td><strong>${g.t}</strong><div class="xs muted">${g.s}</div></td>
+            <td><div class="cluster" style="gap:4px">${g.a.map((k) => `<span class="tag ${AUD[k][1]}">${AUD[k][0]}</span>`).join('')}</div></td>
+            <td class="nowrap">${g.m}</td>
+            <td><span class="nowrap">до ${fmt.format(d)}</span><div style="margin-top:6px"><span class="tag ${cls} deadline">${UI.icon('clock')}осталось ${g.days} ${plural(g.days, ['день', 'дня', 'дней'])}</span></div></td>
+            <td><button class="btn btn--sm ${g.days <= 7 ? 'btn--accent' : 'btn--soft'}" type="button" data-grant="${g.t}">Подать заявку</button></td>
+          </tr>`;
+        }).join('') || `<tr><td colspan="5" class="muted">Сейчас нет открытых конкурсов для этой группы.</td></tr>`;
+      }
+      audGroup.addEventListener('chipchange', renderGrants);
+      document.getElementById('grant-body').addEventListener('click', (e) => {
+        const b = e.target.closest('[data-grant]');
+        if (b) UI.toast(`Заявка на «${b.dataset.grant}» откроется в личном кабинете (демо)`);
+      });
+      renderGrants();
+
+      /* ---------- Прогресс проектов: анимация при появлении ---------- */
+      const bars = document.querySelectorAll('.progress > span[data-w]');
+      bars.forEach((b) => { b.style.width = '0%'; });
+      if ('IntersectionObserver' in window) {
+        const io = new IntersectionObserver((ents) => ents.forEach((en) => { if (en.isIntersecting) { en.target.style.width = en.target.dataset.w + '%'; io.unobserve(en.target); } }), { threshold: .4 });
+        bars.forEach((b) => io.observe(b));
+      } else bars.forEach((b) => { b.style.width = b.dataset.w + '%'; });
+
+      /* ---------- TRL-шкалы ---------- */
+      document.querySelectorAll('.trl[data-trl]').forEach((el) => {
+        const n = +el.dataset.trl;
+        el.innerHTML = Array.from({ length: 9 }, (_, i) => `<span class="${i < n ? 'on' : ''}"></span>`).join('');
+      });
+
+      /* ---------- Фильтр стартапов ---------- */
+      const stGroup = document.getElementById('st-filter');
+      stGroup.addEventListener('chipchange', () => {
+        const t = stGroup.querySelector('[aria-pressed="true"]').dataset.type;
+        document.querySelectorAll('#st-list > [data-type]').forEach((c) => { c.hidden = t !== 'all' && c.dataset.type !== t; });
+      });
+
+      /* ---------- Заявка бизнеса ---------- */
+      const form = document.getElementById('biz-form');
+      const err = document.getElementById('biz-error');
+      form.addEventListener('submit', (e) => {
+        e.preventDefault();
+        const bad = [...form.querySelectorAll('[required]')].filter((f) => f.type === 'checkbox' ? !f.checked : !f.value.trim());
+        form.querySelectorAll('[required]').forEach((f) => f.setAttribute('aria-invalid', String(bad.includes(f))));
+        if (bad.length) {
+          err.hidden = false;
+          err.textContent = 'Заполните обязательные поля: ' + bad.map((f) => (f.type === 'checkbox' ? 'согласие на обработку данных' : form.querySelector(`label[for="${f.id}"]`).textContent.replace(' *', '').toLowerCase())).join(', ');
+          bad[0].focus();
+          return;
+        }
+        err.hidden = true;
+        UI.toast('Заявка отправлена — эксперт свяжется с вами за 3 рабочих дня (демо)');
+        form.reset();
+      });
+      /* ---------- Переход по якорю: повторяем после отрисовки шапки и загрузки шрифтов ---------- */
+      let touched = false; // если пользователь уже листает — не дёргаем страницу
+      ['wheel', 'touchstart', 'keydown', 'mousedown'].forEach((ev) => window.addEventListener(ev, () => { touched = true; }, { once: true, passive: true }));
+      const landOnHash = () => {
+        const id = decodeURIComponent(location.hash.slice(1));
+        const t = id && document.getElementById(id);
+        if (t && !touched) t.scrollIntoView({ block: 'start', behavior: 'instant' });
+      };
+      window.addEventListener('load', landOnHash);
+      if (document.fonts && document.fonts.ready) document.fonts.ready.then(landOnHash);
+    })();
+  </script>
+</body>
+</html>

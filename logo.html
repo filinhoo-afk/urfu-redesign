@@ -1,0 +1,173 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Логотип: три концепции — УрФУ</title>
+  <link rel="icon" href="assets/logo/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="assets/css/tokens.css">
+  <link rel="stylesheet" href="assets/css/components.css">
+  <style>
+    .logo-nav { position: sticky; top: calc(var(--header-h) + 53px); z-index: 5; background: var(--bg); padding: 12px 0; }
+    .concept { padding: clamp(40px, 6vw, 72px) 0; border-top: 1px solid var(--border); }
+    .concept__head { display: grid; gap: 32px; grid-template-columns: 1fr; align-items: start; margin-bottom: 32px; }
+    @media (min-width: 1024px) { .concept__head { grid-template-columns: 1fr 1fr; } }
+    .concept__num { font-size: var(--fs-xs); font-weight: 800; color: var(--text-3); letter-spacing: .1em; }
+    .hero-logo { border-radius: var(--r-xl); background: var(--surface); border: 1px solid var(--border); display: grid; place-items: center; padding: clamp(40px, 7vw, 88px) 24px; color: var(--text); }
+    .hero-logo svg { width: min(100%, 440px); height: auto; }
+    .variants { display: grid; gap: 16px; grid-template-columns: repeat(auto-fit, minmax(min(100%, 220px), 1fr)); margin-top: 16px; }
+    .variant { border-radius: var(--r-lg); display: grid; place-items: center; padding: 36px 20px; min-height: 160px; position: relative; }
+    .variant svg { width: 100%; max-width: 200px; height: auto; }
+    .variant span { position: absolute; left: 14px; top: 12px; font-size: var(--fs-xs); font-weight: 650; opacity: .7; }
+    .v-light { background: var(--surface); border: 1px solid var(--border); color: #121826; }
+    .v-dark { background: #0f1830; color: #fff; }
+    .v-brand { background: var(--brand-soft); color: #121826; }
+    .v-mono { background: #fff; border: 1px solid var(--border); color: #121826; }
+    .sizes { display: flex; align-items: end; gap: 20px; flex-wrap: wrap; }
+    .sizes figure { margin: 0; display: flex; flex-direction: column; align-items: center; gap: 8px; font-size: var(--fs-xs); color: var(--text-3); }
+    .app-icon { border-radius: 22%; display: grid; place-items: center; box-shadow: var(--shadow-md); overflow: hidden; background: #fff; }
+    .app-icon svg { width: 72%; height: 72%; }
+    .mock-header { border-radius: var(--r-md); background: var(--surface); border: 1px solid var(--border); padding: 14px 18px; display: flex; align-items: center; gap: 18px; color: var(--text); }
+    .mock-header svg { height: 32px; width: auto; }
+    .mock-header i, .mock-header .bar { height: 8px; border-radius: 4px; background: var(--surface-2); display: block; }
+    .merch { display: grid; gap: 16px; grid-template-columns: repeat(auto-fit, minmax(min(100%, 200px), 1fr)); }
+    .merch > div { border-radius: var(--r-lg); aspect-ratio: 4 / 3; display: grid; place-items: center; padding: 24px; }
+    .merch svg { width: 70%; height: auto; }
+    .badge-mock { background: var(--brand); color: #fff; }
+    .pattern-mock { background: var(--accent-soft); }
+    .compare th:first-child { width: 28%; }
+    .score { display: inline-flex; gap: 3px; }
+    .score b { width: 10px; height: 10px; border-radius: 50%; background: var(--border); display: inline-block; }
+    .score b.on { background: var(--brand); }
+    .choose-bar { display: flex; gap: 12px; flex-wrap: wrap; align-items: center; margin-top: 24px; }
+  </style>
+</head>
+<body data-page="about">
+  <div id="site-header"></div>
+  <main id="main">
+    <section class="page-hero page-hero--tinted">
+      <div class="container">
+        <nav class="crumbs" aria-label="Хлебные крошки"><a href="index.html">Главная</a><i data-icon="chevron-right"></i><a href="concept.html">Концепция</a><i data-icon="chevron-right"></i><span>Логотип</span></nav>
+        <span class="eyebrow">Айдентика</span>
+        <h1 class="h1" style="margin-top:12px">Логотип: три концепции</h1>
+        <p class="lead">Новый знак должен работать в 16 пикселях вкладки браузера, в иконке приложения и на фасаде нового кампуса. Каждый вариант можно примерить на весь сайт — кнопка «Примерить в шапке».</p>
+        <div class="cluster" style="margin-top:24px" id="current-logo"></div>
+      </div>
+    </section>
+
+    <div class="logo-nav">
+      <div class="container cluster">
+        <a class="chip" href="#evolution">1 · Эволюция</a>
+        <a class="chip" href="#gem">2 · Самоцвет</a>
+        <a class="chip" href="#vector">3 · Вектор</a>
+        <a class="chip" href="#compare">Сравнение</a>
+      </div>
+    </div>
+
+    <div class="container" id="concepts"></div>
+
+    <section class="section" id="compare">
+      <div class="container">
+        <div class="section-head"><div><span class="eyebrow">Итог</span><h2 class="h2" style="margin-top:8px">Сравнение по критериям</h2><p>Оценки — наша экспертная гипотеза. Перед внедрением стоит проверить варианты на студентах и абитуриентах.</p></div></div>
+        <div class="table-wrap">
+          <table class="table compare">
+            <thead><tr><th>Критерий</th><th>1 · Эволюция</th><th>2 · Самоцвет</th><th>3 · Вектор</th></tr></thead>
+            <tbody id="compare-body"></tbody>
+          </table>
+        </div>
+        <div class="notice" style="margin-top:24px"><i data-icon="lightbulb"></i><div><strong>Рекомендуем «Самоцвет».</strong> Он сильнее всех связан с Уралом, узнаётся в 16 px и даёт систему: грани кристалла можно раскрашивать под институты, не создавая 18 разных логотипов.</div></div>
+      </div>
+    </section>
+  </main>
+  <div id="site-footer"></div>
+
+  <script src="assets/js/app.js"></script>
+  <script>
+    const C = [
+      { id: 'evolution', n: '01', name: 'Эволюция', tag: 'Сохраняем узнаваемость',
+        idea: 'Буква «Ф» из названия становится знаком: круг — глобус и открытость миру, вертикаль — ось, опора, инженерная точность. Коралловая точка — «ты здесь»: человек в центре университета.',
+        why: ['Плавный переход: аббревиатура остаётся главной', 'Простая геометрия — легко вышить, вырезать, напечатать', 'Точка-акцент переиспользуется в интерфейсе как маркер «ты здесь»'],
+        mono: { word: '#121826', bg: '#121826', fg: '#fff', dot: '#fff' }, inv: { word: '#fff', bg: '#fff', fg: '#1f4fd8' } },
+      { id: 'gem', n: '02', name: 'Самоцвет', tag: 'Рекомендуем',
+        idea: 'Огранённый кристалл — уральские самоцветы, малахит и яшма, «каменный пояс» России. Шесть граней — разные институты и роли, которые вместе дают свет. В гранях читается буква «У» — Урал и университет.',
+        why: ['Сильнее всех привязан к месту: Урал = камни', 'Грани = система: перекрашиваются под институты', 'Отлично читается в 16 px и как иконка приложения'],
+        mono: { word: '#121826', mono: '#121826', fg: '#fff', dot: '#fff' }, inv: { word: '#fff', fg: '#fff' } },
+      { id: 'vector', n: '03', name: 'Вектор', tag: 'Динамика и рост',
+        idea: 'Три наклонных столбца — вершины Уральских гор и график роста одновременно. Наклон вперёд — движение и технологии. Тройка — образование, наука, индустрия.',
+        why: ['Самый «технологичный» и смелый', 'Легко анимируется: столбцы вырастают', 'Хорошо работает в паттернах и мерче'],
+        mono: { word: '#121826', a: '#121826', b: '#121826', dot: '#121826' }, inv: { word: '#fff', a: '#9ab4ff', b: '#fff' } }
+    ];
+    const L = UI.LOGOS;
+    const icon = (k, c) => L[k](c).replace('viewBox="0 0 136 48"', 'viewBox="0 0 48 48"').replace(/<text[\s\S]*?<\/text>/, '');
+
+    document.getElementById('concepts').innerHTML = C.map((c) => `
+      <section class="concept" id="${c.id}">
+        <div class="concept__head">
+          <div class="stack">
+            <span class="concept__num">КОНЦЕПЦИЯ ${c.n}</span>
+            <div class="row" style="flex-wrap:wrap"><h2 class="h2">${c.name}</h2><span class="tag ${c.id === 'gem' ? 'tag--accent' : 'tag--brand'}">${c.tag}</span></div>
+            <p class="lead">${c.idea}</p>
+            <ul class="stack-sm">${c.why.map((w) => `<li class="row" style="align-items:flex-start;gap:10px">${UI.icon('check')}<span>${w}</span></li>`).join('')}</ul>
+            <div class="choose-bar">
+              <button class="btn btn--accent" data-apply="${c.id}">${UI.icon('sparkles')} Примерить в шапке</button>
+              <a class="btn btn--ghost" href="assets/logo/${c.id}-color.svg" download>${UI.icon('download')} SVG</a>
+            </div>
+          </div>
+          <div class="hero-logo">${L[c.id]({ word: 'currentColor' })}</div>
+        </div>
+        <div class="variants">
+          <div class="variant v-light"><span>Основной</span>${L[c.id]({ word: '#121826' })}</div>
+          <div class="variant v-dark"><span>Инверсия</span>${L[c.id](c.inv)}</div>
+          <div class="variant v-mono"><span>Монохром</span>${L[c.id](c.mono)}</div>
+          <div class="variant v-brand"><span>На фирменном</span>${L[c.id]({ word: '#121826' })}</div>
+        </div>
+        <div class="grid grid-3" style="margin-top:16px">
+          <div class="card"><h3 class="h4">Масштаб</h3>
+            <div class="sizes">
+              <figure><div class="app-icon" style="width:96px;height:96px">${icon(c.id, {})}</div>96</figure>
+              <figure><div style="width:48px">${icon(c.id, {})}</div>48</figure>
+              <figure><div style="width:32px">${icon(c.id, {})}</div>32</figure>
+              <figure><div style="width:16px">${icon(c.id, {})}</div>16 · favicon</figure>
+            </div>
+          </div>
+          <div class="card"><h3 class="h4">В шапке сайта</h3>
+            <div class="mock-header">${L[c.id]({ word: 'currentColor' })}<span class="bar" style="width:20%"></span><span class="bar" style="width:14%"></span><span class="bar" style="width:16%"></span></div>
+            <div class="mock-header" style="background:#0f1830;border-color:#0f1830;color:#fff">${L[c.id](c.inv)}<span class="bar" style="width:20%;background:rgba(255,255,255,.12)"></span><span class="bar" style="width:14%;background:rgba(255,255,255,.12)"></span></div>
+          </div>
+          <div class="card"><h3 class="h4">Носители</h3>
+            <div class="merch" style="grid-template-columns:1fr 1fr">
+              <div class="badge-mock">${L[c.id](c.inv)}</div>
+              <div class="pattern-mock">${icon(c.id, {})}</div>
+            </div>
+            <p class="xs muted">Студенческий бейдж и стикер</p>
+          </div>
+        </div>
+      </section>`).join('');
+
+    const rows = [
+      ['Узнаваемость текущего бренда', [5, 3, 2]],
+      ['Связь с Уралом', [2, 5, 4]],
+      ['Читаемость в 16 px', [4, 5, 3]],
+      ['Гибкость системы (институты, роли)', [3, 5, 4]],
+      ['Свежесть и «дух» вуза', [3, 4, 5]]
+    ];
+    document.getElementById('compare-body').innerHTML = rows.map(([k, v]) => `<tr><td><strong>${k}</strong></td>${v.map((n) => `<td><span class="score" aria-label="${n} из 5">${[1, 2, 3, 4, 5].map((i) => `<b class="${i <= n ? 'on' : ''}"></b>`).join('')}</span></td>`).join('')}</tr>`).join('');
+
+    function renderCurrent() {
+      const cur = UI.store.get(UI.LOGO_KEY, 'gem');
+      const c = C.find((x) => x.id === cur);
+      document.getElementById('current-logo').innerHTML = `<span class="tag tag--brand">${UI.icon('check')} Сейчас в шапке: ${c.n} · ${c.name}</span>`;
+      document.querySelectorAll('[data-apply]').forEach((b) => { b.disabled = b.dataset.apply === cur; b.innerHTML = b.dataset.apply === cur ? UI.icon('check') + ' Уже в шапке' : UI.icon('sparkles') + ' Примерить в шапке'; });
+    }
+    document.addEventListener('click', (e) => {
+      const b = e.target.closest('[data-apply]');
+      if (!b) return;
+      UI.store.set(UI.LOGO_KEY, b.dataset.apply);
+      document.querySelectorAll('[data-logo-slot]').forEach((s) => { s.innerHTML = L[b.dataset.apply](); });
+      renderCurrent();
+      UI.toast('Логотип применён ко всему сайту');
+    });
+    document.addEventListener('appready', renderCurrent);
+  </script>
+</body>
+</html>

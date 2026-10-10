@@ -1,0 +1,926 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Поступление 2027 — УрФУ</title>
+  <meta name="description" content="Как поступить в УрФУ в 2027 году: выбрать программу, подать документы и следить за рейтингом — в три шага.">
+  <link rel="icon" href="assets/logo/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="assets/css/tokens.css">
+  <link rel="stylesheet" href="assets/css/components.css">
+  <style>
+    main [id] { scroll-margin-top: 140px; }
+    .adm-hero__grid > *, .dates-grid > *, .apply-grid > *, .cost-grid > *, .layout-aside > *, .rank-band > * { min-width: 0; }
+    ol.tsteps, ol.dates, ol.target-list { list-style: none; margin: 0; padding: 0; }
+
+    /* Заголовок секции: без eyebrow, с рукописной пометкой */
+    .s-head { display: flex; align-items: end; justify-content: space-between; gap: 16px 24px; flex-wrap: wrap; margin-bottom: 32px; }
+    .s-head p { color: var(--text-2); margin-top: 10px; max-width: 620px; }
+    .s-head .hand { display: inline-block; margin-top: 6px; transform: rotate(var(--rot)); --rot: -2deg; }
+
+    /* ---------- Герой ---------- */
+    .adm-hero { overflow: hidden; padding-bottom: clamp(48px, 6vw, 80px); }
+    .adm-hero__grid { display: grid; gap: 40px; grid-template-columns: 1fr; align-items: start; }
+    @media (min-width: 1024px) { .adm-hero__grid { grid-template-columns: 1fr 400px; gap: 56px; } }
+    .adm-hero h1 { margin: 14px 0 0; }
+    .hero-note { display: inline-block; margin-top: 8px; transform: rotate(var(--rot)); --rot: -3deg; }
+    .adm-hero .lead { color: var(--text-2); }
+    .adm-hero .tabs { margin-top: 26px; }
+    .level-panel { margin-top: 22px; }
+    .level-panel p { color: var(--text-2); max-width: 620px; }
+    .facts { display: grid; gap: 0 28px; grid-template-columns: repeat(auto-fit, minmax(min(100%, 150px), 1fr)); margin: 18px 0 26px; max-width: 680px; }
+    .fact { border-top: var(--line) solid var(--ink); padding-top: 12px; }
+    .fact b { display: block; font: 800 var(--fs-2xl)/1.05 var(--font-display); letter-spacing: -.03em; }
+    .fact:nth-child(2) b { color: transparent; -webkit-text-stroke: 1.5px var(--ink); }
+    .fact span { font-size: var(--fs-xs); color: var(--text-2); }
+
+    .adm-side { position: relative; padding-top: 10px; max-width: 440px; }
+    .adm-side .photo { width: 80%; height: 300px; margin-left: auto; --rot: 3deg; }
+    .adm-side .photo img { height: calc(100% - 34px); }
+    .adm-side .sticker { position: absolute; left: 0; top: 30px; z-index: 3; --rot: -9deg; }
+    .now-card { position: relative; z-index: 2; width: 88%; margin-top: -64px; background: var(--surface); border: var(--line) solid var(--ink); border-radius: var(--r-lg); box-shadow: var(--shadow-md); overflow: hidden; transform: rotate(var(--rot)); --rot: -1.5deg; }
+    .now-card__top { display: flex; align-items: center; gap: 8px; padding: 8px 18px; background: #ff5a36; color: #fff; font: 700 var(--fs-xs)/1.2 var(--font-display); text-transform: uppercase; letter-spacing: .04em; }
+    .now-card__top .i { width: 16px; height: 16px; }
+    .now-card__body { padding: 14px 20px 18px; }
+    .now-card h2 { font-size: var(--fs-md); font-weight: 700; }
+    .now-card__count { display: flex; align-items: baseline; gap: 10px; margin: 4px 0 6px; }
+    .now-card__count b { font: 800 calc(64px * var(--fs-scale))/1 var(--font-display); letter-spacing: -.04em; }
+    .now-card ul li { display: flex; gap: 10px; align-items: flex-start; padding: 8px 0; border-top: 1.5px dashed var(--border); font-size: var(--fs-sm); }
+    .now-card ul li .i { color: var(--brand); margin-top: 2px; flex: none; }
+    @media (max-width: 1023px) { .adm-side { margin-inline: auto; width: 100%; } .adm-side .photo { height: 250px; } }
+
+    /* ---------- Три шага: билеты лесенкой ---------- */
+    .tsteps { display: flex; flex-direction: column; gap: 18px; }
+    .tstep { position: relative; display: grid; grid-template-columns: 60px 1fr; gap: 10px 22px; align-items: start; padding: 22px 24px; border: var(--line) solid var(--ink); border-radius: var(--r-lg); background: var(--surface); }
+    /* узкая колонка рядом с аккордеоном: длинное «преимущества» не должно вылезать */
+    @media (min-width: 1024px) { #benefits .layout-aside { grid-template-columns: 340px 1fr; } #benefits .h2 { font-size: calc(clamp(26px, 2.2vw, 32px) * var(--fs-scale)); } }
+    .tstep__n { font: 800 calc(32px * var(--fs-scale))/1 var(--font-display); color: var(--text-3); grid-row: span 2; }
+    .tstep h3 { font: 700 var(--fs-xl)/1.15 var(--font-display); margin-bottom: 6px; }
+    .tstep p { color: var(--text-2); font-size: var(--fs-sm); }
+    .tstep__links { display: flex; flex-direction: column; gap: 8px; grid-column: 2; }
+    .tstep::before, .tstep::after { content: ""; position: absolute; left: 70px; width: 18px; height: 18px; border-radius: 50%; background: var(--bg); border: var(--line) solid var(--ink); }
+    .tstep::before { top: -10px; clip-path: inset(50% 0 0 0); }
+    .tstep::after { bottom: -10px; clip-path: inset(0 0 50% 0); }
+    .tstep.is-current { background: var(--lime); color: #14141a; box-shadow: var(--shadow-md); }
+    .tstep.is-current :is(h3, p, .arrow-link) { color: #14141a; }
+    .tstep.is-current .tstep__n { color: #45434d; }
+    @media (min-width: 900px) {
+      .tstep { grid-template-columns: 64px 1fr 260px; align-items: center; }
+      .tstep__n { grid-row: auto; }
+      .tstep__links { grid-column: 3; }
+      .tstep::before, .tstep::after { left: 90px; }
+      .tstep:nth-child(2) { margin-left: 6%; }
+      .tstep:nth-child(3) { margin-left: 12%; }
+    }
+
+    /* ---------- Сроки: отрывной календарь ---------- */
+    .dates-grid { display: grid; gap: 32px; grid-template-columns: 1fr; }
+    @media (min-width: 1024px) { .dates-grid { grid-template-columns: 1.4fr 1fr; gap: 48px; } }
+    .dates { display: grid; gap: 10px 18px; grid-template-columns: 1fr; }
+    @media (min-width: 640px) { .dates { grid-template-columns: 1fr 1fr; } }
+    .dates li { display: flex; gap: 16px; align-items: flex-start; padding: 12px; border: var(--line) solid transparent; border-radius: var(--r-md); }
+    .tear__day { flex: none; width: calc(84px * var(--fs-scale)); background: #fffdf8; color: #14141a; border: var(--line) solid #14141a; border-radius: 10px; overflow: hidden; text-align: center; box-shadow: 3px 3px 0 #14141a; transform: rotate(var(--rot)); --rot: -2deg; }
+    .dates li:nth-child(even) .tear__day { --rot: 2deg; }
+    .tear__day b { display: block; background: #ff5a36; color: #fff; font: 700 calc(11px * var(--fs-scale))/1 var(--font-display); text-transform: uppercase; padding: 6px 0; }
+    .tear__day strong { display: block; font: 800 calc(34px * var(--fs-scale))/1 var(--font-display); padding: 8px 0 2px; }
+    .tear__day span { display: block; font-size: calc(11px * var(--fs-scale)); padding: 0 6px 8px; color: #45434d; line-height: 1.2; }
+    .dates h3 { font-size: var(--fs-md); font-weight: 700; line-height: 1.25; margin: 2px 0 4px; }
+    .dates p { font-size: var(--fs-sm); color: var(--text-2); }
+    .dates li.is-done { opacity: .6; }
+    .dates li.is-done .tear__day b { background: #8a8794; }
+    .dates li.is-done h3 { text-decoration: line-through; text-decoration-color: var(--accent); text-decoration-thickness: 2px; }
+    .dates li.is-current { background: var(--lime-soft); border-color: var(--ink); box-shadow: var(--shadow-sm); }
+    .dates li.is-current .tear__day b { background: #2747ff; }
+    .now-label { display: inline-flex; margin-left: 6px; vertical-align: middle; }
+    .dates-side .card--flat h3 { margin-bottom: 6px; }
+
+    /* ---------- Способы подачи ---------- */
+    .apply-grid { display: grid; gap: 22px; grid-template-columns: 1fr; }
+    @media (min-width: 900px) { .apply-grid { grid-template-columns: 1.25fr 1fr; } .apply-main { grid-row: span 2; } }
+    .apply-card { position: relative; display: flex; flex-direction: column; gap: 12px; }
+    .apply-card ul { display: flex; flex-direction: column; gap: 8px; font-size: var(--fs-sm); color: var(--text-2); }
+    .apply-card li { display: flex; gap: 8px; align-items: flex-start; }
+    .apply-card li .i { color: var(--ok); width: 18px; height: 18px; margin-top: 2px; flex: none; }
+    .apply-card .card__footer { margin-top: auto; flex-wrap: wrap; }
+    .school > *, .apply-grid > * { min-width: 0; }
+    .school-card .card__footer { flex-wrap: wrap; }
+    .apply-card__head { display: flex; gap: 14px; align-items: center; }
+    .apply-main { box-shadow: var(--shadow-md); transform: rotate(var(--rot)); --rot: -.8deg; padding: clamp(24px, 3vw, 36px); }
+    .apply-main .card__title { font: 800 var(--fs-2xl)/1.1 var(--font-display); letter-spacing: -.02em; max-width: 12ch; }
+    .apply-main .sticker { position: absolute; top: -16px; right: 20px; --rot: 6deg; }
+    .apply-main .photo { height: 200px; margin: 6px 0 4px; }
+    .apply-main .photo img { height: 100%; }
+    .apply-main .hand { transform: rotate(var(--rot)); --rot: -2deg; display: inline-block; }
+    .checklist-card { margin-top: 32px; }
+    .checklist { display: grid; gap: 4px; grid-template-columns: 1fr; margin-top: 16px; }
+    @media (min-width: 700px) { .checklist { grid-template-columns: 1fr 1fr; column-gap: 32px; } }
+    .checklist .check { padding: 10px 0; border-bottom: 1.5px dashed var(--border); align-items: flex-start; }
+    .checklist .check small { display: block; color: var(--text-3); font-size: var(--fs-xs); }
+    .progress { height: 14px; border-radius: var(--r-pill); background: var(--surface-2); border: var(--line) solid var(--ink); overflow: hidden; }
+    .progress > span { display: block; height: 100%; width: 0; background: var(--lime); transition: width .3s var(--ease); }
+
+    /* ---------- Списки: синяя плашка ---------- */
+    .rank-band { position: relative; display: grid; gap: 36px; grid-template-columns: 1fr; padding: clamp(24px, 4vw, 52px); border: var(--line) solid var(--ink); border-radius: var(--r-xl); box-shadow: var(--shadow-lg); background: #2747ff; color: #fff; }
+    @media (min-width: 1024px) { .rank-band { grid-template-columns: 1fr 420px; align-items: center; } }
+    .rank-band h2 { color: #fff; max-width: 14ch; }
+    .rank-band .lead { color: #e3e8ff; margin-top: 14px; max-width: 520px; }
+    .rank-band .hand { color: #d7ff3d; display: inline-block; margin-top: 18px; transform: rotate(var(--rot)); --rot: -3deg; }
+    .upd { display: inline-flex; align-items: center; gap: 6px; margin-top: 18px; padding: 6px 12px; border: 1.5px solid #fff; border-radius: 6px; font-size: var(--fs-xs); font-weight: 700; }
+    .upd .i { width: 14px; height: 14px; }
+    .rank-form { position: relative; background: var(--surface); color: var(--text); transform: rotate(var(--rot)); --rot: 1.2deg; box-shadow: var(--shadow-md); }
+    .rank-form .sticker { position: absolute; top: -18px; right: 18px; --rot: 6deg; }
+    .form-error { color: var(--danger); font-size: var(--fs-xs); font-weight: 600; min-height: 1.2em; }
+    .rank-out { margin-top: 36px; display: grid; gap: 20px; }
+    .rank-sum { display: grid; gap: 0 28px; grid-template-columns: repeat(auto-fit, minmax(min(100%, 150px), 1fr)); }
+    .rank-sum div { border-top: var(--line) solid var(--ink); padding-top: 10px; }
+    .rank-sum b { display: block; font: 800 var(--fs-xl)/1.15 var(--font-display); }
+    .rank-sum span { font-size: var(--fs-xs); color: var(--text-2); }
+    #rank-body td:nth-child(2) { white-space: nowrap; }
+    #rank-body tr.gap td { text-align: left; color: var(--text-3); letter-spacing: .2em; }
+    .table td.num { font-variant-numeric: tabular-nums; font-weight: 650; }
+    .table tr.is-me td { background: var(--lime-soft); }
+    .table tr.is-me td:first-child { box-shadow: inset 4px 0 0 var(--accent); }
+    .table tr.gap td { text-align: center; color: var(--text-3); padding: 6px; }
+    .tag--danger { color: var(--danger); background: transparent; }
+    .tag--warn { background: var(--role-partner-bg); color: var(--role-partner); }
+
+    /* ---------- Стоимость ---------- */
+    .cost-grid { display: grid; gap: 28px; grid-template-columns: 1fr; }
+    @media (min-width: 1024px) { .cost-grid { grid-template-columns: 1.2fr 1fr; align-items: start; } }
+    .price-out { font: 800 calc(clamp(32px, 4vw, 48px) * var(--fs-scale))/1.05 var(--font-display); letter-spacing: -.03em; }
+    .notes { display: grid; gap: 16px; grid-template-columns: repeat(auto-fit, minmax(min(100%, 220px), 1fr)); margin-top: 8px; }
+    .note-card { padding: 18px 18px 16px; border: var(--line) solid var(--ink); border-radius: var(--r-md); background: var(--surface); transform: rotate(var(--rot)); }
+    .note-card:nth-child(1) { --rot: -1.5deg; background: var(--lime-soft); }
+    .note-card:nth-child(2) { --rot: 1deg; }
+    .note-card:nth-child(3) { --rot: .8deg; }
+    .note-card:nth-child(4) { --rot: -1deg; background: var(--brand-soft); }
+    .note-card strong { display: block; margin-bottom: 4px; }
+    .note-card p { font-size: var(--fs-sm); color: var(--text-2); }
+
+    /* ---------- Льготы ---------- */
+    .benefits-photo { height: 240px; max-width: 320px; margin-top: 28px; --rot: -2.5deg; }
+    .benefits-photo img { height: calc(100% - 34px); }
+    @media (max-width: 1023px) { .benefits-photo { display: none; } }
+
+    /* ---------- Целевое: чёрная плашка ---------- */
+    .target-band { position: relative; display: grid; gap: 32px; grid-template-columns: 1fr; padding: clamp(28px, 4vw, 56px); border: var(--line) solid var(--ink); border-radius: var(--r-xl); background: #14141a; color: #f3eee3; }
+    @media (min-width: 1024px) { .target-band { grid-template-columns: 1fr 1fr; align-items: center; } }
+    .target-band h2 { color: #fff; }
+    .target-band h2 em { font-style: normal; color: #d7ff3d; }
+    .target-band .lead { color: #cfcad8; margin-top: 12px; }
+    .target-list { display: flex; flex-direction: column; gap: 12px; counter-reset: t; }
+    .target-list li { counter-increment: t; display: flex; gap: 14px; align-items: flex-start; border: 1.5px dashed #6d6a78; border-radius: var(--r-md); padding: 16px; }
+    .target-list li::before { content: counter(t); flex: none; width: 34px; height: 34px; border-radius: 50%; display: grid; place-items: center; font: 800 var(--fs-sm) var(--font-display); background: #d7ff3d; color: #14141a; }
+    .target-list b { display: block; color: #fff; }
+    .target-list span { font-size: var(--fs-sm); color: #cfcad8; }
+    .btn--on-dark { background: transparent; color: #f3eee3; border-color: #f3eee3; box-shadow: none; }
+    .btn--on-dark:hover { background: rgba(255, 255, 255, .08); }
+
+    /* ---------- Школьникам: бенто ---------- */
+    .school { display: grid; gap: 18px; grid-template-columns: 1fr; grid-auto-flow: dense; }
+    @media (min-width: 700px) { .school { grid-template-columns: 1fr 1fr; } }
+    @media (min-width: 1024px) { .school { grid-template-columns: repeat(3, 1fr); } .school-card--big { grid-column: span 2; grid-row: span 2; } }
+    .school-card { position: relative; display: flex; flex-direction: column; gap: 10px; }
+    .school-card .card__footer .tag { white-space: nowrap; }
+    .school-card .card__footer { margin-top: auto; }
+    .school-card .photo--flat { height: 140px; margin: -4px 0 4px; }
+    .school-card .photo--flat img { height: 100%; }
+    .school-card--big { background: var(--surface); }
+    .school-card--big .photo--flat { height: auto; min-height: 240px; flex: 1; }
+    .school-card--big .card__title { font: 800 var(--fs-2xl)/1.1 var(--font-display); letter-spacing: -.02em; }
+    .school-card--big .sticker { position: absolute; top: 34px; right: 34px; z-index: 2; }
+    .school-card--lime { background: var(--lime-soft); }
+
+    /* ---------- Контакты: коралловая плашка ---------- */
+    .contact-band { position: relative; display: grid; gap: 32px; grid-template-columns: 1fr; align-items: center; padding: clamp(26px, 4vw, 52px); border: var(--line) solid var(--ink); border-radius: var(--r-xl); box-shadow: var(--shadow-lg); background: #ff5a36; color: #fff; }
+    @media (min-width: 900px) { .contact-band { grid-template-columns: 1.2fr 1fr; } }
+    .contact-band h2 { color: #fff; margin-bottom: 14px; }
+    .contact-band p { color: #fff1ec; }
+    .contact-band > .sticker { position: absolute; top: -22px; right: 28px; --rot: 8deg; }
+    @media (max-width: 899px) { .contact-band { padding-top: 64px; } .contact-band > .sticker { top: -20px; right: 12px; } }
+    .btn--on-coral { background: transparent; color: #fff; border-color: #fff; box-shadow: none; }
+    .btn--on-coral:hover { background: rgba(255, 255, 255, .12); }
+    .contact-list { display: flex; flex-direction: column; gap: 10px; }
+    .contact-list > * { display: flex; gap: 14px; align-items: center; padding: 14px 18px; border-radius: var(--r-md); background: #fffdf8; color: #14141a; border: var(--line) solid #14141a; }
+    .contact-list a { transition: transform .2s var(--ease); }
+    .contact-list a:hover { transform: translateX(6px); }
+    .contact-list .i { color: #e2421f; flex: none; }
+    .contact-list small { display: block; color: #45434d; font-size: var(--fs-xs); }
+    .phone-big { font: 800 calc(clamp(20px, 2.6vw, 28px) * var(--fs-scale)) var(--font-display); letter-spacing: -.02em; white-space: nowrap; }
+
+    /* ---------- Версия для слабовидящих ---------- */
+    html[data-a11y] :is(.tstep, .apply-main, .rank-form, .now-card, .note-card) { transform: none !important; margin-left: 0 !important; margin-right: 0 !important; }
+    html[data-a11y] :is(.tstep, .ticket)::before, html[data-a11y] .tstep::after { display: none; }
+    html[data-a11y] .tstep { grid-template-columns: 1fr; }
+    html[data-a11y] :is(.tstep__n, .tstep__links) { grid-column: auto; grid-row: auto; }
+    html[data-a11y] .adm-side { max-width: none; }
+    html[data-a11y] .adm-side .photo { width: auto; height: auto; margin: 0; }
+    html[data-a11y] .adm-side .photo img { height: 240px; }
+    html[data-a11y] .now-card { width: auto; margin-top: 16px; }
+    html[data-a11y] :is(.adm-side, .apply-main, .rank-form, .school-card--big, .contact-band) .sticker { position: static; align-self: flex-start; justify-self: start; margin-bottom: 8px; }
+    html[data-a11y] .adm-side { display: flex; flex-direction: column; }
+    html[data-a11y] .dates li { flex-direction: column; }
+    html[data-a11y] .tear__day { width: auto; min-width: 8em; }
+    html[data-a11y] .dates li.is-done { opacity: 1; }
+    html[data-a11y] .contact-band { padding-top: clamp(26px, 4vw, 52px); }
+    html[data-a11y] .school-card--big .photo--flat { min-height: 0; flex: none; }
+  </style>
+</head>
+<body data-page="admission">
+  <div id="site-header"></div>
+
+  <main id="main">
+    <!-- 1. Герой: выбор уровня -->
+    <section class="page-hero page-hero--tinted adm-hero">
+      <div class="container">
+        <nav class="crumbs" aria-label="Хлебные крошки"><a href="index.html">Главная</a><i data-icon="chevron-right"></i><span>Поступление</span></nav>
+        <div class="adm-hero__grid">
+          <div>
+            <h1 class="h1">Поступление в <span class="u-hand">УрФУ</span></h1>
+            <span class="hand hero-note">выбрать → подать → следить. всё!</span>
+            <p class="lead" style="margin-top:16px">Выбери уровень — покажем программы, экзамены и сроки. Весь путь укладывается в три шага.</p>
+
+            <div class="tabs" role="tablist" aria-label="Уровень образования">
+              <button class="tab" role="tab" id="lvl-tab-bachelor" aria-controls="lvl-bachelor" aria-selected="true">Бакалавриат</button>
+              <button class="tab" role="tab" id="lvl-tab-master" aria-controls="lvl-master" aria-selected="false">Магистратура</button>
+              <button class="tab" role="tab" id="lvl-tab-phd" aria-controls="lvl-phd" aria-selected="false">Аспирантура</button>
+              <button class="tab" role="tab" id="lvl-tab-college" aria-controls="lvl-college" aria-selected="false">Колледж</button>
+            </div>
+
+            <div class="tabpanel level-panel" role="tabpanel" id="lvl-bachelor" aria-labelledby="lvl-tab-bachelor">
+              <p>Бакалавриат и специалитет — после 11 класса или колледжа. Поступаешь по результатам ЕГЭ или внутренних экзаменов УрФУ. Можно выбрать до 5 направлений.</p>
+              <div class="facts">
+                <div class="fact"><b>250+</b><span>программ бакалавриата и специалитета</span></div>
+                <div class="fact"><b>6 200</b><span>бюджетных мест в 2027</span></div>
+                <div class="fact"><b>4–5,5</b><span>лет обучения</span></div>
+              </div>
+              <div class="cluster">
+                <a class="btn btn--accent btn--lg" href="programs.html?level=bachelor#calc"><i data-icon="target"></i> Подобрать по баллам ЕГЭ</a>
+                <a class="btn btn--ghost btn--lg" href="#steps">Как поступить</a>
+              </div>
+            </div>
+            <div class="tabpanel level-panel" role="tabpanel" id="lvl-master" aria-labelledby="lvl-tab-master" hidden>
+              <p>Магистратура — после бакалавриата или специалитета, в том числе из другого вуза. Один вступительный экзамен по профилю (онлайн) плюс баллы за портфолио.</p>
+              <div class="facts">
+                <div class="fact"><b>150+</b><span>магистерских программ</span></div>
+                <div class="fact"><b>2 400</b><span>бюджетных мест</span></div>
+                <div class="fact"><b>2 года</b><span>очно, очно-заочно или онлайн</span></div>
+              </div>
+              <div class="cluster">
+                <a class="btn btn--accent btn--lg" href="programs.html?level=master"><i data-icon="grid"></i> Смотреть программы</a>
+                <a class="btn btn--ghost btn--lg" href="#dates">Сроки и экзамены</a>
+              </div>
+            </div>
+            <div class="tabpanel level-panel" role="tabpanel" id="lvl-phd" aria-labelledby="lvl-tab-phd" hidden>
+              <p>Аспирантура — путь в науку и преподавание. Сначала договорись с научным руководителем, затем сдай экзамен по специальности и защити исследовательский проект.</p>
+              <div class="facts">
+                <div class="fact"><b>60+</b><span>научных специальностей</span></div>
+                <div class="fact"><b>380</b><span>бюджетных мест</span></div>
+                <div class="fact"><b>3–4 года</b><span>с ежемесячной стипендией</span></div>
+              </div>
+              <div class="cluster">
+                <a class="btn btn--accent btn--lg" href="programs.html?level=phd"><i data-icon="flask"></i> Выбрать специальность</a>
+                <a class="btn btn--ghost btn--lg" href="science.html">Наука в УрФУ</a>
+              </div>
+            </div>
+            <div class="tabpanel level-panel" role="tabpanel" id="lvl-college" aria-labelledby="lvl-tab-college" hidden>
+              <p>Колледж УрФУ — после 9 или 11 класса. Экзаменов нет: конкурс по среднему баллу аттестата. Через 3–4 года — диплом и возможность продолжить учёбу в бакалавриате.</p>
+              <div class="facts">
+                <div class="fact"><b>14</b><span>специальностей колледжа</span></div>
+                <div class="fact"><b>520</b><span>бюджетных мест</span></div>
+                <div class="fact"><b>без ЕГЭ</b><span>конкурс аттестатов</span></div>
+              </div>
+              <div class="cluster">
+                <a class="btn btn--accent btn--lg" href="programs.html?level=college"><i data-icon="book"></i> Специальности колледжа</a>
+                <a class="btn btn--ghost btn--lg" href="#school">Я ещё в школе</a>
+              </div>
+            </div>
+            <p class="demo-note" style="margin-top:14px">Цифры приёма — для примера. Точные — в правилах приёма 2027.</p>
+          </div>
+
+          <div class="adm-side">
+            <span class="sticker sticker--blue" aria-hidden="true">приём-2027</span>
+            <figure class="photo tape">
+              <img src="assets/img/applicant.jpg" alt="Абитуриентка с книгой" loading="eager">
+              <figcaption>это ты, только летом</figcaption>
+            </figure>
+            <aside class="now-card" aria-labelledby="now-title">
+              <div class="now-card__top"><i data-icon="clock"></i> Сейчас</div>
+              <div class="now-card__body">
+                <h2 id="now-title">До старта приёма документов</h2>
+                <div class="now-card__count"><b id="days-left">—</b><span class="muted" id="days-word">дней</span></div>
+                <p class="small muted">Приём стартует 20 июня 2027. Самое время выбрать программы и подготовиться.</p>
+                <ul style="margin-top:8px">
+                  <li><i data-icon="check"></i><span id="now-stage">Регистрация на олимпиады УрФУ</span></li>
+                  <li><i data-icon="calendar"></i><span>Ближайший день открытых дверей — 12 октября</span></li>
+                </ul>
+                <a class="arrow-link small" href="#dates">Все сроки <i data-icon="arrow-right"></i></a>
+              </div>
+            </aside>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 2. Три шага -->
+    <section class="section" id="steps">
+      <div class="container">
+        <div class="s-head">
+          <div>
+            <h2 class="h2">Три шага — и ты в списках</h2>
+            <span class="hand">без очередей и бумажных папок</span>
+          </div>
+          <p>Всё можно сделать онлайн за вечер. Подсвечен шаг, с которого стоит начать сейчас.</p>
+        </div>
+        <ol class="tsteps">
+          <li class="tstep is-current">
+            <span class="tstep__n" aria-hidden="true">01</span>
+            <div>
+              <h3>Выбрать</h3>
+              <p>Найди программы по интересам и баллам. Посмотри проходные прошлого года, бюджетные места и экзамены.</p>
+            </div>
+            <div class="tstep__links">
+              <a class="arrow-link" href="programs.html#calc">Подбор по баллам <i data-icon="arrow-right"></i></a>
+              <a class="arrow-link" href="programs.html">Каталог программ <i data-icon="arrow-right"></i></a>
+            </div>
+          </li>
+          <li class="tstep">
+            <span class="tstep__n" aria-hidden="true">02</span>
+            <div>
+              <h3>Подать</h3>
+              <p>Отправь заявление через Госуслуги или личный кабинет. До 5 направлений и до 10 программ — расставь их по приоритету.</p>
+            </div>
+            <div class="tstep__links">
+              <a class="arrow-link" href="#apply">Способы подачи <i data-icon="arrow-right"></i></a>
+              <a class="arrow-link" href="#benefits">Льготы и особые права <i data-icon="arrow-right"></i></a>
+            </div>
+          </li>
+          <li class="tstep">
+            <span class="tstep__n" aria-hidden="true">03</span>
+            <div>
+              <h3>Следить</h3>
+              <p>Проверяй своё место в рейтинге — списки обновляются каждый час. Вовремя подай согласие на зачисление.</p>
+            </div>
+            <div class="tstep__links">
+              <a class="arrow-link" href="#lists">Списки и рейтинги <i data-icon="arrow-right"></i></a>
+              <a class="arrow-link" href="campus.html#dorms">Заселиться в общежитие <i data-icon="arrow-right"></i></a>
+            </div>
+          </li>
+        </ol>
+      </div>
+    </section>
+
+    <!-- 3. Сроки -->
+    <section class="section section--surface grid-paper" id="dates">
+      <div class="container">
+        <div class="s-head">
+          <div>
+            <h2 class="h2">Сроки приёма 2027</h2>
+            <span class="hand">отрывай по листочку</span>
+          </div>
+          <button class="btn btn--ghost" data-toast="Даты добавлены в календарь (демо)"><i data-icon="calendar"></i> Добавить в календарь</button>
+        </div>
+        <div class="dates-grid">
+          <ol class="dates" id="timeline">
+            <li data-date="2026-10-01"><div class="tear__day" aria-hidden="true"><b>октябрь</b><strong>1</strong><span>2026</span></div><div><h3>Опубликованы правила приёма</h3><p><span class="sr-only">1 октября 2026. </span>Перечень программ, экзаменов и количество бюджетных мест.</p></div></li>
+            <li data-date="2026-11-15"><div class="tear__day" aria-hidden="true"><b>ноябрь</b><strong>15</strong><span>крайний срок</span></div><div><h3>Регистрация на олимпиады УрФУ</h3><p><span class="sr-only">До 15 ноября 2026. </span>Победители получают 100 баллов по предмету или поступают без экзаменов.</p></div></li>
+            <li data-date="2027-02-01"><div class="tear__day" aria-hidden="true"><b>февраль</b><strong>1</strong><span>крайний срок</span></div><div><h3>Запись на ЕГЭ</h3><p><span class="sr-only">До 1 февраля 2027. </span>Выбери предметы под нужные направления — проверь их в каталоге.</p></div></li>
+            <li data-date="2027-06-20"><div class="tear__day" aria-hidden="true"><b>июнь</b><strong>20</strong><span>2027</span></div><div><h3>Старт приёма документов</h3><p><span class="sr-only">20 июня 2027. </span>Подать заявление можно на Госуслугах, в личном кабинете или лично.</p></div></li>
+            <li data-date="2027-07-10"><div class="tear__day" aria-hidden="true"><b>июль</b><strong>10</strong><span>последний день</span></div><div><h3>Подача для тех, кто сдаёт внутренние экзамены</h3><p><span class="sr-only">10 июля 2027. </span>Выпускники колледжей, иностранные граждане, поступающие без ЕГЭ.</p></div></li>
+            <li data-date="2027-07-25"><div class="tear__day" aria-hidden="true"><b>июль</b><strong>25</strong><span>до 18:00</span></div><div><h3>Последний день подачи по ЕГЭ</h3><p><span class="sr-only">25 июля 2027. </span>До 18:00 по Екатеринбургу (UTC+5).</p></div></li>
+            <li data-date="2027-07-30"><div class="tear__day" aria-hidden="true"><b>июль</b><strong>30</strong><span>2027</span></div><div><h3>Зачисление по особым правам и целевому</h3><p><span class="sr-only">30 июля 2027. </span>Приоритетный этап: особая, отдельная и целевая квоты.</p></div></li>
+            <li data-date="2027-08-03"><div class="tear__day" aria-hidden="true"><b>август</b><strong>3</strong><span>2027</span></div><div><h3>Зачисление на бюджет</h3><p><span class="sr-only">3 августа 2027. </span>Основной этап. Не забудь подать согласие до 12:00 2 августа.</p></div></li>
+          </ol>
+          <div class="stack dates-side">
+            <div class="notice"><i data-icon="bell"></i><div><strong>Напомним о важном</strong><p class="small muted" style="margin-top:4px">Включи уведомления в личном кабинете абитуриента — пришлём сообщение за 3 дня до каждой даты.</p><button class="btn btn--sm btn--soft" style="margin-top:12px" data-toast="Напоминания включены (демо)"><i data-icon="bell"></i> Включить напоминания</button></div></div>
+            <div class="card card--flat">
+              <h3 class="h4">Платное обучение</h3>
+              <p class="small muted">Приём документов на платные места — до 20 августа, зачисление — до 31 августа. Договор можно заключить онлайн.</p>
+              <a class="arrow-link small" href="#cost">Стоимость и оплата <i data-icon="arrow-right"></i></a>
+            </div>
+            <div class="card card--flat">
+              <h3 class="h4">Магистратура</h3>
+              <p class="small muted">Приём документов — с 20 июня по 5 августа, экзамены онлайн — с 1 июля по 10 августа, зачисление — 20 августа.</p>
+              <a class="arrow-link small" href="programs.html?level=master">Программы магистратуры <i data-icon="arrow-right"></i></a>
+            </div>
+            <p class="demo-note">Даты демонстрационные. Официальный график публикуется в правилах приёма. Даты для бакалавриата и специалитета.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 4. Способы подачи -->
+    <section class="section" id="apply">
+      <div class="container">
+        <div class="s-head">
+          <div>
+            <h2 class="h2">Как подать документы</h2>
+            <p>Все три способа равноценны — заявление попадёт в один и тот же конкурс.</p>
+          </div>
+          <a class="arrow-link" href="help.html#visa">Поступаешь из другой страны? <i data-icon="arrow-right"></i></a>
+        </div>
+        <div class="apply-grid">
+          <article class="card apply-card apply-main">
+            <span class="sticker sticker--coral">быстрее всего</span>
+            <h3 class="card__title">Через Госуслуги</h3>
+            <figure class="photo photo--flat">
+              <img src="assets/img/laptop.jpg" alt="Студенты смеются над ноутбуками в библиотеке" loading="lazy">
+            </figure>
+            <p class="muted">Заявление за 10 минут: аттестат и результаты ЕГЭ подтянутся автоматически.</p>
+            <ul>
+              <li><i data-icon="check"></i>Нужна подтверждённая учётная запись</li>
+              <li><i data-icon="check"></i>Статус заявления — в уведомлениях</li>
+              <li><i data-icon="check"></i>Согласие на зачисление — в один клик</li>
+            </ul>
+            <div class="card__footer"><button class="btn btn--accent" data-toast="Переход на Госуслуги (демо)">Подать на Госуслугах <i data-icon="external"></i></button><span class="hand">выбирают чаще всего</span></div>
+          </article>
+          <article class="card card--pad-lg apply-card">
+            <div class="apply-card__head"><span class="icon-tile"><i data-icon="log-in"></i></span><h3 class="card__title">В личном кабинете абитуриента</h3></div>
+            <p class="small muted">Подходит всем, включая поступающих без ЕГЭ, в магистратуру и иностранных граждан.</p>
+            <ul>
+              <li><i data-icon="check"></i>Загрузка сканов документов</li>
+              <li><i data-icon="check"></i>Запись на внутренние экзамены</li>
+              <li><i data-icon="check"></i>Чат с приёмной комиссией</li>
+            </ul>
+            <div class="card__footer"><button class="btn btn--soft" data-toast="Личный кабинет абитуриента откроется в новой вкладке (демо)">Открыть кабинет</button></div>
+          </article>
+          <article class="card card--flat card--pad-lg apply-card">
+            <div class="apply-card__head"><span class="icon-tile"><i data-icon="map-pin"></i></span><h3 class="card__title">Лично в приёмной комиссии</h3></div>
+            <p class="small muted">Екатеринбург, ул. Мира, 19, главный учебный корпус. Пн–Пт 9:00–18:00, Сб 10:00–15:00.</p>
+            <ul>
+              <li><i data-icon="check"></i>Помогут заполнить заявление</li>
+              <li><i data-icon="check"></i>Электронная очередь — без ожидания</li>
+              <li><i data-icon="check"></i>Можно подать за другого по доверенности</li>
+            </ul>
+            <div class="card__footer"><button class="btn btn--ghost" data-toast="Вы записаны на 21 июня, 11:30 (демо)"><i data-icon="calendar"></i> Записаться на время</button></div>
+          </article>
+        </div>
+
+        <div class="card card--pad-lg checklist-card">
+          <div class="row between" style="flex-wrap:wrap">
+            <div><h3 class="h3">Что подготовить</h3><span class="hand">отмечай — мы запомним</span></div>
+            <div style="min-width:200px;flex:1;max-width:320px">
+              <div class="row between small"><span>Готово</span><strong id="check-count" aria-live="polite">0 из 6</strong></div>
+              <div class="progress" style="margin-top:8px" aria-hidden="true"><span id="check-bar"></span></div>
+            </div>
+          </div>
+          <div class="checklist" id="checklist">
+            <label class="check"><input type="checkbox" value="passport"><span>Паспорт<small>скан страниц с фото и пропиской</small></span></label>
+            <label class="check"><input type="checkbox" value="diploma"><span>Аттестат или диплом<small>оригинал понадобится только при зачислении</small></span></label>
+            <label class="check"><input type="checkbox" value="snils"><span>СНИЛС<small>по нему ты найдёшь себя в рейтинге</small></span></label>
+            <label class="check"><input type="checkbox" value="ege"><span>Результаты ЕГЭ<small>подтягиваются автоматически из базы</small></span></label>
+            <label class="check"><input type="checkbox" value="achievements"><span>Индивидуальные достижения<small>дипломы олимпиад, значок ГТО, волонтёрская книжка</small></span></label>
+            <label class="check"><input type="checkbox" value="benefits"><span>Документы на льготы<small>если есть особые права — смотри ниже</small></span></label>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 5. Списки и рейтинги — ключевой сценарий на синей плашке -->
+    <section class="section section--surface" id="lists">
+      <div class="container">
+        <div class="rank-band">
+          <div>
+            <h2 class="h2">Найди себя в списках</h2>
+            <p class="lead">Введи СНИЛС или номер заявления — покажем место в конкурсе и шансы на бюджет.</p>
+            <span class="upd"><i data-icon="refresh"></i> Обновлено сегодня в <span id="upd-time">14:00</span></span><br>
+            <span class="hand">списки обновляются каждый час</span>
+          </div>
+          <form class="card card--pad-lg stack rank-form" id="rank-form" novalidate>
+            <span class="sticker sticker--paper" aria-hidden="true">проверь шансы</span>
+            <div class="field">
+              <label for="rank-id">СНИЛС или номер заявления</label>
+              <div class="input-icon"><i data-icon="search"></i><input class="input" id="rank-id" inputmode="numeric" autocomplete="off" placeholder="123-456-789 01" aria-describedby="rank-err"></div>
+              <span class="form-error" id="rank-err" aria-live="polite"></span>
+            </div>
+            <div class="field">
+              <label for="rank-prog">Конкурс</label>
+              <select class="select" id="rank-prog">
+                <option value="se" data-seats="120" data-total="1480" data-base="262">Программная инженерия · бюджет</option>
+                <option value="ib" data-seats="60" data-total="690" data-base="255">Информационная безопасность · бюджет</option>
+                <option value="ee" data-seats="140" data-total="980" data-base="205">Электроэнергетика · бюджет</option>
+                <option value="ec" data-seats="40" data-total="760" data-base="268">Экономика · бюджет</option>
+                <option value="ln" data-seats="30" data-total="540" data-base="270">Лингвистика · бюджет</option>
+              </select>
+            </div>
+            <button class="btn btn--accent btn--block" type="submit"><i data-icon="search"></i> Найти себя в списке</button>
+            <p class="demo-note">Это демо: подойдёт любой СНИЛС, например 123-456-789 01. Позиция рассчитывается случайно, но стабильно.</p>
+          </form>
+        </div>
+        <div class="rank-out">
+          <div class="rank-sum" id="rank-sum" aria-live="polite">
+            <div><b id="rs-place">—</b><span>твоё место в списке</span></div>
+            <div><b id="rs-seats">120</b><span>бюджетных мест</span></div>
+            <div><b id="rs-consent">—</b><span>место среди подавших согласие</span></div>
+            <div><b id="rs-status">—</b><span>статус</span></div>
+          </div>
+          <div class="table-wrap">
+            <table class="table" aria-describedby="rank-caption">
+              <thead><tr><th scope="col">Место</th><th scope="col">СНИЛС / код</th><th scope="col">Сумма</th><th scope="col">ЕГЭ</th><th scope="col">Достижения</th><th scope="col">Приоритет</th><th scope="col">Согласие</th></tr></thead>
+              <tbody id="rank-body"></tbody>
+            </table>
+          </div>
+          <p class="xs muted" id="rank-caption">Списки ранжируются по сумме баллов, затем — по приоритету и преимущественному праву. Данные демонстрационные.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- 6. Стоимость -->
+    <section class="section" id="cost">
+      <div class="container">
+        <div class="s-head">
+          <div>
+            <h2 class="h2">Сколько стоит платное</h2>
+            <p>Цена фиксируется в договоре и индексируется не выше инфляции. Есть скидки за высокие баллы и учёбу.</p>
+          </div>
+        </div>
+        <div class="cost-grid">
+          <div class="card card--pad-lg stack">
+            <h3 class="h3">Посчитай стоимость</h3>
+            <div class="grid" style="grid-template-columns:repeat(auto-fit,minmax(min(100%,220px),1fr));gap:16px">
+              <div class="field">
+                <label for="cost-prog">Программа</label>
+                <select class="select" id="cost-prog">
+                  <option value="289000" data-years="4">Программная инженерия · бакалавриат</option>
+                  <option value="240000" data-years="4">Электроэнергетика · бакалавриат</option>
+                  <option value="265000" data-years="4">Экономика · бакалавриат</option>
+                  <option value="255000" data-years="4">Лингвистика · бакалавриат</option>
+                  <option value="320000" data-years="2">Инженерия ИИ · магистратура</option>
+                  <option value="150000" data-years="3.83">Информационные системы · колледж</option>
+                </select>
+              </div>
+              <div class="field">
+                <label for="cost-pay">Как платить</label>
+                <select class="select" id="cost-pay">
+                  <option value="2">По семестрам (2 раза в год)</option>
+                  <option value="1">Сразу за год</option>
+                  <option value="10">Помесячно (10 платежей)</option>
+                </select>
+              </div>
+            </div>
+            <fieldset style="border:none;padding:0;margin:0" class="stack-sm">
+              <legend class="label" style="margin-bottom:8px">Скидки</legend>
+              <label class="check"><input type="checkbox" class="disc" value="25">250+ баллов ЕГЭ — скидка 25% на первый год</label>
+              <label class="check"><input type="checkbox" class="disc" value="50">Призёр олимпиады — скидка 50% на первый год</label>
+              <label class="check"><input type="checkbox" class="disc" value="10">Брат или сестра учится в УрФУ — 10%</label>
+            </fieldset>
+            <div class="divider" style="margin:4px 0"></div>
+            <div class="row between" style="flex-wrap:wrap;align-items:flex-end">
+              <div><div class="label">Первый год</div><div class="price-out" id="price-year" aria-live="polite">289 000 ₽</div><div class="small muted" id="price-part">2 платежа по 144 500 ₽</div></div>
+              <div style="text-align:right"><div class="label">За весь срок</div><div class="h3" id="price-total">1 156 000 ₽</div></div>
+            </div>
+            <p class="demo-note">Стоимость демонстрационная. Скидки не суммируются — применяется наибольшая.</p>
+          </div>
+          <div class="stack">
+            <div class="table-wrap">
+              <table class="table">
+                <caption class="sr-only">Стоимость обучения за год по уровням</caption>
+                <thead><tr><th scope="col">Уровень</th><th scope="col">В год, от–до</th></tr></thead>
+                <tbody>
+                  <tr><td>Бакалавриат и специалитет</td><td class="num">210 000 – 310 000 ₽</td></tr>
+                  <tr><td>Магистратура</td><td class="num">190 000 – 350 000 ₽</td></tr>
+                  <tr><td>Аспирантура</td><td class="num">260 000 – 320 000 ₽</td></tr>
+                  <tr><td>Колледж</td><td class="num">120 000 – 160 000 ₽</td></tr>
+                </tbody>
+              </table>
+            </div>
+            <span class="hand">как сэкономить ↓</span>
+            <div class="notes">
+              <div class="note-card"><strong>Образовательный кредит</strong><p>Под 3% годовых с господдержкой, платить — после выпуска.</p></div>
+              <div class="note-card"><strong>Материнский капитал</strong><p>Оплата напрямую через Социальный фонд.</p></div>
+              <div class="note-card"><strong>Налоговый вычет 13%</strong><p>Родители вернут до 14 300 ₽ за каждый год.</p></div>
+              <div class="note-card"><strong>Перевод на бюджет</strong><p>Освободилось место — учись без долгов и на 4 и 5.</p></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 7. Льготы -->
+    <section class="section section--surface" id="benefits">
+      <div class="container">
+        <div class="layout-aside">
+          <div>
+            <h2 class="h2">Кому положены преимущества</h2>
+            <p class="muted" style="margin-top:12px">Документы на льготы прикладываются вместе с заявлением. Не уверен, подходишь ли ты, — спроси в чате, ответим за 15 минут.</p>
+            <a class="btn btn--soft" style="margin-top:20px" href="help.html#chat"><i data-icon="message"></i> Спросить в чате</a>
+            <figure class="photo tape--corner benefits-photo">
+              <img src="assets/img/library.jpg" alt="Студенты в библиотеке" loading="lazy">
+              <figcaption>не стесняйся спрашивать</figcaption>
+            </figure>
+          </div>
+          <div>
+            <details class="acc" open>
+              <summary>Без вступительных испытаний (БВИ)<i data-icon="plus"></i></summary>
+              <div class="acc__body">Победители и призёры заключительного этапа Всероссийской олимпиады школьников и олимпиад из перечня Минобрнауки поступают без экзаменов — на программу, соответствующую профилю олимпиады. Право можно использовать на одну программу.</div>
+            </details>
+            <details class="acc">
+              <summary>Особая квота<i data-icon="plus"></i></summary>
+              <div class="acc__body">Для детей-инвалидов, инвалидов I и II группы, детей-сирот и детей, оставшихся без попечения родителей. Нужно сдать экзамены не ниже минимальных баллов; конкурс идёт отдельно на 10% бюджетных мест.</div>
+            </details>
+            <details class="acc">
+              <summary>Отдельная квота<i data-icon="plus"></i></summary>
+              <div class="acc__body">Для категорий граждан, указанных в правилах приёма (в том числе участников специальной военной операции и их детей). Квота — 10% бюджетных мест, конкурс отдельный. Подтверждающие документы загружаются в личный кабинет.</div>
+            </details>
+            <details class="acc">
+              <summary>Преимущественное право<i data-icon="plus"></i></summary>
+              <div class="acc__body">Если у тебя и другого абитуриента одинаковые баллы и приоритет, место получит тот, у кого есть преимущественное право. Список категорий — в правилах приёма.</div>
+            </details>
+            <details class="acc">
+              <summary>Индивидуальные достижения — до 10 баллов<i data-icon="plus"></i></summary>
+              <div class="acc__body">
+                Баллы прибавляются к сумме ЕГЭ:
+                <ul style="list-style:disc;padding-left:1.2em;margin-top:8px">
+                  <li>аттестат с отличием или медаль — 5 баллов;</li>
+                  <li>золотой значок ГТО — 3 балла;</li>
+                  <li>волонтёрство от 100 часов — 2 балла;</li>
+                  <li>диплом олимпиады УрФУ «Изумруд» — до 10 баллов;</li>
+                  <li>итоговое сочинение на «отлично» — 1 балл.</li>
+                </ul>
+              </div>
+            </details>
+            <p class="demo-note" style="margin-top:16px">Баллы за достижения указаны для примера.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 8. Целевое обучение -->
+    <section class="section" id="target">
+      <div class="container">
+        <div class="target-band reveal">
+          <div>
+            <h2 class="h2">Учёба за счёт <em>будущего работодателя</em></h2>
+            <p class="lead">Компания оплачивает обучение и платит доплату к стипендии, а ты после выпуска работаешь у неё 3 года. Конкурс отдельный — обычно проходные ниже.</p>
+            <div class="cluster" style="margin-top:24px">
+              <button class="btn btn--soft btn--lg" data-toast="Открываем витрину целевых предложений (демо)"><i data-icon="briefcase"></i> Найти предложение</button>
+              <a class="btn btn--on-dark btn--lg" href="help.html#contacts">Задать вопрос</a>
+            </div>
+          </div>
+          <ol class="target-list">
+            <li><div><b>Найди предложение</b><span>На портале «Работа России» — 400+ заказчиков для УрФУ: УГМК, Росатом, РЖД, Уралвагонзавод.</span></div></li>
+            <li><div><b>Подай заявку заказчику</b><span>Он одобрит её за 3–5 дней — договор подпишешь онлайн.</span></div></li>
+            <li><div><b>Поступай по целевой квоте</b><span>Укажи договор в заявлении. Можно параллельно участвовать в общем конкурсе.</span></div></li>
+          </ol>
+        </div>
+      </div>
+    </section>
+
+    <!-- 9. Школьникам -->
+    <section class="section section--surface" id="school">
+      <div class="container">
+        <div class="s-head">
+          <div>
+            <h2 class="h2">Ещё в школе? Начни сейчас</h2>
+            <p>Олимпиады дают до 100 баллов, курсы — уверенность на ЕГЭ, профильные классы — знакомство с университетом.</p>
+          </div>
+          <div>
+            <span class="hand" style="display:block;margin-bottom:6px">я в классе…</span>
+            <div class="cluster" data-chip-group id="grade-chips" role="group" aria-label="Мой класс">
+              <button class="chip" aria-pressed="true" data-grade="all">Все</button>
+              <button class="chip" aria-pressed="false" data-grade="8">8 класс</button>
+              <button class="chip" aria-pressed="false" data-grade="9">9 класс</button>
+              <button class="chip" aria-pressed="false" data-grade="10">10 класс</button>
+              <button class="chip" aria-pressed="false" data-grade="11">11 класс</button>
+            </div>
+          </div>
+        </div>
+        <div class="school" id="school-cards">
+          <article class="card card--pad-lg school-card school-card--big" data-grades="8 9 10 11">
+            <span class="sticker sticker--round sticker--coral" aria-hidden="true">до 100 баллов</span>
+            <figure class="photo photo--flat"><img src="assets/img/selfie.jpg" alt="Селфи студентов в аудитории" loading="lazy"></figure>
+            <h3 class="card__title">Олимпиада «Изумруд»</h3>
+            <p class="muted">Олимпиада УрФУ по 12 предметам. Победители 11 класса получают 100 баллов или поступают без экзаменов.</p>
+            <div class="card__footer"><span class="tag tag--accent">Регистрация до 15 ноября</span><button class="btn btn--accent" data-toast="Ты зарегистрирован на олимпиаду (демо)">Участвовать</button></div>
+          </article>
+          <article class="card school-card school-card--lime" data-grades="10 11">
+            <h3 class="card__title">Подготовка к ЕГЭ</h3>
+            <p class="small muted">Курсы от преподавателей УрФУ: очно по субботам или онлайн. Пробные экзамены каждый месяц.</p>
+            <div class="card__footer"><span class="tag">от 3 500 ₽/мес</span><button class="btn btn--sm btn--soft" data-toast="Заявка на курсы отправлена (демо)">Записаться</button></div>
+          </article>
+          <article class="card school-card" data-grades="8 9 10 11">
+            <figure class="photo photo--flat"><img src="assets/img/robotics.jpg" alt="Трое исследователей склонились над прибором в лаборатории" loading="lazy"></figure>
+            <h3 class="card__title">Профильные классы УрФУ</h3>
+            <p class="small muted">60+ школ Свердловской области: инженерные, IT и медиаклассы с занятиями в лабораториях университета.</p>
+            <div class="card__footer"><span class="tag tag--ok">бесплатно</span><a class="arrow-link small" href="institutes.html">Партнёры <i data-icon="arrow-right"></i></a></div>
+          </article>
+          <article class="card school-card" data-grades="9 10 11">
+            <figure class="photo photo--flat"><img src="assets/img/friends.jpg" alt="Студенты смеются за столом" loading="lazy"></figure>
+            <h3 class="card__title">Летняя школа</h3>
+            <p class="small muted">Две недели в кампусе: проекты с наставниками, лаборатории и жизнь в общежитии.</p>
+            <div class="card__footer"><span class="tag">июль</span><a class="arrow-link small" href="campus.html">Про кампус <i data-icon="arrow-right"></i></a></div>
+          </article>
+          <article class="card school-card" data-grades="8 9 10 11">
+            <figure class="photo photo--flat"><img src="assets/img/lecture.jpg" alt="Студенты болтают в аудитории перед парой" loading="lazy"></figure>
+            <h3 class="card__title">Дни открытых дверей</h3>
+            <p class="small muted">Каждый месяц один из институтов показывает лаборатории и рассказывает о программах.</p>
+            <div class="card__footer"><span class="tag tag--brand">12 октября · ИРИТ-РтФ</span><a class="arrow-link small" href="news.html">Афиша <i data-icon="arrow-right"></i></a></div>
+          </article>
+          <article class="card card--flat school-card" data-grades="9">
+            <h3 class="card__title">После 9 класса — в колледж</h3>
+            <p class="small muted">Без ЕГЭ, по среднему баллу аттестата. Потом можно продолжить в бакалавриате УрФУ.</p>
+            <div class="card__footer"><span class="tag">14 специальностей</span><a class="arrow-link small" href="programs.html?level=college">Смотреть <i data-icon="arrow-right"></i></a></div>
+          </article>
+        </div>
+        <p class="muted small" id="school-empty" hidden style="margin-top:16px">Для этого класса пока нет активностей — загляни позже.</p>
+      </div>
+    </section>
+
+    <!-- 10. FAQ -->
+    <section class="section" id="faq">
+      <div class="container">
+        <div class="layout-aside">
+          <div>
+            <h2 class="h2">Коротко о главном</h2>
+            <span class="hand" style="display:inline-block;margin-top:8px">спрашивают чаще всего</span>
+            <p class="muted" style="margin-top:12px">Не нашёл ответ? Больше вопросов — в <a href="help.html">центре помощи</a>.</p>
+          </div>
+          <div>
+            <details class="acc"><summary>Сколько направлений можно выбрать?<i data-icon="plus"></i></summary><div class="acc__body">До 5 направлений (специальностей) и до 10 конкурсных групп внутри них. Расставь их по приоритету — тебя зачислят на самый приоритетный, куда проходишь.</div></details>
+            <details class="acc"><summary>Нужен ли оригинал аттестата?<i data-icon="plus"></i></summary><div class="acc__body">Для подачи — нет, достаточно скана. Оригинал или согласие на зачисление через Госуслуги понадобится только перед зачислением.</div></details>
+            <details class="acc"><summary>Какие ЕГЭ засчитываются?<i data-icon="plus"></i></summary><div class="acc__body">Результаты за последние 4 года: 2023–2027. Если сдавал предмет несколько раз, берём лучший результат.</div></details>
+            <details class="acc"><summary>Можно ли поступить без ЕГЭ?<i data-icon="plus"></i></summary><div class="acc__body">Да, если ты окончил колледж, иностранный гражданин или имеешь инвалидность. Тогда сдаёшь внутренние экзамены УрФУ — онлайн или в кампусе.</div></details>
+            <details class="acc"><summary>Дают ли общежитие первокурсникам?<i data-icon="plus"></i></summary><div class="acc__body">Да, иногородним студентам очной формы. Заявку на общежитие подаёшь в личном кабинете сразу после зачисления. Подробнее — на странице <a href="campus.html#dorms">общежитий</a>.</div></details>
+            <details class="acc"><summary>Что делать, если не прошёл на бюджет?<i data-icon="plus"></i></summary><div class="acc__body">Можно поступить на платное место со скидкой и перевестись на бюджет при освобождении мест, либо выбрать программу с меньшим конкурсом в следующем году.</div></details>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 11. Контакты приёмной -->
+    <section class="section" style="padding-top:0" id="contacts">
+      <div class="container">
+        <div class="contact-band reveal">
+          <span class="sticker sticker--paper" aria-hidden="true">отвечаем за 15 минут</span>
+          <div>
+            <h2 class="h2">Остались вопросы? Пиши</h2>
+            <p>Приёмная комиссия ответит про программы, документы, общежитие и льготы.</p>
+            <div class="cluster" style="margin-top:24px">
+              <a class="btn btn--white btn--lg" href="help.html#chat"><i data-icon="message"></i> Написать в чат</a>
+              <a class="btn btn--on-coral btn--lg" href="tel:+73433754444"><i data-icon="phone"></i> Позвонить</a>
+            </div>
+          </div>
+          <div class="contact-list">
+            <a href="tel:+73433754444"><i data-icon="phone"></i><span><span class="phone-big">+7 (343) 375-44-44</span><small>Пн–Пт 9:00–18:00, в июле — без выходных</small></span></a>
+            <div><i data-icon="map-pin"></i><span><strong>ул. Мира, 19, главный корпус</strong><small>Вход с ул. Мира, ауд. И-120</small></span></div>
+            <a href="help.html#contacts"><i data-icon="users"></i><span><strong>Контакты институтов</strong><small>Ответственные секретари и консультанты</small></span></a>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <div id="site-footer"></div>
+
+  <script src="assets/js/app.js"></script>
+  <script>
+    (function () {
+      const $ = (s, r = document) => r.querySelector(s);
+      const $$ = (s, r = document) => [...r.querySelectorAll(s)];
+      const fmt = (n) => Math.round(n).toLocaleString('ru-RU');
+      const plural = (n, f) => f[(n % 10 === 1 && n % 100 !== 11) ? 0 : (n % 10 >= 2 && n % 10 <= 4 && (n % 100 < 10 || n % 100 >= 20)) ? 1 : 2];
+
+      /* Уровень из URL: admission.html?level=master */
+      const lvl = new URLSearchParams(location.search).get('level');
+      if (lvl && document.getElementById('lvl-' + lvl)) {
+        $$('.adm-hero [role="tab"]').forEach((t) => {
+          const on = t.getAttribute('aria-controls') === 'lvl-' + lvl;
+          t.setAttribute('aria-selected', String(on));
+          document.getElementById(t.getAttribute('aria-controls')).hidden = !on;
+        });
+      }
+
+      /* Таймлайн: подсвечиваем текущий этап по сегодняшней дате */
+      const today = new Date(); today.setHours(0, 0, 0, 0);
+      const items = $$('#timeline > li');
+      let currentIdx = items.findIndex((it) => new Date(it.dataset.date) >= today);
+      if (currentIdx === -1) currentIdx = items.length - 1;
+      items.forEach((it, i) => {
+        it.classList.toggle('is-done', i < currentIdx);
+        it.classList.toggle('is-current', i === currentIdx);
+        if (i === currentIdx) {
+          it.querySelector('h3').insertAdjacentHTML('beforeend', ' <span class="tag tag--accent now-label">сейчас</span>');
+          it.setAttribute('aria-current', 'step');
+          const t = it.querySelector('h3').firstChild.textContent.trim();
+          $('#now-stage').textContent = 'Сейчас: ' + t.charAt(0).toLowerCase() + t.slice(1);
+        }
+      });
+      const start = new Date('2027-06-20');
+      const left = Math.max(0, Math.ceil((start - today) / 864e5));
+      $('#days-left').textContent = fmt(left);
+      $('#days-word').textContent = plural(left, ['день', 'дня', 'дней']);
+
+      /* Чек-лист документов (с сохранением) */
+      const KEY = 'urfu-adm-checklist';
+      let saved = [];
+      try { saved = JSON.parse(UI.store.get(KEY, '[]')) || []; } catch (e) { saved = []; }
+      const boxes = $$('#checklist input');
+      boxes.forEach((b) => { b.checked = saved.includes(b.value); });
+      function syncChecklist() {
+        const done = boxes.filter((b) => b.checked);
+        $('#check-count').textContent = done.length + ' из ' + boxes.length;
+        $('#check-bar').style.width = (done.length / boxes.length * 100) + '%';
+        UI.store.set(KEY, JSON.stringify(done.map((b) => b.value)));
+      }
+      boxes.forEach((b) => b.addEventListener('change', syncChecklist));
+      syncChecklist();
+
+      /* Списки и рейтинги (демо) */
+      const hhmm = new Date(); $('#upd-time').textContent = String(hhmm.getHours()).padStart(2, '0') + ':00';
+      const input = $('#rank-id'), err = $('#rank-err'), prog = $('#rank-prog');
+      const hash = (s) => { let h = 2166136261; for (const c of s) { h ^= c.charCodeAt(0); h = Math.imul(h, 16777619); } return h >>> 0; };
+      const rnd = (seed) => () => { seed = (seed * 1664525 + 1013904223) >>> 0; return seed / 4294967296; };
+      const mask = (seed) => { const r = rnd(seed); const d = () => Math.floor(r() * 10); return `${d()}${d()}${d()}-***-*** ${d()}${d()}`; };
+
+      input.addEventListener('input', () => {
+        const digits = input.value.replace(/\D/g, '');
+        if (/^\d[\d\s-]*$/.test(input.value) && digits.length <= 11) {
+          const p = [digits.slice(0, 3), digits.slice(3, 6), digits.slice(6, 9)].filter(Boolean).join('-');
+          input.value = p + (digits.length > 9 ? ' ' + digits.slice(9) : '');
+        }
+        err.textContent = '';
+      });
+
+      function buildRows(place, opt, me) {
+        const seats = +opt.dataset.seats, total = +opt.dataset.total, base = +opt.dataset.base;
+        const scoreAt = (p) => Math.max(160, Math.round(base + 28 - (p / total) * 120 - (p < 10 ? 0 : 4)));
+        const rowsIdx = new Set([1, 2, 3]);
+        if (place) {
+          for (let p = place - 2; p <= place + 2; p++) { if (p >= 1 && p <= total) rowsIdx.add(p); }
+        } else {
+          [seats - 1, seats, seats + 1].forEach((p) => rowsIdx.add(p));
+        }
+        const list = [...rowsIdx].sort((a, b) => a - b);
+        let html = '', prev = 0;
+        list.forEach((p) => {
+          if (p - prev > 1) html += `<tr class="gap"><td colspan="7">· · ·</td></tr>`;
+          prev = p;
+          const isMe = place === p;
+          const r = rnd(p * 31 + base);
+          const sum = scoreAt(p);
+          const ind = Math.floor(r() * 8);
+          const prio = 1 + Math.floor(r() * 3);
+          const agree = r() > .45;
+          const line = p === seats ? ' style="box-shadow: inset 0 -2px 0 var(--brand)"' : '';
+          html += `<tr class="${isMe ? 'is-me' : ''}"${line}>
+            <td class="num">${p}${isMe ? ' <span class="tag tag--accent">ты здесь</span>' : ''}</td>
+            <td>${isMe ? me : mask(p * 7 + base)}</td>
+            <td class="num">${sum}</td><td class="num">${sum - ind}</td><td class="num">${ind}</td>
+            <td>${prio}</td><td>${(isMe ? true : agree) ? '<span class="tag tag--ok">да</span>' : '<span class="tag">нет</span>'}</td></tr>`;
+        });
+        $('#rank-body').innerHTML = html;
+        $('#rs-seats').textContent = seats;
+      }
+
+      function search(e) {
+        e && e.preventDefault();
+        const v = input.value.trim();
+        const opt = prog.selectedOptions[0];
+        if (!v) { err.textContent = 'Введи СНИЛС или номер заявления'; input.focus(); return; }
+        const digits = v.replace(/\D/g, '');
+        if (digits.length !== 11 && v.length < 4) { err.textContent = 'Похоже на неполный номер: СНИЛС — 11 цифр, номер заявления — от 4 символов'; input.focus(); return; }
+        const seats = +opt.dataset.seats, total = +opt.dataset.total;
+        const place = 1 + hash(v + opt.value) % Math.round(seats * 1.6);
+        const consent = Math.max(1, Math.round(place * 0.58));
+        const shown = digits.length === 11 ? `${digits.slice(0, 3)}-***-*** ${digits.slice(9)}` : v.slice(0, 12);
+        buildRows(place, opt, shown);
+        $('#rs-place').textContent = place + ' / ' + fmt(total);
+        $('#rs-consent').textContent = consent;
+        const st = $('#rs-status');
+        if (consent <= seats * 0.9) st.innerHTML = '<span class="tag tag--ok">проходишь</span>';
+        else if (consent <= seats) st.innerHTML = '<span class="tag tag--warn">на грани</span>';
+        else st.innerHTML = '<span class="tag tag--danger">ниже черты</span>';
+        UI.toast('Нашли тебя: ' + place + '-е место');
+      }
+      $('#rank-form').addEventListener('submit', search);
+      prog.addEventListener('change', () => { if (input.value.trim()) search(); else buildRows(0, prog.selectedOptions[0]); });
+      buildRows(0, prog.selectedOptions[0]);
+
+      /* Калькулятор стоимости */
+      const cp = $('#cost-prog'), pay = $('#cost-pay'), discs = $$('.disc');
+      function cost() {
+        const price = +cp.value, years = +cp.selectedOptions[0].dataset.years;
+        const d = Math.max(0, ...discs.filter((x) => x.checked).map((x) => +x.value));
+        const first = price * (1 - d / 100);
+        const parts = +pay.value;
+        $('#price-year').textContent = fmt(first) + ' ₽';
+        $('#price-part').textContent = parts === 1 ? 'один платёж в год' : `${parts} ${plural(parts, ['платёж', 'платежа', 'платежей'])} по ${fmt(first / parts)} ₽` + (d ? ` · скидка ${d}%` : '');
+        $('#price-total').textContent = fmt(first + price * (years - 1)) + ' ₽';
+      }
+      [cp, pay, ...discs].forEach((el) => el.addEventListener('change', cost));
+      cost();
+
+      /* Школьникам: фильтр по классу */
+      $('#grade-chips').addEventListener('chipchange', () => {
+        const g = $('#grade-chips [aria-pressed="true"]').dataset.grade;
+        let n = 0;
+        $$('#school-cards .school-card').forEach((c) => {
+          const show = g === 'all' || c.dataset.grades.split(' ').includes(g);
+          c.hidden = !show; if (show) n++;
+        });
+        $('#school-empty').hidden = n > 0;
+      });
+    })();
+  </script>
+</body>
+</html>

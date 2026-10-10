@@ -1,0 +1,1009 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Кампус и карта — УрФУ</title>
+  <meta name="description" content="Интерактивная карта кампуса УрФУ: корпуса, общежития, столовые, спорт и медицина. Как заселиться, где поесть и чем заняться.">
+  <link rel="icon" href="assets/logo/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="assets/css/tokens.css">
+  <link rel="stylesheet" href="assets/css/components.css">
+  <style>
+    /* ---------- Герой-коллаж ---------- */
+    .campus-hero { padding-bottom: 24px; overflow: hidden; }
+    .campus-hero__grid { display: grid; gap: 28px; grid-template-columns: 1fr; align-items: center; }
+    .campus-hero__grid > * { min-width: 0; }
+    @media (min-width: 1024px) { .campus-hero__grid { grid-template-columns: 1fr 1fr; } }
+    .campus-hero .hand { display: inline-block; transform: rotate(-3deg); margin-top: 12px; }
+    .ccol { position: relative; height: 340px; }
+    .ccol .photo { position: absolute; }
+    .ccol .photo img { height: calc(100% - 32px); }
+    .ccol .p1 { left: 2%; top: 26px; width: 54%; height: 250px; --rot: -3deg; z-index: 2; }
+    .ccol .p2 { right: 0; top: 0; width: 42%; height: 200px; --rot: 5deg; z-index: 1; }
+    .ccol .p3 { right: 8%; bottom: 0; width: 44%; height: 170px; --rot: -2deg; z-index: 3; }
+    .ccol .s1 { position: absolute; left: 0; bottom: 18px; z-index: 4; --rot: -8deg; }
+    .ccol .s2 { position: absolute; right: -4px; top: 168px; z-index: 4; --rot: 7deg; }
+    @media (max-width: 1023px) {
+      .ccol { height: auto; display: grid; grid-template-columns: 1.3fr 1fr; gap: 12px; padding: 14px 4px 4px; }
+      .ccol .photo { position: relative; inset: auto; width: auto; height: auto; }
+      .ccol .photo img { height: 150px; }
+      .ccol .p3 { display: none; }
+      .ccol .s1 { left: auto; right: -4px; bottom: auto; top: 118px; }
+      .ccol .s2 { display: none; }
+    }
+    .jump { margin-top: 20px; }
+    .jump .chip { min-height: 36px; font-size: var(--fs-xs); }
+    .jump .chip .i { width: 16px; height: 16px; }
+    @media (max-width: 767px) { .jump { flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; margin-right: calc(-1 * var(--gutter)); padding-right: var(--gutter); } .jump::-webkit-scrollbar { display: none; } .jump .chip { flex: none; } }
+    .anchor { scroll-margin-top: 56px; }
+
+    /* ---------- Карта + список ---------- */
+    .campus { display: grid; gap: 20px; grid-template-columns: minmax(0, 1fr); }
+    .campus__map { order: -1; min-width: 0; }
+    @media (min-width: 1024px) { .campus { grid-template-columns: 360px minmax(0, 1fr); gap: 24px; } .campus__map { order: 0; } }
+    .campus__side { display: flex; flex-direction: column; gap: 14px; min-width: 0; }
+    .campus__side .cluster { gap: 6px; }
+    .campus__side .chip { min-height: 36px; padding: 0 12px; font-size: var(--fs-xs); }
+    .poi-list { position: relative; display: flex; flex-direction: column; gap: 6px; max-height: 420px; overflow-y: auto; padding: 2px; margin: -2px; overscroll-behavior: contain; }
+    @media (min-width: 1024px) { .poi-list { max-height: 452px; } }
+    .poi-item { width: 100%; display: flex; gap: 12px; align-items: center; text-align: left; padding: 10px 12px; border-radius: var(--r-md); border: var(--line) solid transparent; background: var(--surface); }
+    .poi-item:hover { border-color: var(--ink); }
+    .poi-item[aria-current="true"] { border-color: var(--ink); background: var(--lime-soft); box-shadow: var(--shadow-sm); }
+    .poi-item .icon-tile { width: 38px; height: 38px; border-radius: 11px; }
+    .poi-item .icon-tile .i { width: 19px; height: 19px; }
+    .poi-item strong { display: block; font-size: var(--fs-sm); line-height: 1.3; }
+    .poi-item small { display: block; font-size: var(--fs-xs); color: var(--text-3); }
+    .status { display: inline-flex; align-items: center; gap: 6px; font-size: var(--fs-xs); font-weight: 600; color: var(--text-3); }
+    .status .dot { width: 7px; height: 7px; }
+    .status.is-open { color: var(--ok); }
+    .c-study { background: var(--brand-soft); color: var(--brand); }
+    .c-dorm { background: var(--role-staff-bg); color: var(--role-staff); }
+    .c-food { background: var(--accent-soft); color: var(--accent-strong); }
+    .c-sport { background: var(--role-student-bg); color: var(--role-student); }
+    .c-med { background: var(--role-intl-bg); color: var(--role-intl); }
+
+    .map-wrap { position: relative; border-radius: var(--r-lg); overflow: hidden; border: var(--line) solid var(--ink); background: var(--surface-2); box-shadow: var(--shadow-md); }
+    .map-stage { position: relative; height: 60vh; min-height: 360px; overflow: hidden; }
+    @media (min-width: 1024px) { .map-stage { height: 640px; } }
+    .map { width: 100%; height: 100%; display: block; touch-action: pan-y; user-select: none; -webkit-user-select: none; cursor: grab; }
+    .map.is-dragging { cursor: grabbing; }
+    .map text { font-family: var(--font); pointer-events: none; }
+    .map-areas { display: inline-flex; margin-bottom: 10px; max-width: 100%; gap: 4px; padding: 4px; border: var(--line) solid var(--ink); border-radius: var(--r-pill); background: var(--surface); box-shadow: var(--shadow-sm); }
+    .map-areas button { padding: 7px 14px; border: 0; border-radius: var(--r-pill); background: transparent; color: var(--text); font-weight: 600; font-size: var(--fs-sm); cursor: pointer; }
+    .map-areas button[aria-pressed="true"] { background: var(--ink); color: var(--bg); }
+    @media (max-width: 520px) { .map-areas button { padding: 6px 10px; font-size: var(--fs-xs); } }
+    @media (max-width: 479px) { .h2--long { font-size: calc(22px * var(--fs-scale)); } }
+    .m-stop { fill: var(--accent); stroke: var(--ink); stroke-width: 2; }
+    .m-bld { fill: var(--surface); stroke: var(--border); stroke-width: 1.5; }
+    .m-bld--gate { fill: var(--surface-2); stroke: var(--text-3); }
+    .m-foot { fill: none; stroke: var(--border); stroke-width: 2; stroke-dasharray: 4 4; opacity: .8; }
+    .m-note { fill: var(--text-2); font-size: 13px; font-weight: 650; }
+    .m-park { fill: var(--role-student-bg); }
+    .m-park-label { fill: var(--role-student); font-size: 11px; font-weight: 600; }
+    .m-water { fill: none; stroke: var(--role-applicant-bg); stroke-width: 74; stroke-linecap: round; }
+    .m-water-line { fill: none; stroke: var(--role-applicant); stroke-width: 1.5; opacity: .35; stroke-dasharray: 6 8; }
+    .m-water-label { fill: var(--role-applicant); font-size: 12px; font-weight: 700; letter-spacing: .06em; }
+    .m-road-o { fill: none; stroke: var(--border); stroke-width: 26; }
+    .m-road { fill: none; stroke: var(--surface); stroke-width: 20; }
+    #area-new .m-road-o { stroke-width: 16; stroke-linejoin: round; stroke-linecap: round; }
+    #area-new .m-road { stroke-width: 11; stroke-linejoin: round; stroke-linecap: round; }
+    .m-street { fill: var(--text-3); font-size: 11px; font-weight: 650; letter-spacing: .02em; }
+    .poi { cursor: pointer; outline: none; transition: opacity .2s; }
+    .poi__b { stroke-width: 2; transition: stroke-width .15s, fill .15s; }
+    .poi__t { font-size: 12.5px; font-weight: 750; fill: var(--text); }
+    .poi__s { font-size: 10.5px; fill: var(--text-2); }
+    .poi--study .poi__b { fill: var(--brand-soft); stroke: var(--brand); }
+    .poi--dorm .poi__b { fill: var(--role-staff-bg); stroke: var(--role-staff); }
+    .poi--food .poi__b { fill: var(--accent-soft); stroke: var(--accent); }
+    .poi--sport .poi__b { fill: var(--role-student-bg); stroke: var(--role-student); }
+    .poi--med .poi__b { fill: var(--role-intl-bg); stroke: var(--role-intl); }
+    .poi:hover .poi__b { stroke-width: 3.5; }
+    .poi:focus-visible .poi__b { stroke: var(--text); stroke-width: 4; }
+    .poi.is-active .poi__b { stroke-width: 4.5; fill: var(--surface); }
+    .poi.is-dim { opacity: .28; }
+    .pin path { fill: var(--accent); stroke: var(--surface); stroke-width: 1.4; }
+    .pin circle { fill: var(--surface); }
+    .pin__bounce { animation: pin .5s var(--ease); }
+    @keyframes pin { from { transform: translateY(-14px); opacity: 0; } }
+
+    .map-ctrl { position: absolute; top: 12px; right: 12px; display: flex; flex-direction: column; gap: 6px; z-index: 2; }
+    .map-ctrl button { width: 40px; height: 40px; border-radius: 12px; border: var(--line) solid var(--ink); background: var(--surface); color: var(--text); display: grid; place-items: center; box-shadow: var(--shadow-sm); }
+    .map-ctrl button:hover { background: var(--lime); color: #14141a; }
+    .map-ctrl button:disabled { opacity: .4; cursor: default; }
+    .map-hint { position: absolute; left: 12px; top: 12px; z-index: 2; padding: 6px 12px; border-radius: var(--r-pill); background: var(--surface); border: var(--line) solid var(--ink); box-shadow: var(--shadow-sm); font-size: var(--fs-xs); color: var(--text-2); max-width: calc(100% - 80px); }
+
+    /* На телефоне карточка идёт под картой, чтобы не закрывать её; с 640px — поверх карты слева снизу */
+    .map-card { position: relative; z-index: 3; background: var(--surface); border-top: var(--line) solid var(--ink); padding: 20px; display: flex; flex-direction: column; gap: 12px; animation: drop .22s var(--ease); }
+    @media (min-width: 640px) { .map-card { position: absolute; left: 12px; bottom: 12px; width: 360px; max-height: calc(100% - 24px); overflow-y: auto; border: var(--line) solid var(--ink); border-radius: var(--r-lg); box-shadow: var(--shadow-md); } }
+    .map-card__head { display: flex; gap: 12px; align-items: flex-start; }
+    .map-card__head > div { flex: 1; min-width: 0; }
+    .map-card h3 { font-size: var(--fs-lg); line-height: 1.25; margin-top: 6px; outline: none; }
+    .map-card .close { width: 40px; height: 40px; border-radius: 50%; border: var(--line) solid var(--ink); background: var(--surface-2); color: var(--text-2); display: grid; place-items: center; flex: none; }
+    .map-card .close:hover { color: var(--text); }
+    .facts { display: flex; flex-direction: column; gap: 8px; font-size: var(--fs-sm); }
+    .facts div { display: flex; gap: 10px; align-items: flex-start; }
+    .facts .i { color: var(--text-3); margin-top: 2px; }
+    .inside { display: flex; flex-wrap: wrap; gap: 6px; }
+    .legend { display: flex; flex-wrap: wrap; gap: 8px 16px; margin-top: 12px; font-size: var(--fs-xs); color: var(--text-2); }
+    .legend span { display: inline-flex; align-items: center; gap: 6px; }
+    .legend .demo-note, .legend .demo-note span { display: inline; }
+    .legend i { width: 14px; height: 14px; border-radius: 4px; display: inline-block; border: 2px solid; }
+    .lg-study { background: var(--brand-soft); border-color: var(--brand) !important; }
+    .lg-dorm { background: var(--role-staff-bg); border-color: var(--role-staff) !important; }
+    .lg-food { background: var(--accent-soft); border-color: var(--accent) !important; }
+    .lg-sport { background: var(--role-student-bg); border-color: var(--role-student) !important; }
+    .lg-med { background: var(--role-intl-bg); border-color: var(--role-intl) !important; }
+
+    .map-top { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 6px 16px; }
+    .map-top .hand { transform: rotate(-3deg); display: inline-block; margin-bottom: 10px; }
+    .campus__side .hand { font-size: calc(22px * var(--fs-scale)); transform: rotate(-2deg); display: inline-block; }
+
+    /* ---------- Заголовки секций ---------- */
+    .sec-head { display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: 12px 24px; margin-bottom: 32px; }
+    .sec-head > div { max-width: 720px; }
+    .sec-head p { color: var(--text-2); margin-top: 10px; }
+    .sec-head .hand { display: inline-block; transform: rotate(-3deg); }
+
+    /* ---------- Общежития ---------- */
+    .dorm-grid { display: grid; gap: var(--gap); grid-template-columns: minmax(0, 1fr); }
+    .dorm-table td:first-child { min-width: 170px; }
+    .dorm-table .dorm-group th { background: var(--lime); color: #14141a; font: 700 var(--fs-sm) var(--font-display); text-transform: uppercase; letter-spacing: .02em; text-align: left; padding: 10px 14px; }
+    .dorm-table .dorm-group th span { font: 600 var(--fs-xs) var(--font); text-transform: none; letter-spacing: 0; color: #45434d; margin-left: 8px; }
+    .dorm-table .price { font: 800 var(--fs-md) var(--font-display); white-space: nowrap; color: var(--text); }
+    .amen { display: flex; flex-wrap: wrap; gap: 4px; min-width: 200px; }
+    .settle { display: grid; gap: 28px; grid-template-columns: minmax(0, 1fr); align-items: start; }
+    @media (min-width: 1024px) { .settle { grid-template-columns: 280px minmax(0, 1fr); } }
+    .settle .photo { height: 280px; --rot: -3deg; max-width: 300px; }
+    .settle .photo img { height: calc(100% - 34px); }
+    @media (max-width: 1023px) { .settle .photo { display: none; } }
+
+    /* ---------- Еда: «чеки» ---------- */
+    .food-grid { display: grid; gap: 24px; grid-template-columns: repeat(auto-fill, minmax(min(100%, 260px), 1fr)); }
+    .food { position: relative; border-style: dashed; background: var(--surface); }
+    @media (min-width: 900px) { .food:nth-child(odd) { transform: rotate(-1deg); } .food:nth-child(even) { transform: rotate(1deg); margin-top: 18px; } }
+    .food .row { flex-wrap: wrap; gap: 8px; }
+    .food__check { font: 800 calc(30px * var(--fs-scale))/1 var(--font-display); letter-spacing: -.02em; }
+    .food__check small { font: 600 var(--fs-xs) var(--font); color: var(--text-3); margin-left: 6px; letter-spacing: 0; }
+
+    /* ---------- Здоровье ---------- */
+    .health { display: grid; gap: 20px; grid-template-columns: minmax(0, 1fr); }
+    @media (min-width: 900px) { .health { grid-template-columns: 1.3fr 1fr 1fr; } }
+    .health .card:first-child { background: var(--lime-soft); }
+    .sos { margin-top: 24px; display: flex; flex-wrap: wrap; gap: 14px 24px; align-items: center; padding: 22px 26px; border: var(--line) solid var(--ink); border-radius: var(--r-xl); background: #ff5a36; color: #fff; box-shadow: var(--shadow-md); }
+    .sos b { font: 800 calc(56px * var(--fs-scale))/1 var(--font-display); }
+    .sos p { flex: 1 1 260px; }
+    .sos a { color: #fff; font-weight: 700; text-decoration: underline; text-underline-offset: 3px; }
+
+    /* ---------- Сообщества: цифра вместо иконки ---------- */
+    .clubs { display: grid; gap: 22px; grid-template-columns: repeat(auto-fill, minmax(min(100%, 260px), 1fr)); }
+    @media (min-width: 900px) { .clubs .club:nth-child(4n+2), .clubs .club:nth-child(4n+4) { margin-top: 22px; } }
+    .club__n { font: 800 calc(40px * var(--fs-scale))/1 var(--font-display); letter-spacing: -.03em; }
+    .club:nth-child(odd) .club__n { color: transparent; -webkit-text-stroke: 1.5px var(--ink); }
+    .club__n small { display: block; font: 600 var(--fs-xs) var(--font); color: var(--text-3); letter-spacing: 0; margin-top: 4px; -webkit-text-stroke: 0; }
+
+    /* ---------- Спорт ---------- */
+    .sport-wrap { display: grid; gap: 32px; grid-template-columns: minmax(0, 1fr); align-items: start; }
+    @media (min-width: 1024px) { .sport-wrap { grid-template-columns: 320px minmax(0, 1fr); } }
+    .sport-pic { position: relative; }
+    .sport-pic .photo { height: 300px; --rot: 3deg; }
+    .sport-pic .photo img { height: calc(100% - 34px); }
+    .sport-pic .sticker { position: absolute; left: -6px; bottom: 62px; z-index: 2; --rot: -8deg; }
+    @media (max-width: 1023px) { .sport-pic .photo { height: 240px; max-width: 360px; } }
+    .sport-top { display: grid; gap: 4px 28px; grid-template-columns: repeat(auto-fit, minmax(min(100%, 160px), 1fr)); margin-bottom: 28px; }
+    .sport-top .num { padding-top: 12px; border-top: var(--line) solid var(--ink); }
+    .sport-top .big-num { display: block; font-size: calc(clamp(44px, 5vw, 72px) * var(--fs-scale)); }
+    .sport-top .num:nth-child(2) .big-num { color: transparent; -webkit-text-stroke: 2px var(--ink); }
+    .sport-top .num span:last-child { display: block; margin-top: 6px; font-size: var(--fs-sm); color: var(--text-2); }
+    .sports { display: grid; gap: 0 28px; grid-template-columns: repeat(auto-fill, minmax(min(100%, 260px), 1fr)); border-top: var(--line) solid var(--ink); }
+    .sport-item { display: flex; gap: 14px; align-items: center; padding: 14px 0; border-bottom: var(--line) solid var(--ink); }
+    .sport-item > div { flex: 1; min-width: 0; }
+    .sport-item strong { font-size: var(--fs-md); }
+    .sport-item .btn { flex: none; }
+
+    /* ---------- Творчество: первая карточка крупная ---------- */
+    .art-grid { display: grid; gap: 24px; grid-template-columns: repeat(auto-fill, minmax(min(100%, 280px), 1fr)); }
+    .art-grid .card { position: relative; }
+    .art-grid .card .photo { margin: -24px -24px 6px; height: 180px; border-width: 0 0 var(--line); border-radius: calc(var(--r-lg) - 2px) calc(var(--r-lg) - 2px) 0 0; }
+    .art-grid .card .photo img { height: 100%; }
+    @media (min-width: 900px) {
+      .art-grid { grid-template-columns: repeat(3, 1fr); }
+      .art-grid .card:first-child { grid-column: span 2; display: grid; grid-template-columns: 1.2fr 1fr; gap: 10px 24px; align-content: start; }
+      .art-grid .card:first-child .photo { grid-row: span 4; height: auto; min-height: 260px; margin: -24px 0 -24px -24px; border-width: 0 var(--line) 0 0; border-radius: calc(var(--r-lg) - 2px) 0 0 calc(var(--r-lg) - 2px); }
+      .art-grid .card:first-child .card__title { font: 700 var(--fs-xl)/1.15 var(--font-display); margin-top: 8px; }
+    }
+    .art-grid .sticker { position: absolute; top: -14px; right: 16px; z-index: 2; --rot: 6deg; }
+
+    /* ---------- Новый кампус: синяя плашка ---------- */
+    .new-band { position: relative; border: var(--line) solid var(--ink); border-radius: var(--r-xl); box-shadow: var(--shadow-lg); background: #2747ff; color: #fff; padding: clamp(24px, 4vw, 52px); }
+    .new-grid { display: grid; gap: 40px; grid-template-columns: minmax(0, 1fr); }
+    @media (min-width: 1024px) { .new-grid { grid-template-columns: 1.1fr 1fr; align-items: start; } }
+    .new-band h2 { color: #fff; }
+    .new-band p.lead { color: #e3e8ff; }
+    .new-band .new-grid > div > .sticker { --rot: -4deg; margin-bottom: 14px; }
+    .new-band .photo { margin-top: 26px; height: 260px; --rot: -2deg; }
+    .new-band .photo img { height: calc(100% - 34px); }
+    @media (max-width: 599px) { .new-band .photo { height: auto; } .new-band .photo img { height: 200px; } }
+    .new-stats { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; margin-top: 28px; }
+    .new-stats > div { border-top: 1px solid rgba(255, 255, 255, .4); padding-top: 10px; }
+    .new-stats b { display: block; font: 800 calc(clamp(20px, 2.6vw, 34px) * var(--fs-scale))/1 var(--font-display); color: #fff; }
+    .new-stats span { display: block; margin-top: 6px; font-size: var(--fs-xs); color: #e3e8ff; }
+    .new-band .demo-note { color: #e3e8ff; margin-top: 10px; }
+    .new-band .card { color: var(--text); transform: rotate(1.2deg); box-shadow: var(--shadow-md); }
+
+    /* ---------- Версия для слабовидящих ---------- */
+    html[data-a11y] :is(.campus-hero .hand, .map-top .hand, .campus__side .hand, .sec-head .hand, .food, .new-band .card) { transform: none !important; }
+    html[data-a11y] :is(.food, .club) { margin-top: 0 !important; }
+    html[data-a11y] .ccol { height: auto; display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 200px), 1fr)); gap: 16px; }
+    html[data-a11y] .ccol .photo { position: relative; inset: auto; width: auto; height: auto; }
+    html[data-a11y] .ccol .photo img { height: 180px; }
+    html[data-a11y] .ccol :is(.s1, .s2) { position: static; display: inline-flex; justify-self: start; }
+    html[data-a11y] :is(.sport-pic .sticker, .art-grid .sticker) { position: static; display: inline-flex; margin-bottom: 10px; }
+    html[data-a11y] .sport-pic .photo { height: auto; }
+    html[data-a11y] .sport-pic .photo img { height: 200px; }
+    html[data-a11y] .settle .photo { display: none; }
+    html[data-a11y] .art-grid .card:first-child { grid-column: auto; display: flex; }
+    html[data-a11y] .art-grid .card .photo { margin: 0 0 6px; height: auto; border-width: var(--line); border-radius: var(--r-md); min-height: 0; }
+    html[data-a11y] .art-grid .card .photo img { height: 160px; }
+    html[data-a11y] .new-band .photo { height: auto; }
+    html[data-a11y] .new-band .photo img { height: 200px; }
+    html[data-a11y] .new-stats { grid-template-columns: 1fr; }
+    html[data-a11y] .sos b { font-size: var(--fs-2xl); }
+  </style>
+</head>
+<body data-page="campus">
+  <div id="site-header"></div>
+
+  <main id="main">
+    <section class="page-hero page-hero--tinted campus-hero">
+      <div class="container">
+        <nav class="crumbs" aria-label="Хлебные крошки"><a href="index.html">Главная</a><i data-icon="chevron-right"></i><span>Кампус</span></nav>
+        <div class="campus-hero__grid">
+          <div>
+        <h1 class="h1"><span class="u-hand">Кампус</span> УрФУ</h1>
+        <p class="lead">Найди корпус, общежитие, столовую или спортзал на карте — с часами работы и тем, что внутри.</p>
+        <span class="hand" aria-hidden="true">от общаги до пар — 5 минут пешком</span>
+        <nav class="cluster jump" aria-label="Разделы страницы">
+          <a class="chip" href="#dorms"><i data-icon="bed"></i> Общежития</a>
+          <a class="chip" href="#food"><i data-icon="utensils"></i> Где поесть</a>
+          <a class="chip" href="#health"><i data-icon="heart"></i> Здоровье</a>
+          <a class="chip" href="#life"><i data-icon="users"></i> Сообщества</a>
+          <a class="chip" href="#sport"><i data-icon="activity"></i> Спорт</a>
+          <a class="chip" href="#art"><i data-icon="palette"></i> Творчество</a>
+          <a class="chip" href="#new"><i data-icon="sparkles"></i> Новый кампус</a>
+        </nav>
+          </div>
+          <div class="ccol">
+            <figure class="photo tape p1"><img src="assets/img/dorm.jpg" alt="Комната в общежитии" loading="eager"><figcaption>наша комната в общаге</figcaption></figure>
+            <figure class="photo p2"><img src="assets/img/concert.jpg" alt="Студенческий концерт" loading="eager"><figcaption>Весна УрФУ</figcaption></figure>
+            <figure class="photo tape tape--corner p3"><img src="assets/img/winter.jpg" alt="Екатеринбург на закате, вид на замёрзший пруд" loading="eager"><figcaption>зимой тоже красиво</figcaption></figure>
+            <span class="sticker sticker--blue s1" aria-hidden="true"><i data-icon="sparkles"></i>новый кампус — с 2026</span>
+            <span class="sticker sticker--round sticker--coral s2" aria-hidden="true">200+ сообществ</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Интерактивная карта -->
+    <section class="section--tight anchor" id="map" style="padding-top:8px">
+      <div class="container">
+        <h2 class="sr-only">Карта кампуса</h2>
+        <div class="campus">
+          <aside class="campus__side" aria-label="Объекты кампуса">
+            <div class="field">
+              <label for="poi-q">Найти на карте</label>
+              <div class="input-icon"><i data-icon="search"></i><input class="input" id="poi-q" type="search" placeholder="Корпус, аудитория «E-203» или «библиотека»" autocomplete="off"></div>
+              <span class="hand" aria-hidden="true">вбей код аудитории из расписания</span>
+            </div>
+            <div class="cluster" data-chip-group id="poi-filter" role="group" aria-label="Тип объекта">
+              <button class="chip" aria-pressed="true" data-cat="all">Все</button>
+              <button class="chip" aria-pressed="false" data-cat="study">Учебные корпуса</button>
+              <button class="chip" aria-pressed="false" data-cat="dorm">Общежития</button>
+              <button class="chip" aria-pressed="false" data-cat="food">Еда</button>
+              <button class="chip" aria-pressed="false" data-cat="sport">Спорт</button>
+              <button class="chip" aria-pressed="false" data-cat="med">Медицина</button>
+            </div>
+            <p class="small muted" id="poi-count" aria-live="polite"></p>
+            <ul class="poi-list" id="poi-list"></ul>
+            <p class="small muted" id="poi-empty" hidden>Ничего не нашли. Попробуй «столовая», «Мира» или сбрось фильтр.</p>
+          </aside>
+
+          <div class="campus__map">
+            <div class="map-top">
+              <div class="map-areas" role="group" aria-label="Район на карте">
+                <button type="button" data-area="center" aria-pressed="true">Втузгородок и центр</button>
+                <button type="button" data-area="new" aria-pressed="false">Новый кампус</button>
+              </div>
+              <span class="hand" aria-hidden="true">← ИРИТ-РтФ и ИнЭУ — тут</span>
+            </div>
+            <div class="map-wrap" id="map-wrap">
+             <div class="map-stage">
+              <svg class="map" id="map-svg" viewBox="0 0 1000 680" preserveAspectRatio="xMidYMid meet" role="group" aria-label="Схема кампуса УрФУ. Объекты можно выбрать клавишами Tab и Enter.">
+                <defs>
+                  <pattern id="map-grid" width="40" height="40" patternUnits="userSpaceOnUse"><path d="M40 0H0V40" fill="none" stroke="var(--border)" stroke-width=".7" opacity=".55"/></pattern>
+                </defs>
+                <rect x="-600" y="-600" width="2200" height="1880" fill="var(--surface-2)"/>
+                <rect x="-600" y="-600" width="2200" height="1880" fill="url(#map-grid)"/>
+                <g id="area-center">
+                <!-- Парки -->
+                <rect class="m-park" x="255" y="18" width="165" height="112" rx="22"/>
+                <text class="m-park-label" x="337" y="78" text-anchor="middle">Сквер</text>
+                <rect class="m-park" x="885" y="635" width="200" height="80" rx="18"/>
+                <!-- Река -->
+                <path class="m-water" d="M110 -60 C 40 120, 175 230, 100 360 S 30 560, 125 760"/>
+                <path class="m-water-line" d="M110 -60 C 40 120, 175 230, 100 360 S 30 560, 125 760"/>
+                <text class="m-water-label" transform="translate(84 300) rotate(-78)">р. Исеть</text>
+                <!-- Улицы -->
+                <path class="m-road-o" d="M-60 470H1060M-60 620H1060M600 -60V470M230 -60V740M600 60H1060M600 260H1060M860 -60V740M230 150H600"/>
+                <path class="m-road" d="M-60 470H1060M-60 620H1060M600 -60V470M230 -60V740M600 60H1060M600 260H1060M860 -60V740M230 150H600"/>
+                <text class="m-street" x="400" y="470" dominant-baseline="central">пр. Ленина</text>
+                <text class="m-street" x="400" y="620" dominant-baseline="central">ул. Малышева</text>
+                <text class="m-street" transform="translate(600 235) rotate(-90)" dominant-baseline="central">ул. Мира</text>
+                <text class="m-street" transform="translate(230 600) rotate(-90)" dominant-baseline="central">ул. Гоголя</text>
+                <text class="m-street" transform="translate(860 610) rotate(-90)" dominant-baseline="central">ул. Комсомольская</text>
+                <text class="m-street" x="690" y="60" dominant-baseline="central">ул. Софьи Ковалевской</text>
+                <text class="m-street" x="690" y="260" dominant-baseline="central">ул. Коминтерна</text>
+                <text class="m-street" x="290" y="150" dominant-baseline="central">ул. Гагарина</text>
+                </g>
+                <!-- Новый кампус в Новокольцовском: схема условная -->
+                <g id="area-new" hidden>
+                  <!-- Контуры зданий, улицы и площадки — © участники OpenStreetMap (ODbL), октябрь 2026 -->
+                  <polygon class="m-park" points="631.7,438.4 691.4,423.5 668.2,330.6 607.6,346.0 631.7,438.4"/>
+                  <polygon class="m-park" points="624.6,430.7 630.3,442.8 636.6,449.9 643.0,454.0 649.8,456.6 657.2,457.7 662.8,457.5 668.9,456.6 672.8,455.5 677.7,453.3 682.2,450.1 685.7,447.1 688.5,443.8 690.9,439.8 693.1,435.4 695.1,429.9 695.5,427.7 695.8,421.8 695.5,416.9"/>
+                  <polygon class="m-park" points="695.5,416.9 675.2,338.2 672.6,331.6 667.9,324.3 662.1,318.6 655.6,314.8 649.4,312.6 642.8,311.8 634.0,312.1 626.5,314.1 620.1,317.4 616.1,320.4 612.4,324.5 608.0,331.1 605.1,338.6 603.9,344.6 603.9,350.8"/>
+                  <polygon class="m-park" points="601.9,342.6 603.9,350.8 624.6,430.7"/>
+                  <polygon class="m-park" points="610.7,336.0 610.9,336.9 651.0,326.8 651.1,327.3 657.1,325.8 656.5,323.5 650.5,325.0 650.7,325.9 610.7,336.0"/>
+                  <polygon class="m-park" points="577.3,386.4 583.0,409.0 594.0,406.2 588.4,383.6 577.3,386.4"/>
+                  <polygon class="m-park" points="90.2,92.3 139.4,71.0 124.3,35.4 74.5,56.3 90.2,92.3"/>
+                  <path class="m-foot" d="M807.9 93.3 L801.3 102.0 L797.4 107.5 L795.2 110.6 L787.4 121.2 L781.1 128.7 L778.1 132.3 L775.8 135.2 L755.9 161.0 L740.1 176.4 L720.7 193.2 L693.4 214.5 L668.2 230.8 L642.9 244.9 L612.6 259.6 L583.2 272.0 L551.3 281.9 L504.1 291.4 L479.7 295.0 L454.7 295.9 L420.2 295.8 L392.6 294.1 L378.8 292.6 L363.8 290.6 L324.7 282.6 L298.8 275.6 L284.5 270.1 L279.6 265.8 L277.2 262.0 M808.0 151.3 L815.1 140.8 L822.4 130.6 L825.0 127.0 L834.5 113.6 M1105.6 308.4 L1092.7 299.2 L1066.6 280.6 L1018.7 245.5 L970.5 210.2 L834.5 113.6 L821.2 103.5 L807.9 93.3 L757.3 56.4 L623.5 -41.1 L604.3 -54.5 L588.3 -65.8 L536.4 -102.4 L518.7 -114.9 L517.6 -157.8 L536.0 -166.4 L526.3 -183.5 L525.1 -184.6 L521.1 -191.5 L518.1 -197.3 L514.8 -203.6 L502.9 -201.8 L493.6 -202.5 L483.1 -205.7 L469.1 -212.1 L455.3 -216.6 L443.7 -219.3 L429.4 -220.3 L418.3 -219.5 L407.6 -218.4 L398.6 -218.1 L388.5 -219.0 L380.0 -223.6 L311.2 -274.8 L294.9 -283.3 M861.7 189.8 L912.3 226.0 L1040.0 317.5 L1039.9 323.8 L889.7 528.7 L886.0 533.0 L877.0 543.6 L868.6 552.4 L856.4 563.3 L844.8 572.4 L831.1 582.7 L822.3 587.3 L806.5 596.6 L793.9 602.7 L781.8 606.6 L754.2 615.6 L738.3 619.7 L715.9 625.6 L686.7 633.3 L645.4 644.4 L613.2 653.0 L608.7 654.2 L503.3 681.8 L482.0 686.0 L468.8 688.5 L459.5 689.6 L423.8 689.6 L391.4 683.7 L363.9 674.9 L336.1 663.2 L250.4 622.7 L237.3 616.4 L225.0 610.6 L143.1 571.3 M390.4 -44.6 L251.8 249.7 M426.0 -28.2 L417.8 -32.0 L410.8 -35.2 L404.3 -38.2 L395.9 -42.1 L390.4 -44.6 M390.4 -44.6 L400.3 -66.2 L367.5 -85.2 L339.8 -73.3 L337.1 -72.3 M-518.4 -826.3 L-482.7 -790.7 L-454.0 -765.9 L-408.8 -725.8 L-361.4 -682.8 L-316.0 -648.0 L-303.2 -638.2 L-298.6 -634.6 L-187.6 -552.7 L-174.2 -542.7 L-151.3 -526.2 L-124.8 -507.0 L-93.2 -484.1 L-0.0 -416.6 L28.8 -395.7 L88.0 -352.9 L167.9 -295.2 L343.7 -167.6 L347.8 -159.7 L347.8 -152.8 L346.6 -145.2 L342.5 -134.8 L338.5 -129.1 L331.6 -120.8 L326.9 -116.6 L318.8 -113.2 L321.7 -106.7 L325.1 -99.2 L330.9 -86.9 L337.1 -72.3 M801.3 102.0 L773.6 81.5 L759.4 71.0 L757.3 56.4 M651.8 665.9 L670.0 661.1 L686.3 656.9 L692.1 659.8 L696.3 662.0 M620.0 681.6 L619.1 677.8 L616.7 668.2 L613.7 655.5 L613.2 653.0 M653.8 673.1 L652.8 669.4 L651.8 665.9 L649.9 659.0 L646.2 646.1 L645.4 644.4 M62.1 656.4 L75.0 626.4 L90.2 587.4 M127.9 605.0 L119.2 602.8 L109.7 598.2 L101.6 595.0 L90.2 587.4 M150.0 602.5 L146.3 604.2 L142.6 605.6 M132.5 594.0 L150.0 602.5 L164.3 608.3 L176.8 613.1 L179.4 620.6 L181.3 626.2 M130.2 599.9 L142.6 605.6 L181.3 626.2 L296.1 679.8 L348.4 702.0 L358.1 705.1 L363.7 706.6 L369.3 708.5 L381.5 712.5 L395.6 715.6 L403.0 716.6 L412.6 718.2 L418.6 719.2 L428.2 720.1 L460.0 719.8 L466.7 719.4 L504.4 713.0 L515.9 710.3 L547.8 701.5 L620.0 681.6 L632.9 678.1 L653.8 673.1 L667.3 669.9 L696.3 662.0 L718.9 655.8 L758.2 646.2 L786.9 637.5 L806.8 630.1 L819.7 625.0 L831.3 618.1 L849.2 607.7 L860.9 598.9 L875.3 586.8 L891.5 572.4 L899.3 563.5 L904.3 557.9 L915.1 545.5 L926.3 530.8 L934.4 519.0 L962.2 480.9 L996.8 433.7 L1028.9 389.8 L1047.0 365.7 L1055.9 353.1 L1063.5 341.2 M127.9 605.0 L77.8 712.4 L69.6 732.1 L60.1 752.8 L40.9 792.6 L-6.0 892.2 L-81.4 1049.2 L-79.6 1055.3 L-38.7 1078.6 L0.0 1095.2 L5.8 1095.4 L12.4 1093.7 L15.9 1092.3 L25.3 1086.8 M251.8 249.7 L232.1 293.9 M232.1 293.9 L213.4 329.0 L109.9 548.5 M264.6 307.4 L260.2 305.6 L250.4 301.2 L242.2 297.6 L232.1 293.9 M821.1 160.6 L827.4 158.1 L839.5 166.7 L848.1 172.9 L849.0 180.6 M601.9 -84.0 L597.9 -87.5 L606.2 -99.2 L614.4 -110.6 L618.2 -111.5 L621.2 -109.9 M588.3 -65.8 L601.9 -84.0 L621.2 -109.9 L623.7 -113.3 M512.7 -67.7 L522.6 -61.2 L528.6 -54.4 L536.1 -53.9 L547.1 -46.1 L557.0 -39.0 L558.7 -31.1 L560.9 -20.8 M507.2 -59.8 L511.7 -66.4 L512.7 -67.7 L516.6 -73.5 L519.1 -77.2 L525.6 -86.3 L536.4 -102.4 M146.4 564.0 L219.0 406.5 L264.6 307.4 L268.5 299.1 L269.9 295.9 L275.1 287.3 L283.3 272.2 L284.5 270.1 L316.1 203.9 L426.0 -28.2 L436.6 -50.8 L441.3 -59.0 L487.1 -74.4 L507.2 -59.8 L560.9 -20.8 L573.2 -11.9 L775.8 135.2 L784.1 141.7 L788.8 145.4 L798.1 152.5 L808.0 151.3 L821.1 160.6 L849.0 180.6 L861.7 189.8 M250.4 622.7 L252.3 618.8 L254.9 613.3 L258.2 600.9 L260.3 596.5 M260.3 596.5 L267.4 578.7 L267.1 570.6 L269.1 566.5 L279.8 546.0 L283.2 541.7 L302.3 502.1 L353.7 473.9 L379.7 459.8 M337.4 381.7 L350.5 416.7 L379.7 459.8 L383.6 474.5 M307.0 523.3 L309.4 516.8 L319.8 506.5 L359.8 486.4 L383.6 474.5 M353.7 473.9 L359.8 486.4 L370.2 508.1 M487.5 501.2 L472.6 525.9 L462.6 542.6 M486.9 498.9 L452.5 497.9 L448.9 497.8 L397.3 496.4 M472.1 442.2 L486.9 498.9 L487.5 501.2 L492.2 520.5 M417.0 454.7 L401.0 466.5 L391.5 471.3 L392.4 475.4 L396.4 492.5 L397.3 496.4 L412.6 514.0 L425.5 523.0 L435.5 527.3 L447.2 529.8 L460.0 528.4 L472.6 525.9 L492.2 520.5 L496.6 519.5 L500.8 518.6 L550.7 506.4 L583.1 498.5 L588.7 497.2 L593.5 496.0 L619.2 489.3 L651.0 480.7 M690.6 288.3 L700.6 307.1 L729.9 370.0 M764.5 347.8 L729.9 370.0 L721.7 375.4 L695.4 388.4 M737.0 319.1 L729.9 370.0 M535.0 453.7 L543.5 457.5 L552.3 462.1 L560.2 468.5 L583.1 498.5 M462.6 542.6 L460.0 528.4 L452.5 497.9 M448.9 497.8 L435.5 527.3 L421.1 557.4 M66.2 1065.7 L67.8 1062.5 L74.8 1047.7 L81.3 1033.8 L88.0 1019.7 L94.6 1005.7 L101.3 991.6 L107.9 977.8 L110.5 972.3 M110.5 972.3 L118.5 955.6 L16.2 907.2 M133.4 962.8 L267.6 1025.5 L270.2 1028.4 L266.8 1035.8 L263.9 1042.1 L263.6 1044.1 M629.7 459.4 L644.5 463.1 L656.8 465.4 L668.4 464.9 L677.8 461.3 L686.7 455.9 L703.9 441.4 L706.2 437.8 L706.7 432.6 L695.4 388.4 L675.8 314.3 L671.8 307.1 M727.3 305.9 L700.6 307.1 L691.1 307.6 L677.7 307.4 L671.8 307.1 L666.8 306.4 M594.6 323.8 L590.2 327.4 L579.1 336.6 M604.4 433.0 L598.1 434.5 L573.8 440.5 M599.6 422.0 L598.1 434.5 L594.9 476.5 L593.5 496.0 M583.9 479.0 L594.9 476.5 L614.6 471.8 M590.2 327.4 L588.8 317.4 L584.4 305.0 M575.5 334.1 L560.4 387.2 M557.0 389.2 L560.7 388.3 L563.4 387.6 L590.8 381.0 M563.4 387.6 L578.9 402.5 L580.8 411.4 M567.3 414.9 L580.8 411.4 L586.2 410.1 L597.6 407.1 M586.2 410.1 L599.6 422.0 L602.2 424.2 M487.2 485.7 L504.4 491.2 L529.4 499.4 L550.7 506.4 L555.0 522.0 M146.4 564.0 L138.3 560.6 L128.7 556.7 L121.1 553.6 L109.9 548.5 M383.6 474.5 L388.7 472.4 L391.5 471.3 M379.7 459.8 L385.0 456.8 L388.6 454.8 M388.6 454.8 L420.6 447.1 L467.7 435.9 M420.6 447.1 L406.4 389.8 M277.2 262.0 L271.1 259.1 L262.1 254.7 L255.6 251.5 L251.8 249.7 M109.9 548.5 L90.2 587.4 M127.9 605.0 L130.2 599.9 L131.2 597.1 L132.5 594.0 L137.0 584.6 L141.9 573.8 L143.1 571.3 L144.0 569.3 L146.4 564.0"/>
+                  <path class="m-road-o" d="M593.8 -39.2 L541.6 -75.9 L525.6 -86.3 L520.7 -89.4 L499.8 -103.0 L492.6 -113.3 L488.1 -124.1 L486.1 -139.0 M406.7 -96.4 L410.8 -89.6 L413.1 -83.5 L415.3 -74.7 L416.0 -68.5 L415.0 -62.9 L410.0 -51.8 L404.3 -38.2 L395.0 -17.9 L390.4 0.3 M455.2 -96.2 L461.9 -101.1 L465.9 -104.8 L473.8 -112.0 L478.6 -118.6 L481.5 -124.6 L486.1 -139.0 M203.6 399.4 L243.6 315.5 L250.4 301.2 L260.0 281.0 M119.7 576.3 L128.7 556.7 L138.0 534.4 L156.7 493.7 L203.6 399.4 M-97.7 1019.0 L-98.9 1005.9 L-99.3 1000.3 L-98.3 995.0 L-95.8 989.7 L-60.8 928.8 L-31.7 879.3 L-24.2 866.5 L-6.4 835.4 L2.4 820.0 L11.1 803.8 L64.2 695.6 L109.7 598.2 L115.2 586.6 L119.7 576.3 M390.4 0.3 L400.7 -14.7 L410.8 -35.2 L417.0 -47.3 L423.7 -63.2 L430.0 -74.2 L434.2 -80.0 L437.7 -84.4 L441.1 -87.6 L444.8 -91.5 M455.2 -96.2 L463.5 -97.5 L470.8 -97.7 L480.3 -97.0 L491.2 -94.5 L500.8 -90.0 L513.4 -81.2 L519.1 -77.2 L523.8 -73.8 L536.1 -64.6 L552.1 -52.8 L585.0 -28.4 L787.4 121.2 L800.8 130.8 M119.7 576.3 L129.5 581.0 L137.0 584.6 L168.9 599.8 L230.8 629.4 L324.1 674.0 L350.5 685.1 L373.9 693.7 L388.8 697.9 L403.6 700.9 L418.0 703.0 L432.9 704.0 L446.5 704.1 L459.0 703.3 L466.4 702.9 L474.2 701.8 L487.4 699.7 L506.0 695.4 L524.4 691.2 L611.8 669.5 L616.7 668.2 L649.9 659.0 L668.1 654.1 L684.0 649.7 L691.0 647.8 L784.3 623.0 L795.5 619.3 L806.3 615.0 L817.6 610.2 L828.4 605.3 L840.4 597.9 L846.2 593.8 L851.6 590.0 L857.3 585.9 L862.7 581.5 L873.2 572.1 L886.6 557.8 L898.9 541.7 L959.2 460.9 L1052.2 333.0 L1053.2 331.6 L1064.0 316.3 M800.8 130.8 L788.8 145.4 L769.2 168.6 L757.4 181.4 L750.1 189.4 L728.6 208.3 L718.0 217.8 L706.5 227.0 L667.9 251.7 L657.7 257.2 L642.3 265.5 L621.9 275.1 L600.1 284.6 L582.4 291.0 L563.0 296.5 L542.9 301.8 L532.7 303.9 L522.0 305.7 L496.9 309.9 L484.3 311.5 L471.8 312.9 L459.9 313.3 L448.0 313.6 L447.2 313.6 L424.9 315.2 L404.9 315.2 L388.7 313.7 L367.9 310.9 L347.4 307.5 L335.9 305.1 L300.0 295.9 L275.1 287.3 L269.9 285.9 L260.0 281.0 M119.7 576.3 L112.6 572.8 M260.0 281.0 L252.3 277.4 M299.4 189.4 L284.3 209.8 L262.1 254.7 L252.3 277.4 M305.8 176.4 L330.2 126.4 L375.1 33.0 M808.4 120.5 L800.8 130.8 M393.9 -106.5 L400.0 -101.7 L406.7 -96.4 M374.7 -145.5 L376.0 -139.2 L379.8 -125.8 L383.1 -119.3 L387.5 -113.8 L393.9 -106.5 M374.7 -145.5 L372.6 -139.1 L370.0 -130.6 L366.7 -124.8 L362.7 -119.0 L357.6 -113.0 L350.1 -108.2 L339.7 -103.6 L331.3 -101.8 L327.4 -100.4 L325.1 -99.2 L321.9 -97.5 L317.9 -95.7 M323.6 -83.6 L330.9 -86.9 L348.1 -94.7 L362.7 -102.0 L368.5 -104.4 L375.1 -106.0 L381.8 -106.6 L388.2 -106.7 L393.9 -106.5 M417.0 -47.3 L423.1 -56.3 L427.0 -62.3 L431.7 -67.8 L436.9 -72.3 L443.4 -76.6 L449.2 -79.6 L458.1 -82.7 L465.5 -84.1 L472.5 -84.8 L481.0 -84.8 L488.5 -83.8 L498.1 -81.2 L506.8 -77.5 L516.6 -73.5 L524.2 -69.9 L536.1 -64.6 M72.0 657.9 L43.6 719.4 L-8.1 821.5 L-85.2 950.2 L-92.6 959.7 L-98.7 967.4 L-105.8 974.4 L-116.0 980.0 L-125.9 984.8 L-132.5 987.2 M808.4 120.5 L795.2 110.6 L767.3 89.9 L596.6 -37.2 L593.8 -39.2 M1069.9 308.7 L1054.4 297.5 L1027.2 278.0 L822.4 130.6 L808.4 120.5 M157.9 476.4 L151.6 490.3 L121.1 553.6 L112.6 572.8 M235.7 310.9 L212.2 361.0 L195.8 395.7 L157.9 476.4 M299.4 189.4 L305.8 176.4 M375.1 33.0 L390.4 0.3 M277.4 246.1 L294.6 207.8 L299.4 189.4 M260.0 281.0 L271.1 259.1 L277.4 246.1 M800.8 130.8 L815.1 140.8 L843.6 160.9 L868.9 178.8 L920.1 214.9 L1048.5 305.4 L1064.0 316.3 M444.8 -91.5 L455.2 -96.2 M406.7 -96.4 L415.7 -92.1 L420.6 -90.5 L426.5 -89.0 L433.2 -88.7 L440.0 -89.5 L444.8 -91.5 M252.3 277.4 L242.2 297.6 L235.7 310.9 M96.1 606.4 L72.0 657.9 M112.6 572.8 L101.6 595.0 L96.1 606.4 M613.9 602.4 L616.1 608.2 L620.4 614.8 L631.0 615.1 L639.5 612.0 L642.4 609.8 L644.4 607.0 L644.7 602.3 L644.7 596.9 M808.4 120.5 L821.2 103.5 L847.1 76.4 L911.4 -10.5 L915.9 -19.2 L919.0 -30.5 L920.0 -45.1 L920.5 -139.9 M613.9 602.4 L593.1 516.7 M579.1 336.6 L575.5 334.1 L572.1 331.7 L564.4 330.5 L558.1 332.3 L551.8 337.7 L549.4 343.4 L560.4 387.2 L560.7 388.3 L567.3 414.9 L573.8 440.5 L574.6 443.8 M644.7 596.9 L619.2 489.3 L614.6 471.8 L604.4 433.0 L602.2 424.2 L597.6 407.1 L590.8 381.0 L579.1 336.6 M395.1 492.8 L390.8 475.8 L392.4 475.4 L472.6 455.7 L476.8 472.8 L430.9 484.0 L396.4 492.5 L395.1 492.8"/>
+                  <path class="m-road" d="M593.8 -39.2 L541.6 -75.9 L525.6 -86.3 L520.7 -89.4 L499.8 -103.0 L492.6 -113.3 L488.1 -124.1 L486.1 -139.0 M406.7 -96.4 L410.8 -89.6 L413.1 -83.5 L415.3 -74.7 L416.0 -68.5 L415.0 -62.9 L410.0 -51.8 L404.3 -38.2 L395.0 -17.9 L390.4 0.3 M455.2 -96.2 L461.9 -101.1 L465.9 -104.8 L473.8 -112.0 L478.6 -118.6 L481.5 -124.6 L486.1 -139.0 M203.6 399.4 L243.6 315.5 L250.4 301.2 L260.0 281.0 M119.7 576.3 L128.7 556.7 L138.0 534.4 L156.7 493.7 L203.6 399.4 M-97.7 1019.0 L-98.9 1005.9 L-99.3 1000.3 L-98.3 995.0 L-95.8 989.7 L-60.8 928.8 L-31.7 879.3 L-24.2 866.5 L-6.4 835.4 L2.4 820.0 L11.1 803.8 L64.2 695.6 L109.7 598.2 L115.2 586.6 L119.7 576.3 M390.4 0.3 L400.7 -14.7 L410.8 -35.2 L417.0 -47.3 L423.7 -63.2 L430.0 -74.2 L434.2 -80.0 L437.7 -84.4 L441.1 -87.6 L444.8 -91.5 M455.2 -96.2 L463.5 -97.5 L470.8 -97.7 L480.3 -97.0 L491.2 -94.5 L500.8 -90.0 L513.4 -81.2 L519.1 -77.2 L523.8 -73.8 L536.1 -64.6 L552.1 -52.8 L585.0 -28.4 L787.4 121.2 L800.8 130.8 M119.7 576.3 L129.5 581.0 L137.0 584.6 L168.9 599.8 L230.8 629.4 L324.1 674.0 L350.5 685.1 L373.9 693.7 L388.8 697.9 L403.6 700.9 L418.0 703.0 L432.9 704.0 L446.5 704.1 L459.0 703.3 L466.4 702.9 L474.2 701.8 L487.4 699.7 L506.0 695.4 L524.4 691.2 L611.8 669.5 L616.7 668.2 L649.9 659.0 L668.1 654.1 L684.0 649.7 L691.0 647.8 L784.3 623.0 L795.5 619.3 L806.3 615.0 L817.6 610.2 L828.4 605.3 L840.4 597.9 L846.2 593.8 L851.6 590.0 L857.3 585.9 L862.7 581.5 L873.2 572.1 L886.6 557.8 L898.9 541.7 L959.2 460.9 L1052.2 333.0 L1053.2 331.6 L1064.0 316.3 M800.8 130.8 L788.8 145.4 L769.2 168.6 L757.4 181.4 L750.1 189.4 L728.6 208.3 L718.0 217.8 L706.5 227.0 L667.9 251.7 L657.7 257.2 L642.3 265.5 L621.9 275.1 L600.1 284.6 L582.4 291.0 L563.0 296.5 L542.9 301.8 L532.7 303.9 L522.0 305.7 L496.9 309.9 L484.3 311.5 L471.8 312.9 L459.9 313.3 L448.0 313.6 L447.2 313.6 L424.9 315.2 L404.9 315.2 L388.7 313.7 L367.9 310.9 L347.4 307.5 L335.9 305.1 L300.0 295.9 L275.1 287.3 L269.9 285.9 L260.0 281.0 M119.7 576.3 L112.6 572.8 M260.0 281.0 L252.3 277.4 M299.4 189.4 L284.3 209.8 L262.1 254.7 L252.3 277.4 M305.8 176.4 L330.2 126.4 L375.1 33.0 M808.4 120.5 L800.8 130.8 M393.9 -106.5 L400.0 -101.7 L406.7 -96.4 M374.7 -145.5 L376.0 -139.2 L379.8 -125.8 L383.1 -119.3 L387.5 -113.8 L393.9 -106.5 M374.7 -145.5 L372.6 -139.1 L370.0 -130.6 L366.7 -124.8 L362.7 -119.0 L357.6 -113.0 L350.1 -108.2 L339.7 -103.6 L331.3 -101.8 L327.4 -100.4 L325.1 -99.2 L321.9 -97.5 L317.9 -95.7 M323.6 -83.6 L330.9 -86.9 L348.1 -94.7 L362.7 -102.0 L368.5 -104.4 L375.1 -106.0 L381.8 -106.6 L388.2 -106.7 L393.9 -106.5 M417.0 -47.3 L423.1 -56.3 L427.0 -62.3 L431.7 -67.8 L436.9 -72.3 L443.4 -76.6 L449.2 -79.6 L458.1 -82.7 L465.5 -84.1 L472.5 -84.8 L481.0 -84.8 L488.5 -83.8 L498.1 -81.2 L506.8 -77.5 L516.6 -73.5 L524.2 -69.9 L536.1 -64.6 M72.0 657.9 L43.6 719.4 L-8.1 821.5 L-85.2 950.2 L-92.6 959.7 L-98.7 967.4 L-105.8 974.4 L-116.0 980.0 L-125.9 984.8 L-132.5 987.2 M808.4 120.5 L795.2 110.6 L767.3 89.9 L596.6 -37.2 L593.8 -39.2 M1069.9 308.7 L1054.4 297.5 L1027.2 278.0 L822.4 130.6 L808.4 120.5 M157.9 476.4 L151.6 490.3 L121.1 553.6 L112.6 572.8 M235.7 310.9 L212.2 361.0 L195.8 395.7 L157.9 476.4 M299.4 189.4 L305.8 176.4 M375.1 33.0 L390.4 0.3 M277.4 246.1 L294.6 207.8 L299.4 189.4 M260.0 281.0 L271.1 259.1 L277.4 246.1 M800.8 130.8 L815.1 140.8 L843.6 160.9 L868.9 178.8 L920.1 214.9 L1048.5 305.4 L1064.0 316.3 M444.8 -91.5 L455.2 -96.2 M406.7 -96.4 L415.7 -92.1 L420.6 -90.5 L426.5 -89.0 L433.2 -88.7 L440.0 -89.5 L444.8 -91.5 M252.3 277.4 L242.2 297.6 L235.7 310.9 M96.1 606.4 L72.0 657.9 M112.6 572.8 L101.6 595.0 L96.1 606.4 M613.9 602.4 L616.1 608.2 L620.4 614.8 L631.0 615.1 L639.5 612.0 L642.4 609.8 L644.4 607.0 L644.7 602.3 L644.7 596.9 M808.4 120.5 L821.2 103.5 L847.1 76.4 L911.4 -10.5 L915.9 -19.2 L919.0 -30.5 L920.0 -45.1 L920.5 -139.9 M613.9 602.4 L593.1 516.7 M579.1 336.6 L575.5 334.1 L572.1 331.7 L564.4 330.5 L558.1 332.3 L551.8 337.7 L549.4 343.4 L560.4 387.2 L560.7 388.3 L567.3 414.9 L573.8 440.5 L574.6 443.8 M644.7 596.9 L619.2 489.3 L614.6 471.8 L604.4 433.0 L602.2 424.2 L597.6 407.1 L590.8 381.0 L579.1 336.6 M395.1 492.8 L390.8 475.8 L392.4 475.4 L472.6 455.7 L476.8 472.8 L430.9 484.0 L396.4 492.5 L395.1 492.8"/>
+                  <polygon class="m-bld" points="92.9,744.2 48.7,835.8 165.6,890.9 209.3,799.6 92.9,744.2"/>
+                  <polygon class="m-bld" points="279.3,720.6 253.3,774.8 372.3,831.5 398.4,777.3 279.3,720.6"/>
+                  <polygon class="m-bld" points="135.1,652.0 108.9,706.2 227.1,762.4 253.2,708.2 135.1,652.0"/>
+                  <polygon class="m-bld" points="423.3,789.1 397.2,843.4 518.9,901.3 545.0,847.1 423.3,789.1"/>
+                  <polygon class="m-bld" points="398.4,777.3 423.3,789.1 397.2,843.4 372.3,831.5 398.4,777.3"/>
+                  <polygon class="m-bld" points="253.2,708.2 279.3,720.6 253.3,774.8 227.1,762.4 253.2,708.2"/>
+                  <polygon class="m-bld" points="165.6,890.9 216.0,914.6 234.0,876.8 209.9,865.5 253.3,774.8 227.1,762.4 209.3,799.6 165.6,890.9"/>
+                  <polygon class="m-bld" points="239.4,865.1 330.0,905.9 342.7,945.3 337.5,956.1 325.8,962.6 321.6,973.7 311.7,982.3 284.3,980.3 257.9,992.8 240.3,995.3 232.6,984.4 225.1,962.0 204.0,940.8 216.0,914.6 234.0,876.8 239.4,865.1"/>
+                  <polygon class="m-bld" points="335.4,325.8 348.2,332.1 343.4,341.6 330.6,335.2 335.4,325.8"/>
+                  <polygon class="m-bld" points="739.0,236.9 727.0,247.1 732.6,253.7 744.7,243.5 739.0,236.9"/>
+                  <polygon class="m-bld" points="408.0,646.9 403.5,657.7 346.1,634.6 350.5,623.7 408.0,646.9"/>
+                  <polygon class="m-bld" points="805.4,-5.9 807.4,1.1 802.7,2.4 800.8,-4.6 805.4,-5.9"/>
+                  <polygon class="m-bld" points="808.2,4.0 810.5,12.4 802.8,14.5 800.4,6.1 808.2,4.0"/>
+                  <polygon class="m-bld" points="804.7,53.4 808.3,56.2 803.9,61.9 800.3,59.2 804.7,53.4"/>
+                  <polygon class="m-bld" points="791.9,54.8 803.9,63.8 797.2,72.5 785.3,63.5 791.9,54.8"/>
+                  <polygon class="m-bld" points="775.7,46.0 785.9,53.6 780.6,60.6 770.4,53.0 775.7,46.0"/>
+                  <polygon class="m-bld" points="762.0,41.5 771.4,48.6 768.4,52.6 758.9,45.5 762.0,41.5"/>
+                  <polygon class="m-bld" points="753.0,24.9 765.6,34.4 757.3,45.3 744.7,35.8 753.0,24.9"/>
+                  <polygon class="m-bld" points="728.8,6.6 747.6,20.7 739.3,31.6 720.5,17.4 728.8,6.6"/>
+                  <polygon class="m-bld" points="715.7,-3.0 724.6,3.6 716.3,14.5 707.4,7.8 715.7,-3.0"/>
+                  <polygon class="m-bld" points="605.7,301.3 606.4,303.0 605.2,303.5 607.4,308.7 608.6,308.2 609.4,310.1 625.1,303.5 635.0,300.9 635.0,302.1 635.4,302.1 635.4,300.8 663.1,300.9 663.1,293.0 658.2,281.5 632.6,292.3 632.1,290.3 605.7,301.3"/>
+                  <text class="m-street" text-anchor="middle" dominant-baseline="central" transform="translate(687 239) rotate(-33)">ул. 100-летия Уральского университета</text>
+                  <text class="m-street" text-anchor="middle" dominant-baseline="central" transform="translate(1006 397) rotate(-54)">ул. Универсиады</text>
+                  <text class="m-street" text-anchor="middle" dominant-baseline="central" transform="translate(-47 886) rotate(-59)">Экспо-бульвар</text>
+                  <text class="m-street" text-anchor="middle" dominant-baseline="central" transform="translate(632 543) rotate(77)">Алексеевский бульвар</text>
+                  <circle class="m-stop" cx="447.3" cy="304.5" r="9"/><text class="m-note" x="461.3" y="308.5">Кампус УрФУ</text>
+                  <circle class="m-stop" cx="773.4" cy="81.1" r="9"/><text class="m-note" x="787.4" y="85.1">Уральский университет</text>
+                  <text class="m-note" text-anchor="middle" x="269" y="672">МВЦ «Екатеринбург-ЭКСПО»</text>
+                  <polygon class="m-bld m-bld--gate" points="485.3,336.0 527.0,325.9 529.1,334.6 487.4,344.7 485.3,336.0"/>
+                  <text class="m-note" text-anchor="middle" x="507" y="361">КПП</text>
+                  <text class="m-note" text-anchor="end" x="985" y="636">До ГУКа ≈ 1 час: автобус 56 до «Восточной»</text>
+                  <text class="m-note" text-anchor="end" x="985" y="654">и 20 минут пешком</text>
+                </g>
+                <g id="pois"></g>
+                <g id="pin" class="pin" hidden aria-hidden="true"><g class="pin__inner"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></g></g>
+              </svg>
+              <div class="map-hint" aria-hidden="true">Перетаскивай карту, нажимай на корпуса</div>
+              <div class="map-ctrl">
+                <button type="button" id="zoom-in" aria-label="Приблизить карту"><i data-icon="plus"></i></button>
+                <button type="button" id="zoom-out" aria-label="Отдалить карту"><i data-icon="minus"></i></button>
+                <button type="button" id="zoom-reset" aria-label="Показать всю карту"><i data-icon="refresh"></i></button>
+              </div>
+             </div>
+              <div class="map-card" id="map-card" role="dialog" aria-labelledby="mc-title" hidden>
+                <div class="map-card__head">
+                  <span class="icon-tile" id="mc-icon"></span>
+                  <div><span class="tag" id="mc-cat"></span><h3 id="mc-title" tabindex="-1"></h3></div>
+                  <button class="close" type="button" id="mc-close" aria-label="Закрыть карточку объекта"><i data-icon="x"></i></button>
+                </div>
+                <div class="facts">
+                  <div><i data-icon="map-pin"></i><span id="mc-addr"></span></div>
+                  <div><i data-icon="clock"></i><span><span id="mc-hours"></span><br><span class="status" id="mc-status"></span></span></div>
+                </div>
+                <div><span class="xs muted" style="display:block;margin-bottom:6px">Что внутри</span><div class="inside" id="mc-inside"></div></div>
+                <div class="cluster">
+                  <button class="btn btn--accent btn--sm" type="button" id="mc-route"><i data-icon="route"></i> Построить маршрут</button>
+                  <a class="btn btn--ghost btn--sm" id="mc-more" href="campus.html">Подробнее</a>
+                  <button class="btn btn--ghost btn--sm btn--icon" type="button" id="mc-share" aria-label="Скопировать ссылку на объект"><i data-icon="share"></i></button>
+                </div>
+              </div>
+            </div>
+            <div class="legend" aria-label="Легенда карты">
+              <span><i class="lg-study"></i>Учебные корпуса</span>
+              <span><i class="lg-dorm"></i>Общежития</span>
+              <span><i class="lg-food"></i>Еда</span>
+              <span><i class="lg-sport"></i>Спорт</span>
+              <span><i class="lg-med"></i>Медицина</span>
+              <span class="demo-note">Центр — схема условная; новый кампус — по данным © <a href="https://www.openstreetmap.org/copyright" rel="noopener">OpenStreetMap</a>. Часы работы — демонстрационные</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Общежития -->
+    <section class="section section--surface anchor" id="dorms">
+      <div class="container">
+        <div class="sec-head">
+          <div><h2 class="h2">Где жить во время учёбы</h2><p>Общежития есть у главного кампуса на Втузгородке и в новом кампусе в Новокольцовском. Выбирай поближе к своему институту: ИРИТ-РтФ и ИнЭУ учатся в новом кампусе.</p></div>
+          <span class="hand" aria-hidden="true">выбирай поближе к институту</span>
+          <a class="arrow-link" href="student.html#requests">Подать заявку на заселение <i data-icon="arrow-right"></i></a>
+        </div>
+        <div class="dorm-grid">
+          <div class="table-wrap">
+            <table class="table dorm-table">
+              <caption class="sr-only">Общежития у главного кампуса и в новом кампусе</caption>
+              <thead><tr><th scope="col">Общежитие</th><th scope="col">Цена в месяц</th><th scope="col">Комнаты</th><th scope="col">Удобства</th><th scope="col">До учёбы</th><th scope="col"><span class="sr-only">Карта</span></th></tr></thead>
+              <tbody>
+                <tr class="dorm-group"><th colspan="6" scope="colgroup">Втузгородок и центр <span>рядом с ГУКом</span></th></tr>
+                <tr><td><strong>Общежитие №1</strong><div class="xs muted">ул. Комсомольская, 70</div></td><td class="price">1 500 ₽</td><td>на 2–3 человек</td><td><div class="amen"><span class="tag">Wi‑Fi</span><span class="tag">Кухня на этаже</span><span class="tag">Прачечная</span></div></td><td>5 мин пешком</td><td><button class="btn btn--sm btn--soft" type="button" data-place="dorm1"><i data-icon="map-pin"></i> На карте</button></td></tr>
+                <tr><td><strong>Общежитие №2</strong><div class="xs muted">ул. Комсомольская, 66</div></td><td class="price">1 800 ₽</td><td>блоки на 2 комнаты</td><td><div class="amen"><span class="tag">Wi‑Fi</span><span class="tag">Душ в блоке</span><span class="tag">Спортзал</span></div></td><td>7 мин пешком</td><td><button class="btn btn--sm btn--soft" type="button" data-place="dorm2"><i data-icon="map-pin"></i> На карте</button></td></tr>
+                <tr><td><strong>Общежитие №3</strong><div class="xs muted">ул. Коминтерна, 3</div></td><td class="price">2 400 ₽</td><td>на 2 человек</td><td><div class="amen"><span class="tag">Wi‑Fi</span><span class="tag">Коворкинг</span><span class="tag">Кухня в блоке</span><span class="tag">Прачечная</span></div></td><td>6 мин пешком</td><td><button class="btn btn--sm btn--soft" type="button" data-place="dorm3"><i data-icon="map-pin"></i> На карте</button></td></tr>
+                <tr><td><strong>Общежитие №4</strong> <span class="tag tag--intl">для иностранных студентов</span><div class="xs muted">пр. Ленина, 66</div></td><td class="price">3 200 ₽</td><td>на 1–2 человек</td><td><div class="amen"><span class="tag">Wi‑Fi</span><span class="tag">Санузел в комнате</span><span class="tag">Кухня</span><span class="tag">Охрана 24/7</span></div></td><td>8 мин пешком</td><td><button class="btn btn--sm btn--soft" type="button" data-place="dorm4"><i data-icon="map-pin"></i> На карте</button></td></tr>
+              </tbody>
+              <tbody>
+                <tr class="dorm-group"><th colspan="6" scope="colgroup">Новый кампус, Новокольцовский <span>учебные корпуса — через дорогу</span></th></tr>
+                <tr><td><strong>Общежитие НВК №1</strong><div class="xs muted">ул. 100-летия Уральского университета, 6</div></td><td class="price">2 600 ₽</td><td>блоки на 2 комнаты</td><td><div class="amen"><span class="tag">Wi‑Fi</span><span class="tag">Кухня в блоке</span><span class="tag">Прачечная</span></div></td><td>3–7 мин до ИРИТ-РтФ и ИнЭУ</td><td><button class="btn btn--sm btn--soft" type="button" data-place="nk-dorm1"><i data-icon="map-pin"></i> На карте</button></td></tr>
+                <tr><td><strong>Общежитие НВК №2</strong><div class="xs muted">ул. 100-летия Уральского университета, 6/2</div></td><td class="price">2 600 ₽</td><td>блоки на 2 комнаты</td><td><div class="amen"><span class="tag">Wi‑Fi</span><span class="tag">Кухня в блоке</span><span class="tag">Коворкинг</span></div></td><td>3–7 мин до ИРИТ-РтФ и ИнЭУ</td><td><button class="btn btn--sm btn--soft" type="button" data-place="nk-dorm2"><i data-icon="map-pin"></i> На карте</button></td></tr>
+                <tr><td><strong>Общежитие НВК №4</strong><div class="xs muted">ул. 100-летия Уральского университета, 6/4</div></td><td class="price">2 600 ₽</td><td>на 2 человек</td><td><div class="amen"><span class="tag">Wi‑Fi</span><span class="tag">Душ в блоке</span><span class="tag">Прачечная</span></div></td><td>3–7 мин до ИРИТ-РтФ и ИнЭУ</td><td><button class="btn btn--sm btn--soft" type="button" data-place="nk-dorm4"><i data-icon="map-pin"></i> На карте</button></td></tr>
+                <tr><td><strong>Общежитие НВК №5</strong><div class="xs muted">ул. 100-летия Уральского университета, 6/5</div></td><td class="price">2 600 ₽</td><td>на 2 человек</td><td><div class="amen"><span class="tag">Wi‑Fi</span><span class="tag">Душ в блоке</span><span class="tag">Спортзал</span></div></td><td>3–7 мин до ИРИТ-РтФ и ИнЭУ</td><td><button class="btn btn--sm btn--soft" type="button" data-place="nk-dorm5"><i data-icon="map-pin"></i> На карте</button></td></tr>
+              </tbody>
+            </table>
+          </div>
+          <p class="demo-note">Цены, типы комнат и удобства демонстрационные. НВК №3 — гостиница кампуса</p>
+          <div class="settle">
+            <figure class="photo tape"><img src="assets/img/dorm.jpg" alt="Комната в общежитии" loading="lazy"><figcaption>ключи — в день заселения</figcaption></figure>
+            <div>
+            <h3 class="h3" style="margin-bottom:16px">Как заселиться</h3>
+            <div class="steps">
+              <div class="step"><h4 class="h4">Подай заявку</h4><p class="small muted">В кабинете студента — сразу после зачисления, до 15 августа.</p></div>
+              <div class="step"><h4 class="h4">Получи направление</h4><p class="small muted">Придёт в кабинет и на почту: корпус, комната и дата заселения.</p></div>
+              <div class="step"><h4 class="h4">Пройди медосмотр</h4><p class="small muted">Флюорография и справка — бесплатно в студенческой поликлинике.</p></div>
+              <div class="step"><h4 class="h4">Подпиши договор и заезжай</h4><p class="small muted">Онлайн или у коменданта. Ключи — в день заселения.</p></div>
+            </div>
+            </div>
+          </div>
+          <div class="notice"><i data-icon="info"></i><div><strong>Мест не хватило?</strong> Попадёшь в лист ожидания, а пока мы поможем найти проверенное жильё рядом. <a href="help.html#chat">Спросить в чате</a></div></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Еда -->
+    <section class="section anchor" id="food">
+      <div class="container">
+        <div class="sec-head">
+          <div><h2 class="h2">Столовые и кафе</h2><p>Статус «открыто» считается по текущему времени. По студенческому — скидка 10% везде.</p></div>
+        </div>
+        <div class="food-grid">
+          <article class="card food" data-hours='{"wd":["8:00","18:00"],"sat":["9:00","15:00"]}'>
+            <div class="row between"><span class="tag c-food"><i data-icon="utensils"></i>Столовая</span><span class="status" data-status></span></div>
+            <h3 class="card__title">Столовая на Ленина</h3>
+            <p class="small muted">Комплексный обед за 250 ₽, вегетарианское меню каждый день.</p>
+            <div class="food__check">280 ₽<small>средний чек</small></div>
+            <div class="card__footer"><span class="xs muted">пр. Ленина, 53</span><button class="btn btn--sm btn--soft" type="button" data-place="canteen"><i data-icon="map-pin"></i> На карте</button></div>
+          </article>
+          <article class="card food" data-hours='{"wd":["8:00","20:00"],"sat":["10:00","18:00"]}'>
+            <div class="row between"><span class="tag c-food"><i data-icon="utensils"></i>Кафе</span><span class="status" data-status></span></div>
+            <h3 class="card__title">Кафе «Технопарк»</h3>
+            <p class="small muted">Кофе, сэндвичи и розетки у каждого стола — удобно для работы над проектом.</p>
+            <div class="food__check">350 ₽<small>средний чек</small></div>
+            <div class="card__footer"><span class="xs muted">ул. Мира, 30</span><button class="btn btn--sm btn--soft" type="button" data-place="cafe1"><i data-icon="map-pin"></i> На карте</button></div>
+          </article>
+          <article class="card food" data-hours='{"wd":["9:00","22:00"],"sat":["10:00","22:00"],"sun":["10:00","22:00"]}'>
+            <div class="row between"><span class="tag c-food"><i data-icon="utensils"></i>Кафе</span><span class="status" data-status></span></div>
+            <h3 class="card__title">Кафе «Кампус»</h3>
+            <p class="small muted">Рядом с общежитиями: завтраки до 12:00 и ужины до позднего вечера.</p>
+            <div class="food__check">320 ₽<small>средний чек</small></div>
+            <div class="card__footer"><span class="xs muted">ул. Комсомольская, 68</span><button class="btn btn--sm btn--soft" type="button" data-place="cafe2"><i data-icon="map-pin"></i> На карте</button></div>
+          </article>
+          <article class="card food" data-hours='{"wd":["8:30","17:00"]}'>
+            <div class="row between"><span class="tag c-food"><i data-icon="utensils"></i>Буфет</span><span class="status" data-status></span></div>
+            <h3 class="card__title">Буфет Главного корпуса</h3>
+            <p class="small muted">Выпечка и горячие напитки между парами, 2 этаж у актового зала.</p>
+            <div class="food__check">180 ₽<small>средний чек</small></div>
+            <div class="card__footer"><span class="xs muted">ул. Мира, 19</span><button class="btn btn--sm btn--soft" type="button" data-place="main"><i data-icon="map-pin"></i> На карте</button></div>
+          </article>
+        </div>
+        <p class="demo-note" style="margin-top:12px">Часы работы и цены демонстрационные</p>
+      </div>
+    </section>
+
+    <!-- Здоровье -->
+    <section class="section section--surface anchor" id="health">
+      <div class="container">
+        <div class="sec-head">
+          <div><h2 class="h2">Медицина и поддержка</h2><p>Для студентов УрФУ приём бесплатный — нужен только студенческий и полис.</p></div>
+        </div>
+        <div class="health">
+          <div class="card">
+            <h3 class="card__title">Студенческая поликлиника</h3>
+            <p class="small muted">Терапевт, стоматолог, справки для общежития и спорта, вакцинация.</p>
+            <p class="small"><strong>Пн–Пт 8:00–19:00, Сб 9:00–14:00</strong><br><span class="muted">Запись через кабинет студента или по телефону <a href="tel:+73433757575">+7 (343) 375-75-75</a></span></p>
+            <div class="card__footer"><button class="btn btn--sm btn--soft" type="button" data-place="med"><i data-icon="map-pin"></i> На карте</button><button class="btn btn--sm" type="button" data-toast="Запись к терапевту откроется в кабинете студента (демо)">Записаться</button></div>
+          </div>
+          <a class="card card--hover" href="help.html#psy">
+            <h3 class="card__title">Психологическая помощь</h3>
+            <p class="small muted">Бесплатно и анонимно: очные встречи, онлайн-консультации и линия поддержки 24/7.</p>
+            <span class="card__footer"><span class="arrow-link">Как записаться</span><i data-icon="arrow-up-right"></i></span>
+          </a>
+          <div class="card">
+            <h3 class="card__title">Медпункты в общежитиях</h3>
+            <p class="small muted">Дежурная медсестра в общежитиях №1 и №4 — первая помощь, давление, температура.</p>
+            <p class="small"><strong>Ежедневно 8:00–22:00</strong></p>
+            <div class="card__footer"><a class="arrow-link small" href="help.html#safety">Безопасность в кампусе <i data-icon="arrow-right"></i></a></div>
+          </div>
+        </div>
+        <div class="sos"><b>112</b><p><strong>Экстренная ситуация — звони 112.</strong><br>Потом сообщи дежурному кампуса: <a href="tel:+73433759999">+7 (343) 375-99-99</a>, круглосуточно.</p></div>
+        <p class="demo-note" style="margin-top:12px">Телефоны кампуса демонстрационные</p>
+      </div>
+    </section>
+
+    <!-- Сообщества -->
+    <section class="section anchor" id="life">
+      <div class="container">
+        <div class="sec-head">
+          <div><h2 class="h2">200+ сообществ — найди своё</h2><p>Здесь восемь самых больших. Вступить можно в любой момент года.</p></div>
+          <div class="cluster" data-chip-group id="club-filter" role="group" aria-label="Категория сообщества">
+            <button class="chip" aria-pressed="true" data-cat="all">Все</button>
+            <button class="chip" aria-pressed="false" data-cat="self">Самоуправление</button>
+            <button class="chip" aria-pressed="false" data-cat="vol">Волонтёрство</button>
+            <button class="chip" aria-pressed="false" data-cat="media">Медиа</button>
+            <button class="chip" aria-pressed="false" data-cat="sci">Наука и IT</button>
+            <button class="chip" aria-pressed="false" data-cat="hobby">Хобби</button>
+          </div>
+        </div>
+        <div class="clubs" id="clubs">
+          <article class="card club" data-cat="self"><span class="tag tag--brand">Самоуправление</span><h3 class="card__title">Объединённый совет обучающихся</h3><p class="small muted">Решаем вопросы стипендий, общежитий и расписания вместе с администрацией.</p><div class="card__footer"><span class="club__n">850<small>участников</small></span><button class="btn btn--sm btn--soft" type="button" data-toast="Заявка в совет обучающихся отправлена (демо)">Вступить</button></div></article>
+          <article class="card club" data-cat="self"><span class="tag tag--brand">Самоуправление</span><h3 class="card__title">Студенческие отряды</h3><p class="small muted">Летняя работа на стройках, в лагерях и на проводниках — с зарплатой и командой.</p><div class="card__footer"><span class="club__n">1 200<small>участников</small></span><button class="btn btn--sm btn--soft" type="button" data-toast="Заявка в студотряды отправлена (демо)">Вступить</button></div></article>
+          <article class="card club" data-cat="vol"><span class="tag tag--ok">Волонтёрство</span><h3 class="card__title">Волонтёрский центр «Рядом»</h3><p class="small muted">Помощь детским домам, приютам и большим городским событиям.</p><div class="card__footer"><span class="club__n">2 300<small>участников</small></span><button class="btn btn--sm btn--soft" type="button" data-toast="Заявка в волонтёрский центр отправлена (демо)">Вступить</button></div></article>
+          <article class="card club" data-cat="vol"><span class="tag tag--ok">Волонтёрство</span><h3 class="card__title">Эко-клуб «Зелёный кампус»</h3><p class="small muted">Раздельный сбор в корпусах, субботники и обмен вещами каждый месяц.</p><div class="card__footer"><span class="club__n">430<small>участников</small></span><button class="btn btn--sm btn--soft" type="button" data-toast="Заявка в эко-клуб отправлена (демо)">Вступить</button></div></article>
+          <article class="card club" data-cat="media"><span class="tag tag--intl">Медиа</span><h3 class="card__title">Видеостудия «Кадр»</h3><p class="small muted">Снимаем репортажи, клипы и документалки. Научим работать с камерой.</p><div class="card__footer"><span class="club__n">160<small>участников</small></span><button class="btn btn--sm btn--soft" type="button" data-toast="Заявка в видеостудию отправлена (демо)">Вступить</button></div></article>
+          <article class="card club" data-cat="media"><span class="tag tag--intl">Медиа</span><h3 class="card__title">Студенческое радио «Волна»</h3><p class="small muted">Эфиры в корпусах и подкасты: от новостей кампуса до разговоров с учёными.</p><div class="card__footer"><span class="club__n">90<small>участников</small></span><button class="btn btn--sm btn--soft" type="button" data-toast="Заявка на радио отправлена (демо)">Вступить</button></div></article>
+          <article class="card club" data-cat="sci"><span class="tag tag--staff">Наука и IT</span><h3 class="card__title">IT-сообщество «Код Урала»</h3><p class="small muted">Митапы, хакатоны и пет-проекты для студентов всех институтов.</p><div class="card__footer"><span class="club__n">1 050<small>участников</small></span><button class="btn btn--sm btn--soft" type="button" data-toast="Заявка в IT-сообщество отправлена (демо)">Вступить</button></div></article>
+          <article class="card club" data-cat="hobby"><span class="tag tag--accent">Хобби</span><h3 class="card__title">Клуб интеллектуальных игр</h3><p class="small muted">Еженедельные турниры по «Что? Где? Когда?» и брейн-рингу.</p><div class="card__footer"><span class="club__n">320<small>участников</small></span><button class="btn btn--sm btn--soft" type="button" data-toast="Заявка в клуб интеллектуальных игр отправлена (демо)">Вступить</button></div></article>
+        </div>
+      </div>
+    </section>
+
+    <!-- Спорт -->
+    <section class="section section--surface anchor" id="sport">
+      <div class="container">
+        <div class="sec-head">
+          <div><h2 class="h2">Секции бесплатно для студентов</h2><p>Можно заниматься вместо физкультуры — засчитаем в зачёт.</p></div>
+          <button class="btn btn--soft" type="button" data-place="sport"><i data-icon="map-pin"></i> Спорткомплекс на карте</button>
+        </div>
+        <div class="sport-wrap">
+        <div class="sport-pic">
+          <figure class="photo tape"><img src="assets/img/sport.jpg" alt="Студенты играют в баскетбол" loading="lazy"><figcaption>вторник, 19:00 — волейбол</figcaption></figure>
+          <span class="sticker sticker--coral" aria-hidden="true">засчитаем вместо физры</span>
+        </div>
+        <div>
+        <div class="sport-top">
+          <div class="num"><span class="big-num">60</span><span>секций и сборных</span></div>
+          <div class="num"><span class="big-num">3</span><span>спорткомплекса, бассейн и стадион</span></div>
+          <div class="num"><span class="big-num">7–22</span><span>часы работы без выходных</span></div>
+        </div>
+        <div class="sports">
+          <div class="sport-item"><span class="icon-tile c-sport"><i data-icon="activity"></i></span><div><strong>Плавание</strong><div class="xs muted">Бассейн · Пн, Ср, Пт 18:00</div></div><button class="btn btn--sm btn--soft" type="button" data-toast="Ты записан в секцию плавания (демо)">Записаться</button></div>
+          <div class="sport-item"><span class="icon-tile c-sport"><i data-icon="trophy"></i></span><div><strong>Волейбол</strong><div class="xs muted">Спорткомплекс · Вт, Чт 19:00</div></div><button class="btn btn--sm btn--soft" type="button" data-toast="Ты записан в секцию волейбола (демо)">Записаться</button></div>
+          <div class="sport-item"><span class="icon-tile c-sport"><i data-icon="navigation"></i></span><div><strong>Скалолазание</strong><div class="xs muted">Скалодром · Пн, Чт 20:00</div></div><button class="btn btn--sm btn--soft" type="button" data-toast="Ты записан на скалолазание (демо)">Записаться</button></div>
+          <div class="sport-item"><span class="icon-tile c-sport"><i data-icon="target"></i></span><div><strong>Футбол</strong><div class="xs muted">Стадион · Ср, Сб 17:00</div></div><button class="btn btn--sm btn--soft" type="button" data-toast="Ты записан в секцию футбола (демо)">Записаться</button></div>
+          <div class="sport-item"><span class="icon-tile c-sport"><i data-icon="heart"></i></span><div><strong>Фитнес и йога</strong><div class="xs muted">Спорткомплекс · ежедневно</div></div><button class="btn btn--sm btn--soft" type="button" data-toast="Ты записан на фитнес (демо)">Записаться</button></div>
+          <div class="sport-item"><span class="icon-tile c-sport"><i data-icon="grid"></i></span><div><strong>Шахматы</strong><div class="xs muted">Главный корпус · Вт 18:30</div></div><button class="btn btn--sm btn--soft" type="button" data-toast="Ты записан в шахматный клуб (демо)">Записаться</button></div>
+          <div class="sport-item"><span class="icon-tile c-sport"><i data-icon="award"></i></span><div><strong>Баскетбол</strong><div class="xs muted">Спорткомплекс · Пн, Ср 20:00</div></div><button class="btn btn--sm btn--soft" type="button" data-toast="Ты записан в секцию баскетбола (демо)">Записаться</button></div>
+          <div class="sport-item"><span class="icon-tile c-sport"><i data-icon="zap"></i></span><div><strong>Лыжи</strong><div class="xs muted">Стадион · с декабря, Сб 10:00</div></div><button class="btn btn--sm btn--soft" type="button" data-toast="Ты записан в лыжную секцию (демо)">Записаться</button></div>
+        </div>
+        <p class="demo-note" style="margin-top:12px">Расписание секций демонстрационное</p>
+        </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Творчество -->
+    <section class="section anchor" id="art">
+      <div class="container">
+        <div class="sec-head">
+          <div><h2 class="h2">Сцена, студия и репетиционная база</h2><p>Кастинги проходят в сентябре и феврале, но во многие коллективы можно прийти в любой момент.</p></div>
+        </div>
+        <div class="art-grid">
+          <article class="card"><span class="sticker" aria-hidden="true">прослушивание в феврале</span><figure class="photo photo--flat"><img src="assets/img/concert.jpg" alt="Студенческий концерт" loading="lazy"></figure><h3 class="card__title">Академический хор</h3><p class="small muted">Гастроли и конкурсы, нотная грамота с нуля.</p><div class="card__footer"><span class="xs muted">Репетиции Вт, Пт</span><button class="btn btn--sm btn--soft" type="button" data-toast="Записали на прослушивание в хор (демо)">Прослушивание</button></div></article>
+          <article class="card"><figure class="photo photo--flat"><img src="assets/img/lecture.jpg" alt="Студенты в лекционной аудитории" loading="lazy"></figure><h3 class="card__title">Театральная студия</h3><p class="small muted">Два спектакля в год на большой сцене актового зала.</p><div class="card__footer"><span class="xs muted">Репетиции Пн, Чт</span><button class="btn btn--sm btn--soft" type="button" data-toast="Записали на кастинг в театральную студию (демо)">Кастинг</button></div></article>
+          <article class="card"><figure class="photo photo--flat"><img src="assets/img/friends.jpg" alt="Студенты смеются за столом" loading="lazy"></figure><h3 class="card__title">Танцевальные коллективы</h3><p class="small muted">Хип-хоп, контемпорари и народный танец — 6 направлений.</p><div class="card__footer"><span class="xs muted">Ежедневно</span><button class="btn btn--sm btn--soft" type="button" data-toast="Записали на пробное занятие по танцам (демо)">Пробное занятие</button></div></article>
+          <article class="card"><figure class="photo photo--flat"><img src="assets/img/selfie.jpg" alt="Селфи студентов в аудитории" loading="lazy"></figure><h3 class="card__title">Лига юмора</h3><p class="small muted">Команды институтов, внутренний чемпионат и выезды на фестивали.</p><div class="card__footer"><span class="xs muted">Игры раз в месяц</span><button class="btn btn--sm btn--soft" type="button" data-toast="Заявка в Лигу юмора отправлена (демо)">Собрать команду</button></div></article>
+          <article class="card"><figure class="photo photo--flat"><img src="assets/img/city.jpg" alt="Заснеженный Екатеринбург с высоты" loading="lazy"></figure><h3 class="card__title">Фотоклуб</h3><p class="small muted">Выставки в корпусах, фотопрогулки и общая студия со светом.</p><div class="card__footer"><span class="xs muted">Встречи по средам</span><button class="btn btn--sm btn--soft" type="button" data-toast="Заявка в фотоклуб отправлена (демо)">Вступить</button></div></article>
+          <article class="card"><figure class="photo photo--flat"><img src="assets/img/bench.jpg" alt="Студенты отдыхают у корпуса" loading="lazy"></figure><h3 class="card__title">Музыкальная студия</h3><p class="small muted">Репетиционная база с инструментами — бронируй по часам бесплатно.</p><div class="card__footer"><span class="xs muted">10:00–22:00</span><button class="btn btn--sm btn--soft" type="button" data-toast="Репетиционная база забронирована (демо)">Забронировать</button></div></article>
+        </div>
+        <div class="notice" style="margin-top:24px"><i data-icon="calendar"></i><div><strong>Фестиваль «Весна УрФУ» — в апреле.</strong> Заявки от коллективов и сольных исполнителей — с 1 февраля. <a href="news.html#events">Все события</a></div></div>
+      </div>
+    </section>
+
+    <!-- Новый кампус -->
+    <section class="section anchor" id="new">
+      <div class="container">
+        <div class="new-band">
+          <div class="new-grid">
+            <div>
+              <span class="sticker" aria-hidden="true"><i data-icon="sparkles"></i>уже работает</span>
+              <h2 class="h2 h2--long" style="margin-bottom:16px">Кампус в Новокольцовском</h2>
+              <p class="lead">Учебные корпуса, общежития и общественный центр в одном квартале. С 2026 года здесь учатся ИРИТ-РтФ, ИнЭУ и СУНЦ — живёшь в НВК, до пар идёшь пешком.</p>
+              <div class="new-stats">
+                <div><b>100 тыс.</b><span>м² в трёх новых корпусах</span></div>
+                <div><b>8 875</b><span>мест для учёбы</span></div>
+                <div><b>≈ 1 час</b><span>на автобусе до ГУКа</span></div>
+              </div>
+              <p class="demo-note">Цифры приблизительные — уточняй на сайте кампуса</p>
+              <figure class="photo tape"><img src="assets/img/city.jpg" alt="Заснеженный Екатеринбург с высоты" loading="lazy"><figcaption>Екатеринбург сверху — кампус на юго-востоке</figcaption></figure>
+              <a class="btn btn--soft" href="campus.html?place=nk-irit#map" style="margin-top:24px">Открыть на карте <i data-icon="map-pin"></i></a>
+            </div>
+            <div class="card card--pad-lg">
+              <h3 class="h3" style="margin-bottom:20px">Как появлялся кампус</h3>
+              <div class="timeline">
+                <div class="timeline__item is-done"><div class="timeline__date">Сентябрь 2023</div><strong>Первая очередь</strong><p class="small muted">Общежития НВК и Общественный центр: институт физкультуры и подготовительное отделение для иностранных студентов.</p></div>
+                <div class="timeline__item is-done"><div class="timeline__date">Декабрь 2025</div><strong>Вторая очередь готова</strong><p class="small muted">Три учебных корпуса получили разрешения на ввод в эксплуатацию.</p></div>
+                <div class="timeline__item is-done"><div class="timeline__date">Январь 2026</div><strong>Открытие корпусов</strong><p class="small muted">ИРИТ-РтФ — 85 аудиторий и зал на 700 мест, ИнЭУ — библиотека и столовая, СУНЦ — учебная обсерватория.</p></div>
+                <div class="timeline__item is-current"><div class="timeline__date">2026 · сейчас</div><strong>Переезд институтов</strong><p class="small muted">ИРИТ-РтФ, ИнЭУ и СУНЦ учатся в новых корпусах. Старые здания на Мира, 32 и Гоголя, 25 остаются на карте.</p></div>
+              </div>
+              <div class="cluster" style="margin-top:24px">
+                <a class="btn btn--ghost" href="https://campus.urfu.ru" rel="noopener">Сайт кампуса <i data-icon="external"></i></a>
+                <a class="btn btn--ghost" href="#dorms">Общежития</a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <div id="site-footer"></div>
+
+  <script src="assets/js/app.js"></script>
+  <script>
+    (function () {
+      'use strict';
+      const plural = (n, f) => f[(n % 10 === 1 && n % 100 !== 11) ? 0 : (n % 10 >= 2 && n % 10 <= 4 && (n % 100 < 10 || n % 100 >= 20)) ? 1 : 2];
+      const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+
+      /* ---------- Часы работы ---------- */
+      const DKEY = ['sun', 'wd', 'wd', 'wd', 'wd', 'wd', 'sat'];
+      const DNAME = ['в воскресенье', 'в понедельник', 'во вторник', 'в среду', 'в четверг', 'в пятницу', 'в субботу'];
+      const toMin = (s) => { const [h, m] = s.split(':'); return +h * 60 + +m; };
+      function hoursText(h) {
+        if (h === '24/7') return 'Круглосуточно, без выходных';
+        if (h.wd && h.sat && h.sun && h.wd.join() === h.sat.join() && h.sat.join() === h.sun.join()) return `Ежедневно ${h.wd[0]}–${h.wd[1]}`;
+        const p = [];
+        if (h.wd) p.push(`Пн–Пт ${h.wd[0]}–${h.wd[1]}`);
+        p.push(h.sat ? `Сб ${h.sat[0]}–${h.sat[1]}` : 'Сб выходной');
+        p.push(h.sun ? `Вс ${h.sun[0]}–${h.sun[1]}` : 'Вс выходной');
+        return p.join(', ');
+      }
+      function status(h) {
+        if (h === '24/7') return { open: true, t: 'Открыто круглосуточно' };
+        const now = new Date(); const d = now.getDay(); const mins = now.getHours() * 60 + now.getMinutes();
+        const r = h[DKEY[d]];
+        if (r && mins >= toMin(r[0]) && mins < toMin(r[1])) return { open: true, t: `Открыто до ${r[1]}` };
+        if (r && mins < toMin(r[0])) return { open: false, t: `Закрыто · откроется в ${r[0]}` };
+        for (let i = 1; i <= 7; i++) {
+          const nd = (d + i) % 7; const rr = h[DKEY[nd]];
+          if (rr) return { open: false, t: `Закрыто · откроется ${i === 1 ? 'завтра' : DNAME[nd]} в ${rr[0]}` };
+        }
+        return { open: false, t: 'Закрыто' };
+      }
+      const statusHTML = (h) => { const s = status(h); return `<span class="dot" aria-hidden="true"></span>${s.t}`; };
+      const setStatus = (el, h) => { const s = status(h); el.classList.toggle('is-open', s.open); el.innerHTML = statusHTML(h); };
+
+      /* ---------- Объекты кампуса (демо) ---------- */
+      const CATS = {
+        study: { t: 'Учебный корпус', i: 'graduation', more: 'institutes.html', moreT: 'Об институтах' },
+        dorm: { t: 'Общежитие', i: 'bed', more: '#dorms', moreT: 'Об общежитиях' },
+        food: { t: 'Еда', i: 'utensils', more: '#food', moreT: 'Меню и цены' },
+        sport: { t: 'Спорт', i: 'activity', more: '#sport', moreT: 'Секции' },
+        med: { t: 'Медицина', i: 'heart', more: '#health', moreT: 'Как записаться' }
+      };
+      const STUDY = { wd: ['8:00', '21:00'], sat: ['8:00', '17:00'] };
+      const P = [
+        { id: 'main', c: 'study', n: 'Главный корпус', s: 'Главный корпус', sa: 'Мира, 19', a: 'ул. Мира, 19', x: 625, y: 370, w: 215, h: 75, hr: STUDY, in: ['Ректорат', 'Приёмная комиссия', 'Актовый зал', 'Музей УрФУ', 'Буфет'] },
+        { id: 'fti', c: 'study', n: 'Физико-технологический институт (ФТИ)', s: 'ФТИ', sa: 'Мира, 21', a: 'ул. Мира, 21', x: 625, y: 285, w: 120, h: 70, hr: STUDY, in: ['Ядерные лаборатории', 'Компьютерные классы', 'Коворкинг'] },
+        { id: 'lib', c: 'study', n: 'Научная библиотека', s: 'Библиотека', sa: 'Мира, 19Б', a: 'ул. Мира, 19, корпус Б', x: 755, y: 285, w: 85, h: 70, hr: { wd: ['9:00', '20:00'], sat: ['10:00', '18:00'] }, in: ['Читальные залы', 'Тихие переговорные', 'Электронные ресурсы', 'Печать и сканирование'], more: 'student.html#services', moreT: 'Сервисы библиотеки' },
+        { id: 'irit', c: 'study', n: 'Корпус Р — здание радиофака (ИРИТ-РтФ с 2026 — в новом кампусе)', s: 'Корпус Р', sa: 'Мира, 32', a: 'ул. Мира, 32', x: 440, y: 30, w: 140, h: 95, hr: STUDY, in: ['Аудитории с кодом «Р»'], more: 'institute.html', moreT: 'Страница института' },
+        { id: 'hti', c: 'study', n: 'Химико-технологический институт (ХТИ)', s: 'ХТИ', sa: 'Мира, 28', a: 'ул. Мира, 28', x: 440, y: 178, w: 140, h: 80, hr: STUDY, in: ['Химические лаборатории', 'Учебный музей минералов'] },
+        { id: 'uralenin', c: 'study', n: 'Уральский энергетический институт (УралЭНИН)', s: 'УралЭНИН', sa: 'С. Ковалевской, 5', a: 'ул. Софьи Ковалевской, 5', x: 625, y: 85, w: 140, h: 70, hr: STUDY, in: ['Лаборатория водородной энергетики', 'Учебная подстанция'] },
+        { id: 'ineu', c: 'study', n: 'Учебный корпус на Гоголя (ИнЭУ с 2026 — в новом кампусе)', s: 'Гоголя, 25', sa: 'Гоголя, 25', a: 'ул. Гоголя, 25', x: 255, y: 290, w: 140, h: 75, hr: STUDY, in: ['Аудитории УГИ'] },
+        { id: 'ugi', c: 'study', n: 'Уральский гуманитарный институт (УГИ)', s: 'УГИ', sa: 'Ленина, 51', a: 'пр. Ленина, 51', x: 255, y: 500, w: 150, h: 85, hr: STUDY, in: ['Медиацентр', 'Лингафонные кабинеты', 'Архив Урала'] },
+        { id: 'dorm1', c: 'dorm', n: 'Общежитие №1', s: 'Общежитие №1', sa: 'Комсомольская, 70', a: 'ул. Комсомольская, 70', x: 885, y: 85, w: 105, h: 70, hr: '24/7', in: ['Комнаты на 2–3 человек', 'Прачечная', 'Медпункт', 'Кухни на этажах'] },
+        { id: 'dorm2', c: 'dorm', n: 'Общежитие №2', s: 'Общежитие №2', sa: 'Комсомольская, 66', a: 'ул. Комсомольская, 66', x: 885, y: 170, w: 105, h: 64, hr: '24/7', in: ['Блоки на 2 комнаты', 'Спортзал', 'Учебная комната'] },
+        { id: 'dorm3', c: 'dorm', n: 'Общежитие №3', s: 'Общежитие №3', sa: 'Коминтерна, 3', a: 'ул. Коминтерна, 3', x: 885, y: 285, w: 105, h: 75, hr: '24/7', in: ['Коворкинг', 'Кухни в блоках', 'Прачечная'] },
+        { id: 'dorm4', c: 'dorm', n: 'Общежитие №4 (для иностранных студентов)', s: 'Общежитие №4', sa: 'Ленина, 66', a: 'пр. Ленина, 66', x: 640, y: 500, w: 120, h: 85, hr: '24/7', in: ['Санузел в комнате', 'Медпункт', 'Международный офис', 'Охрана 24/7'] },
+        { id: 'canteen', c: 'food', n: 'Столовая на Ленина', s: 'Столовая', sa: 'Ленина, 53', a: 'пр. Ленина, 53', x: 430, y: 505, w: 120, h: 55, hr: { wd: ['8:00', '18:00'], sat: ['9:00', '15:00'] }, in: ['Комплексные обеды', 'Вегетарианское меню', 'Оплата картой'] },
+        { id: 'cafe1', c: 'food', n: 'Кафе «Технопарк»', s: 'Кафе «Технопарк»', sa: 'Мира, 30', a: 'ул. Мира, 30', x: 440, y: 390, w: 140, h: 52, hr: { wd: ['8:00', '20:00'], sat: ['10:00', '18:00'] }, in: ['Кофе и выпечка', 'Розетки у столов', 'Wi‑Fi'] },
+        { id: 'cafe2', c: 'food', n: 'Кафе «Кампус»', s: 'Кафе «Кампус»', sa: 'Комсомольская, 68', a: 'ул. Комсомольская, 68', x: 878, y: 378, w: 112, h: 62, hr: { wd: ['9:00', '22:00'], sat: ['10:00', '22:00'], sun: ['10:00', '22:00'] }, in: ['Завтраки до 12:00', 'Ужины', 'Еда навынос'] },
+        { id: 'sport', c: 'sport', n: 'Спорткомплекс', s: 'Спорткомплекс', sa: 'Коминтерна, 14', a: 'ул. Коминтерна, 14', x: 625, y: 170, w: 210, h: 64, hr: { wd: ['7:00', '22:00'], sat: ['7:00', '22:00'], sun: ['7:00', '22:00'] }, in: ['Игровые залы', 'Тренажёрный зал', 'Скалодром', 'Раздевалки с душем'] },
+        { id: 'pool', c: 'sport', n: 'Бассейн', s: 'Бассейн', sa: 'Ленина, 68', a: 'пр. Ленина, 68', x: 775, y: 500, w: 72, h: 85, hr: { wd: ['7:00', '22:00'], sat: ['8:00', '20:00'], sun: ['8:00', '20:00'] }, in: ['25-метровый бассейн', 'Сауна', 'Секция плавания'] },
+        { id: 'stadium', c: 'sport', n: 'Стадион', s: 'Стадион', sa: 'Комсомольская, 63', a: 'ул. Комсомольская, 63', x: 885, y: 495, w: 105, h: 105, hr: { wd: ['7:00', '22:00'], sat: ['7:00', '22:00'], sun: ['7:00', '22:00'] }, in: ['Футбольное поле', 'Беговая дорожка', 'Лыжная база зимой'] },
+        // Новый кампус в Новокольцовском. Контуры и адреса — OpenStreetMap; ИРИТ-РтФ = дом 5 (2ГИС).
+        // СУНЦ (дом 1, тип «школа») и ИнЭУ (дом 7) — по типу здания в OSM, официально номера не подтверждены.
+        { id: 'nk-irit', area: 'new', c: 'study', n: 'Институт радиоэлектроники и IT (ИРИТ-РтФ)', s: 'ИРИТ-РтФ', sa: '100-летия УрФУ, 5', a: 'ул. 100-летия Уральского университета, 5', x: 340, y: 102, w: 147, h: 187, pts: '393.5,107.5 389.9,107.5 383.6,101.7 375.3,111.1 373.3,143.1 371.5,146.1 367.3,143.1 357.7,154.3 357.9,185.0 353.2,191.1 349.0,188.3 341.0,196.8 339.8,230.7 350.7,246.3 368.1,233.9 390.8,233.6 384.9,241.3 384.3,273.6 393.8,273.5 411.1,287.4 419.8,278.4 435.3,278.0 442.9,288.4 450.9,281.6 453.8,281.8 463.2,287.8 470.9,277.5 472.2,243.5 464.7,234.2 465.0,206.6 468.8,202.5 471.2,202.3 478.7,209.8 487.0,198.7 486.1,165.6 476.4,153.2 470.6,157.4 467.6,157.4 460.4,152.6 449.2,166.0 448.9,194.8 444.7,195.7 436.0,189.2 425.2,202.0 424.3,228.4 378.3,228.1 377.7,199.2 379.7,195.4 385.2,199.3 393.0,190.2 392.6,155.4 394.7,151.6 400.8,156.0 407.9,145.7 410.2,112.3 402.0,101.6 393.5,107.5', hr: STUDY, in: ['85 аудиторий и компьютерных классов', 'Конференц-зал на 700 мест', '23 коворкинга', 'УНЦ «Микроэлектроника»'], more: 'institute.html', moreT: 'Об институте' },
+        { id: 'nk-ineu', area: 'new', c: 'study', n: 'Институт экономики и управления (ИнЭУ)', s: 'ИнЭУ', sa: 'Новый кампус', a: 'ул. 100-летия Уральского университета', x: 583, y: 71, w: 132, h: 142, pts: '668.8,87.1 661.8,81.9 655.9,89.5 655.0,122.5 661.2,131.3 667.8,126.0 672.1,125.8 680.4,132.2 679.6,157.8 656.8,158.7 653.6,163.1 606.6,161.7 598.6,150.7 597.9,135.0 607.1,123.5 620.6,123.5 632.9,111.1 633.3,81.7 624.2,70.8 616.8,76.1 612.8,76.4 605.1,70.7 596.1,80.2 596.1,110.8 584.7,124.4 583.3,155.6 594.0,172.0 594.1,200.7 601.8,211.6 609.6,205.6 613.7,205.6 621.0,211.9 629.3,201.1 648.8,200.7 657.1,212.2 664.9,206.6 669.4,206.8 676.0,212.8 687.0,201.9 687.6,172.0 694.5,167.5 698.3,167.5 706.7,172.9 714.4,162.5 715.0,133.1 707.3,122.3 699.5,128.1 695.7,128.1 688.4,121.7 688.1,93.2 679.3,82.0 672.9,87.3 668.8,87.1', hr: STUDY, in: ['Занятия здесь — с середины октября 2026', 'Столовая', 'Библиотека на 36 000 изданий', 'Конференц-зал на 500 мест'] },
+        { id: 'nk-sunc', area: 'new', c: 'study', n: 'Специализированный учебно-научный центр (СУНЦ)', s: 'СУНЦ', sa: 'Новый кампус', a: 'ул. 100-летия Уральского университета', x: 140, y: 53, w: 132, h: 114, pts: '159.9,101.8 164.2,105.0 161.7,113.5 145.5,110.0 144.8,115.8 144.8,125.5 146.8,135.3 151.4,145.3 140.2,153.3 148.3,166.3 197.0,137.6 203.6,137.2 208.1,137.6 213.8,139.8 218.5,142.7 257.7,166.6 266.4,153.9 229.8,126.1 228.1,123.7 228.0,120.1 229.0,117.5 233.7,114.5 271.8,87.9 262.4,75.2 217.6,100.0 218.9,52.9 193.1,53.1 191.4,99.1 170.7,87.0 159.9,101.8', hr: STUDY, in: ['Учебная обсерватория', 'Зал на 675 мест в два яруса', 'Библиотека с читальным залом'] },
+        { id: 'nk-center', area: 'new', c: 'study', n: 'Общественный центр кампуса', s: 'Общественный', sa: 'центр', a: 'ул. Универсиады, 7', x: 186, y: 422, w: 145, h: 142, pts: '263.3,428.0 317.0,453.4 331.3,483.6 294.7,500.6 292.1,506.0 285.8,503.0 273.0,529.6 227.0,507.7 222.0,518.1 261.2,536.1 274.6,543.7 264.3,564.3 186.4,526.6 198.1,502.2 193.3,496.0 228.7,422.1 259.2,436.5 263.3,428.0', hr: STUDY, in: ['Столовая на 600 мест', 'Библиотека и компьютерные классы', 'Спортивный манеж', 'Институт физкультуры, спорта и молодёжной политики', 'Вход — по студенческому'] },
+        { id: 'nk-med', area: 'new', c: 'med', n: 'Медицинский центр УрФУ', s: 'Медцентр', sa: '№10', a: 'ул. 100-летия Уральского университета, 10', x: 718, y: 263, w: 69, h: 83, pts: '733.0,263.2 752.2,289.3 751.4,289.9 760.6,302.5 761.3,302.0 787.4,337.7 775.3,346.5 748.8,310.4 749.9,309.6 741.4,298.0 738.1,300.4 718.5,273.7 733.0,263.2', hr: { wd: ['8:00', '19:00'], sat: ['9:00', '14:00'] }, in: ['Медпомощь для жителей кампуса'] },
+        { id: 'nk-pool', area: 'new', c: 'sport', n: 'Дворец водных видов спорта', s: 'Дворец водных', sa: 'видов спорта', a: 'ул. Универсиады, 11', x: 701, y: 368, w: 190, h: 195, pts: '700.6,505.8 746.9,463.6 804.6,384.4 808.7,387.6 823.2,367.6 851.2,387.5 840.6,402.1 890.2,437.8 831.6,518.6 788.0,509.6 727.4,562.6 709.5,542.3 723.1,529.6 700.6,505.8', hr: { wd: ['7:00', '22:00'], sat: ['8:00', '20:00'], sun: ['8:00', '20:00'] }, in: ['Бассейны', 'Рядом — стадион кампуса'] },
+        { id: 'nk-dorm1', area: 'new', c: 'dorm', n: 'Общежитие НВК №1', s: 'НВК №1', sa: '6', a: 'ул. 100-летия Уральского университета, 6', x: 377, y: 352, w: 86, h: 94, pts: '429.2,370.6 393.4,379.7 409.7,443.2 399.5,445.8 398.7,442.8 391.2,444.7 376.7,388.3 382.2,386.9 379.6,376.8 396.7,372.5 393.5,360.1 425.7,351.9 429.1,364.9 441.6,361.7 444.4,372.6 449.0,371.4 463.2,426.6 455.4,428.6 456.5,432.9 445.9,435.6 429.2,370.6', hr: '24/7', in: ['13 этажей', 'Блоки A, B и C — вход через блок B', 'Прачечная и лифты в каждом блоке', 'Чат кампуса @urfu_campus'] },
+        { id: 'nk-dorm2', area: 'new', c: 'dorm', n: 'Общежитие НВК №2', s: 'НВК №2', sa: '6/2', a: 'ул. 100-летия Уральского университета, 6/2', x: 475, y: 358, w: 86, h: 94, pts: '527.5,377.1 491.6,386.2 508.0,449.7 497.8,452.3 497.0,449.4 489.5,451.3 475.0,394.8 480.4,393.4 477.9,383.4 495.0,379.0 491.8,366.6 524.0,358.5 527.3,371.4 539.9,368.2 542.7,379.1 547.3,378.0 561.4,433.1 553.6,435.1 554.8,439.4 544.2,442.1 527.5,377.1', hr: '24/7', in: ['13 этажей', 'Блоки A, B и C — вход через блок B', 'Прачечная и лифты в каждом блоке', 'Чат кампуса @urfu_campus'] },
+        { id: 'nk-dorm3', area: 'new', c: 'dorm', n: 'НВК №3 — гостиница кампуса', s: 'НВК №3', sa: '6/3', a: 'ул. 100-летия Уральского университета, 6/3', x: 317, y: 518, w: 85, h: 93, pts: '349.3,592.2 385.4,584.4 371.3,520.3 381.6,518.1 382.2,521.0 389.8,519.4 402.4,576.3 396.9,577.5 399.1,587.6 381.8,591.4 384.6,603.9 352.1,611.0 349.2,597.9 336.6,600.6 334.2,589.7 329.6,590.7 317.3,535.0 325.1,533.3 324.2,529.0 334.8,526.7 349.3,592.2', hr: '24/7', in: ['13 этажей', 'Гостиница для гостей университета'] },
+        { id: 'nk-dorm4', area: 'new', c: 'dorm', n: 'Общежитие НВК №4', s: 'НВК №4', sa: '6/4', a: 'ул. 100-летия Уральского университета, 6/4', x: 425, y: 551, w: 85, h: 93, pts: '456.6,624.7 492.7,616.9 478.6,552.8 488.9,550.6 489.5,553.6 497.1,551.9 509.7,608.8 504.2,610.0 506.4,620.2 489.2,623.9 491.9,636.4 459.4,643.5 456.5,630.4 443.9,633.2 441.5,622.2 436.9,623.2 424.6,567.6 432.4,565.9 431.5,561.5 442.2,559.2 456.6,624.7', hr: '24/7', in: ['14 этажей', 'Блоки A, B и C — вход через блок B', 'Прачечная и лифты в каждом блоке', 'Чат кампуса @urfu_campus'] },
+        { id: 'nk-dorm5', area: 'new', c: 'dorm', n: 'Общежитие НВК №5', s: 'НВК №5', sa: '6/5', a: 'ул. 100-летия Уральского университета, 6/5', x: 517, y: 526, w: 85, h: 93, pts: '549.1,600.0 585.2,592.2 571.0,528.1 581.3,525.9 582.0,528.8 589.5,527.2 602.1,584.1 596.6,585.3 598.9,595.4 581.6,599.2 584.4,611.7 551.9,618.8 549.0,605.7 536.3,608.4 533.9,597.5 529.3,598.5 517.0,542.9 524.9,541.1 523.9,536.8 534.6,534.5 549.1,600.0', hr: '24/7', in: ['14 этажей', 'Блоки A, B и C — вход через блок B', 'Прачечная и лифты в каждом блоке', 'Чат кампуса @urfu_campus'] },
+        { id: 'med', c: 'med', n: 'Студенческая поликлиника', s: 'Поликлиника', sa: 'Мира, 30а', a: 'ул. Мира, 30а', x: 440, y: 300, w: 140, h: 62, hr: { wd: ['8:00', '19:00'], sat: ['9:00', '14:00'] }, in: ['Терапевт', 'Стоматолог', 'Справки', 'Вакцинация'] }
+      ];
+      const byId = Object.fromEntries(P.map((p) => [p.id, p]));
+
+      /* ---------- Рендер карты и списка ---------- */
+      const svg = document.getElementById('map-svg');
+      const poisG = document.getElementById('pois');
+      const pin = document.getElementById('pin');
+      const listEl = document.getElementById('poi-list');
+      poisG.innerHTML = P.map((p) => {
+        const cx = p.x + p.w / 2, cy = p.y + p.h / 2;
+        return `<g class="poi poi--${p.c}" data-id="${p.id}" data-area="${p.area || 'center'}" tabindex="0" role="button" aria-label="${esc(p.n)}, ${esc(p.a)}">
+          ${p.pts ? `<polygon class="poi__b" points="${p.pts}"/>` : `<rect class="poi__b" x="${p.x}" y="${p.y}" width="${p.w}" height="${p.h}" rx="12"/>`}
+          <text class="poi__t" x="${cx}" y="${cy - 3}" text-anchor="middle">${esc(p.s)}</text>
+          <text class="poi__s" x="${cx}" y="${cy + 13}" text-anchor="middle">${esc(p.sa)}</text>
+        </g>`;
+      }).join('');
+      listEl.innerHTML = P.map((p) => `<li data-id="${p.id}"><button class="poi-item" type="button" data-id="${p.id}">
+          <span class="icon-tile c-${p.c}">${UI.icon(CATS[p.c].i)}</span>
+          <span style="min-width:0"><strong>${esc(p.n)}</strong><small>${esc(p.a)}</small><span class="status" data-status-id="${p.id}"></span></span>
+        </button></li>`).join('');
+      const refreshStatuses = () => {
+        listEl.querySelectorAll('[data-status-id]').forEach((el) => setStatus(el, byId[el.dataset.statusId].hr));
+        document.querySelectorAll('[data-hours]').forEach((card) => setStatus(card.querySelector('[data-status]'), JSON.parse(card.dataset.hours)));
+      };
+      refreshStatuses();
+      setInterval(refreshStatuses, 60000);
+
+      /* ---------- Вид карты: центр, масштаб, перетаскивание ---------- */
+      const MAP = { w: 1060, h: 680 }; // справа запас под кнопки масштаба
+      const Z = { min: 1, max: 4 };
+      const view = { cx: MAP.w / 2, cy: MAP.h / 2, z: 1 };
+      const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      const size = () => { const r = svg.getBoundingClientRect(); return { w: r.width || 1, h: r.height || 1 }; };
+      // Базовый масштаб: на широком окне карта видна целиком («meet»), на узком — заполняет окно («cover»),
+      // но не уже ~520 условных единиц по ширине, чтобы на высоком экране не было слишком крупно
+      const k0 = () => {
+        const s = size();
+        return s.w / s.h >= 1.2 ? Math.max(MAP.w / s.w, MAP.h / s.h) : Math.max(Math.min(MAP.w / s.w, MAP.h / s.h), 520 / s.w);
+      };
+      function clamp(v) {
+        const s = size(); const k = k0() / v.z; const vw = s.w * k, vh = s.h * k;
+        v.cx = vw >= MAP.w ? MAP.w / 2 : Math.min(Math.max(v.cx, vw / 2), MAP.w - vw / 2);
+        v.cy = vh >= MAP.h ? MAP.h / 2 : Math.min(Math.max(v.cy, vh / 2), MAP.h - vh / 2);
+        return { vw, vh };
+      }
+      function apply() {
+        const { vw, vh } = clamp(view);
+        svg.setAttribute('viewBox', `${(view.cx - vw / 2).toFixed(1)} ${(view.cy - vh / 2).toFixed(1)} ${vw.toFixed(1)} ${vh.toFixed(1)}`);
+        document.getElementById('zoom-in').disabled = view.z >= Z.max - 0.01;
+        document.getElementById('zoom-out').disabled = view.z <= Z.min + 0.01;
+        svg.style.touchAction = view.z > 1.01 ? 'none' : 'pan-y';
+      }
+      let anim = null;
+      function animateTo(t) {
+        const target = { cx: t.cx ?? view.cx, cy: t.cy ?? view.cy, z: Math.min(Z.max, Math.max(Z.min, t.z ?? view.z)) };
+        clamp(target);
+        cancelAnimationFrame(anim);
+        if (reduce) { Object.assign(view, target); apply(); return; }
+        const from = { ...view }; const t0 = performance.now(); const dur = 320;
+        const step = (now) => {
+          const p = Math.min(1, (now - t0) / dur); const e = 1 - Math.pow(1 - p, 3);
+          view.cx = from.cx + (target.cx - from.cx) * e; view.cy = from.cy + (target.cy - from.cy) * e; view.z = from.z + (target.z - from.z) * e;
+          apply(); if (p < 1) anim = requestAnimationFrame(step);
+        };
+        anim = requestAnimationFrame(step);
+      }
+      document.getElementById('zoom-in').addEventListener('click', () => animateTo({ z: view.z * 1.5 }));
+      document.getElementById('zoom-out').addEventListener('click', () => animateTo({ z: view.z / 1.5 }));
+      document.getElementById('zoom-reset').addEventListener('click', () => animateTo({ cx: MAP.w / 2, cy: MAP.h / 2, z: 1 }));
+
+      const hint = document.querySelector('.map-hint');
+      let drag = null; let suppressClick = false;
+      svg.addEventListener('pointerdown', (e) => {
+        if (e.button !== 0) return;
+        cancelAnimationFrame(anim);
+        hint.hidden = true;
+        drag = { x: e.clientX, y: e.clientY, cx: view.cx, cy: view.cy, moved: false, id: e.pointerId };
+      });
+      svg.addEventListener('pointermove', (e) => {
+        if (!drag) return;
+        const dx = e.clientX - drag.x, dy = e.clientY - drag.y;
+        if (!drag.moved && Math.hypot(dx, dy) < 6) return;
+        if (!drag.moved) { drag.moved = true; try { svg.setPointerCapture(drag.id); } catch (err) { /* ignore */ } svg.classList.add('is-dragging'); }
+        const k = k0() / view.z;
+        view.cx = drag.cx - dx * k; view.cy = drag.cy - dy * k; apply();
+      });
+      const endDrag = () => {
+        if (drag && drag.moved) { suppressClick = true; setTimeout(() => { suppressClick = false; }, 0); }
+        drag = null; svg.classList.remove('is-dragging');
+      };
+      svg.addEventListener('pointerup', endDrag);
+      svg.addEventListener('pointercancel', () => { drag = null; svg.classList.remove('is-dragging'); });
+      if ('ResizeObserver' in window) new ResizeObserver(apply).observe(svg); else window.addEventListener('resize', apply);
+
+      /* ---------- Районы: Втузгородок и центр / новый кампус ---------- */
+      let area = 'center';
+      const areaBtns = document.querySelectorAll('.map-areas [data-area]');
+      function setArea(a) {
+        if (a === area) return;
+        area = a;
+        document.getElementById('area-center').toggleAttribute('hidden', a !== 'center');
+        document.getElementById('area-new').toggleAttribute('hidden', a !== 'new');
+        poisG.querySelectorAll('.poi').forEach((g) => { g.style.display = g.dataset.area === a ? '' : 'none'; });
+        areaBtns.forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.area === a)));
+        if (activeId && (byId[activeId].area || 'center') !== a) { pin.setAttribute('hidden', ''); closeCard(); }
+        cancelAnimationFrame(anim); Object.assign(view, { cx: MAP.w / 2, cy: MAP.h / 2, z: size().w < 640 ? 1.3 : 1 }); apply();
+      }
+      areaBtns.forEach((b) => b.addEventListener('click', () => setArea(b.dataset.area)));
+      poisG.querySelectorAll('.poi[data-area="new"]').forEach((g) => { g.style.display = 'none'; });
+
+      /* ---------- Выбор объекта и карточка ---------- */
+      const card = document.getElementById('map-card');
+      const wrap = document.getElementById('map-wrap');
+      let activeId = null; let returnFocus = null;
+      function select(id, opts = {}) {
+        const p = byId[id]; if (!p) return;
+        setArea(p.area || 'center');
+        activeId = id;
+        returnFocus = opts.trigger || document.activeElement;
+        poisG.querySelectorAll('.poi').forEach((g) => g.classList.toggle('is-active', g.dataset.id === id));
+        listEl.querySelectorAll('.poi-item').forEach((b) => { if (b.dataset.id === id) b.setAttribute('aria-current', 'true'); else b.removeAttribute('aria-current'); });
+        const item = listEl.querySelector(`.poi-item[data-id="${id}"]`);
+        if (item) listEl.scrollTo({ top: item.parentElement.offsetTop - 8, behavior: reduce ? 'auto' : 'smooth' });
+        // метка над выбранным объектом
+        pin.removeAttribute('hidden');
+        hint.hidden = true;
+        pin.setAttribute('transform', `translate(${p.x + p.w / 2 - 18} ${p.y - 30}) scale(1.5)`);
+        const inner = pin.querySelector('.pin__inner'); inner.classList.remove('pin__bounce'); inner.getBoundingClientRect(); inner.classList.add('pin__bounce');
+        // карточка
+        const cat = CATS[p.c];
+        document.getElementById('mc-icon').className = 'icon-tile c-' + p.c;
+        document.getElementById('mc-icon').innerHTML = UI.icon(cat.i);
+        const tag = document.getElementById('mc-cat'); tag.className = 'tag c-' + p.c; tag.textContent = cat.t;
+        document.getElementById('mc-title').textContent = p.n;
+        document.getElementById('mc-addr').textContent = p.a;
+        document.getElementById('mc-hours').textContent = hoursText(p.hr);
+        setStatus(document.getElementById('mc-status'), p.hr);
+        document.getElementById('mc-inside').innerHTML = p.in.map((x) => `<span class="tag">${esc(x)}</span>`).join('');
+        const more = document.getElementById('mc-more');
+        more.href = p.more || cat.more; more.textContent = p.moreT || cat.moreT;
+        card.hidden = false;
+        // центрируем объект с учётом карточки снизу
+        const s = size(); const k = k0() / view.z;
+        const overlay = getComputedStyle(card).position === 'absolute';
+        const offset = overlay ? Math.min(card.offsetHeight / 2, s.h * 0.3) * k : 0;
+        animateTo({ cx: p.x + p.w / 2, cy: p.y + p.h / 2 + offset });
+        if (opts.focusCard) document.getElementById('mc-title').focus({ preventScroll: true });
+        if (opts.updateUrl !== false) {
+          try { const u = new URL(location.href); u.searchParams.set('place', id); history.replaceState(null, '', u.pathname.split('/').pop() + u.search + u.hash); } catch (e) { /* file:// */ }
+        }
+      }
+      function closeCard() {
+        if (card.hidden) return;
+        card.hidden = true; pin.setAttribute('hidden', ''); activeId = null;
+        poisG.querySelectorAll('.poi.is-active').forEach((g) => g.classList.remove('is-active'));
+        listEl.querySelectorAll('[aria-current]').forEach((b) => b.removeAttribute('aria-current'));
+        try { const u = new URL(location.href); u.searchParams.delete('place'); history.replaceState(null, '', u.pathname.split('/').pop() + u.search + u.hash); } catch (e) { /* file:// */ }
+        if (returnFocus && document.contains(returnFocus)) returnFocus.focus({ preventScroll: true });
+      }
+      document.getElementById('mc-close').addEventListener('click', closeCard);
+      document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeCard(); });
+
+      svg.addEventListener('click', (e) => {
+        if (suppressClick) return;
+        const g = e.target.closest('.poi'); if (g) select(g.dataset.id, { trigger: g });
+      });
+      poisG.addEventListener('keydown', (e) => {
+        const g = e.target.closest('.poi');
+        if (g && (e.key === 'Enter' || e.key === ' ')) { e.preventDefault(); select(g.dataset.id, { trigger: g, focusCard: true }); }
+      });
+      listEl.addEventListener('click', (e) => {
+        const b = e.target.closest('.poi-item'); if (!b) return;
+        select(b.dataset.id, { trigger: b });
+        const r = wrap.getBoundingClientRect();
+        if (r.top < 0 || r.bottom > window.innerHeight) document.getElementById('map').scrollIntoView({ behavior: reduce ? 'auto' : 'smooth', block: 'start' });
+      });
+
+      document.getElementById('mc-route').addEventListener('click', () => {
+        const p = byId[activeId]; if (!p) return;
+        const min = Math.max(3, Math.round(Math.hypot(p.x - 730, p.y - 400) / 45));
+        UI.toast(`Маршрут до «${p.s}»: ${min} ${plural(min, ['минута', 'минуты', 'минут'])} пешком от Главного корпуса (демо)`);
+      });
+      document.getElementById('mc-share').addEventListener('click', async () => {
+        const link = 'campus.html?place=' + activeId;
+        try { await navigator.clipboard.writeText(new URL(link, location.href).href); UI.toast('Ссылка на объект скопирована'); }
+        catch (e) { UI.toast('Ссылка: ' + link); }
+      });
+      // Кнопки «На карте» в разделах страницы
+      document.querySelectorAll('[data-place]').forEach((b) => b.addEventListener('click', () => {
+        document.getElementById('map').scrollIntoView({ behavior: reduce ? 'auto' : 'smooth', block: 'start' });
+        setTimeout(() => select(b.dataset.place, { trigger: b }), reduce ? 0 : 450);
+      }));
+
+      /* ---------- Фильтры и поиск ---------- */
+      const q = document.getElementById('poi-q');
+      const filter = document.getElementById('poi-filter');
+      const countEl = document.getElementById('poi-count');
+      // счётчики на чипсах
+      filter.querySelectorAll('.chip').forEach((c) => {
+        const n = c.dataset.cat === 'all' ? P.length : P.filter((p) => p.c === c.dataset.cat).length;
+        c.insertAdjacentHTML('beforeend', ` <span class="count">${n}</span>`);
+      });
+      function applyFilter() {
+        const v = q.value.trim().toLowerCase();
+        const room = UI.findRoom(v); // «р404», «ГУК-300» — ищем корпус аудитории
+        const cat = filter.querySelector('[aria-pressed="true"]').dataset.cat;
+        let n = 0;
+        P.forEach((p) => {
+          const hit = room && room.map ? p.id === room.map : [p.n, p.s, p.a, CATS[p.c].t, ...p.in].join(' ').toLowerCase().includes(v);
+          const ok = (cat === 'all' || p.c === cat) && (!v || hit);
+          listEl.querySelector(`li[data-id="${p.id}"]`).hidden = !ok;
+          poisG.querySelector(`.poi[data-id="${p.id}"]`).classList.toggle('is-dim', !ok);
+          if (ok) n++;
+        });
+        countEl.textContent = `Показано ${n} ${plural(n, ['объект', 'объекта', 'объектов'])} из ${P.length}`;
+        document.getElementById('poi-empty').hidden = n > 0;
+      }
+      q.addEventListener('input', applyFilter);
+      q.addEventListener('keydown', (e) => {
+        if (e.key !== 'Enter') return;
+        e.preventDefault();
+        const first = listEl.querySelector('li:not([hidden]) .poi-item');
+        if (first) select(first.dataset.id, { trigger: q });
+        const room = UI.findRoom(q.value);
+        if (room && room.n) UI.toast(roomText(room));
+      });
+      filter.addEventListener('chipchange', applyFilter);
+      applyFilter();
+
+      /* ---------- Фильтр сообществ ---------- */
+      const clubFilter = document.getElementById('club-filter');
+      clubFilter.addEventListener('chipchange', () => {
+        const c = clubFilter.querySelector('[aria-pressed="true"]').dataset.cat;
+        document.querySelectorAll('#clubs > [data-cat]').forEach((el) => { el.hidden = c !== 'all' && el.dataset.cat !== c; });
+      });
+
+      /* ---------- Старт: ?place=id открывает объект, ?room=E-203 — корпус аудитории (ссылки из расписания) ---------- */
+      const roomText = (r) => r.letter ? `Аудитория ${r.code}: ${r.n}, ${r.a}${r.floor ? `, ${r.floor} этаж` : ''}` : `${r.n}, ${r.a}`;
+      document.addEventListener('appready', () => {
+        if (size().w < 640) view.z = 1.3; // на телефоне сразу чуть крупнее, чтобы читались подписи
+        apply();
+        const params = new URLSearchParams(location.search);
+        const room = params.get('room');
+        const r = room ? (room === 'Спорткомплекс' ? { map: 'sport' } : UI.findRoom(room)) : null;
+        const place = params.get('place') || (r && r.map);
+        if (place && byId[place]) {
+          select(place, { updateUrl: false, trigger: document.getElementById('poi-q') });
+          if (r && r.code && !params.get('place')) UI.toast(roomText(r));
+        } else if (r && r.n) UI.toast(`${roomText(r)} — этого корпуса пока нет на карте`);
+      });
+      /* ---------- Переход по якорю: повторяем после отрисовки шапки и загрузки шрифтов ---------- */
+      let touched = false; // если пользователь уже листает — не дёргаем страницу
+      ['wheel', 'touchstart', 'keydown', 'mousedown'].forEach((ev) => window.addEventListener(ev, () => { touched = true; }, { once: true, passive: true }));
+      const landOnHash = () => {
+        const id = decodeURIComponent(location.hash.slice(1));
+        const t = id && document.getElementById(id);
+        if (t && !touched) t.scrollIntoView({ block: 'start', behavior: 'instant' });
+      };
+      window.addEventListener('load', landOnHash);
+      if (document.fonts && document.fonts.ready) document.fonts.ready.then(landOnHash);
+    })();
+  </script>
+</body>
+</html>

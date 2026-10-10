@@ -1,0 +1,614 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>ИРИТ-РтФ — Институт радиоэлектроники и информационных технологий — УрФУ</title>
+  <meta name="description" content="Институт радиоэлектроники и информационных технологий УрФУ: программы, лаборатории, преподаватели, студенческая жизнь и контакты.">
+  <link rel="icon" href="assets/logo/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="assets/css/tokens.css">
+  <link rel="stylesheet" href="assets/css/components.css">
+  <style>
+    /* ---------- Герой-коллаж ---------- */
+    .inst-hero { position: relative; overflow: hidden; padding-bottom: clamp(40px, 6vw, 72px); }
+    .inst-hero__grid { position: relative; display: grid; gap: 40px; grid-template-columns: minmax(0, 1fr); align-items: center; }
+    @media (min-width: 1024px) { .inst-hero__grid { grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr); } }
+    @media (max-width: 599px) { .inst-hero__grid > div > .sticker { white-space: normal; max-width: calc(100% - 12px); --rot: -3deg; } }
+    .inst-abbr { display: block; white-space: nowrap; font: 800 calc(clamp(52px, 9.5vw, 132px) * var(--fs-scale))/.92 var(--font-display); letter-spacing: -.05em; color: var(--text); }
+    .inst-abbr span { color: var(--accent); }
+    .inst-name { display: block; margin-top: 16px; font-size: var(--fs-xl); font-weight: 700; letter-spacing: -.015em; line-height: 1.25; max-width: 620px; color: var(--text); }
+    .inst-hero .hand { display: inline-block; margin-top: 10px; transform: rotate(var(--rot)); --rot: -2deg; }
+    .inst-hero .lead { margin-top: 14px; max-width: 600px; color: var(--text-2); }
+    .inst-hero .cluster { margin-top: 26px; gap: 12px; }
+    .inst-hero .cluster .btn { white-space: normal; text-align: center; line-height: 1.25; padding-top: 12px; padding-bottom: 12px; }
+    .inst-stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 120px), 1fr)); gap: 0 22px; margin-top: 30px; }
+    .inst-stats > div { border-top: var(--line) solid var(--ink); padding-top: 10px; }
+    .inst-stats b { display: block; font: 800 var(--fs-2xl)/1.05 var(--font-display); letter-spacing: -.03em; }
+    .inst-stats > div:nth-child(even) b { color: transparent; -webkit-text-stroke: 1.5px var(--ink); }
+    .inst-stats span { font-size: var(--fs-xs); color: var(--text-2); }
+
+    .collage { position: relative; height: 500px; }
+    .collage .photo { position: absolute; }
+    .collage .p1 { left: 2%; top: 30px; width: 64%; height: 300px; --rot: -3deg; z-index: 2; }
+    .collage .p2 { right: 0; top: 0; width: 42%; height: 220px; --rot: 5deg; z-index: 1; }
+    .collage .p3 { right: 4%; bottom: 0; width: 54%; height: 220px; --rot: -1.5deg; z-index: 3; }
+    .collage .photo img { height: calc(100% - 34px); }
+    .collage .s1 { position: absolute; left: 0; bottom: 60px; z-index: 4; --rot: -10deg; }
+    .collage .s2 { position: absolute; right: -2%; top: 230px; z-index: 4; --rot: 8deg; }
+    @media (max-width: 1023px) {
+      .collage { height: auto; display: grid; grid-template-columns: 1.3fr 1fr; gap: 14px; padding: 16px 4px 8px; }
+      .collage .photo { position: relative; inset: auto; width: auto; height: auto; }
+      .collage .photo img { height: 160px; }
+      .collage .p1 { grid-column: 1 / -1; }
+      .collage .p1 img { height: 210px; }
+      .collage .s1 { left: auto; right: -4px; bottom: auto; top: 70px; }
+      .collage .s2 { right: auto; left: -4px; top: 0; }
+    }
+
+    /* ---------- Липкая навигация по разделам ---------- */
+    .subnav { position: sticky; top: var(--subnav-top, 0px); z-index: 50; background: var(--bg); border-bottom: var(--line) solid var(--ink); }
+    .subnav .tabs-line { border-bottom: none; gap: 24px; }
+    .subnav .tab { display: inline-flex; align-items: center; }
+    .subnav .tab:hover { color: var(--text); }
+    .subnav .tab[aria-current="true"] { color: var(--text); border-bottom-color: var(--accent); }
+
+    .s-head { display: flex; align-items: end; justify-content: space-between; gap: 16px 24px; flex-wrap: wrap; margin-bottom: 32px; }
+    .s-head p { color: var(--text-2); margin-top: 10px; max-width: 620px; }
+    .s-head .hand { display: inline-block; margin-top: 6px; transform: rotate(var(--rot)); --rot: -2deg; }
+
+    /* ---------- Об институте ---------- */
+    .about-grid { display: grid; gap: 40px; grid-template-columns: 1fr; }
+    @media (min-width: 1024px) { .about-grid { grid-template-columns: 1.1fr 1fr; align-items: start; } }
+    .why { display: grid; gap: 18px; grid-template-columns: repeat(auto-fit, minmax(min(100%, 230px), 1fr)); counter-reset: why; }
+    .why .card { gap: 8px; counter-increment: why; transform: rotate(var(--rot)); }
+    .why .card::before { content: "0" counter(why); font: 800 calc(30px * var(--fs-scale))/1 var(--font-display); color: transparent; -webkit-text-stroke: 1.5px var(--ink); }
+    .why .card:nth-child(1) { background: var(--lime-soft); border-style: solid; border-color: var(--ink); --rot: -1.2deg; }
+    .why .card:nth-child(2) { --rot: 1deg; margin-top: 18px; }
+    .why .card:nth-child(3) { --rot: .6deg; }
+    .why .card:nth-child(4) { --rot: -.8deg; margin-top: 18px; }
+    .partners { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 24px; }
+    .partner { display: flex; align-items: center; gap: 10px; padding: 10px 14px; border-radius: 8px; background: var(--surface); border: var(--line) solid var(--ink); font-weight: 650; font-size: var(--fs-sm); transform: rotate(var(--rot)); }
+    .partner:nth-child(odd) { --rot: -1.5deg; } .partner:nth-child(3n) { --rot: 1.5deg; }
+    .partner b { width: 30px; height: 30px; border-radius: 6px; display: grid; place-items: center; background: var(--lime); color: #14141a; font: 800 var(--fs-xs) var(--font-display); flex: none; }
+
+    /* ---------- Программы ---------- */
+    .prog-grid { display: grid; gap: 22px; grid-template-columns: repeat(auto-fill, minmax(min(100%, 320px), 1fr)); }
+    @media (min-width: 1100px) { .prog-grid .prog:first-child { grid-column: span 2; background: var(--lime-soft); box-shadow: var(--shadow-md); } .prog-grid .prog:first-child .card__title { font: 800 var(--fs-2xl)/1.1 var(--font-display); } }
+    .prog { position: relative; }
+    .prog .card__title { font-size: var(--fs-xl); }
+    .prog__facts { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; padding: 12px 0 0; border-top: var(--line) solid var(--ink); }
+    .prog__facts b { display: block; font: 800 var(--fs-lg)/1.1 var(--font-display); letter-spacing: -.02em; }
+    .prog__facts span { font-size: var(--fs-xs); color: var(--text-3); line-height: 1.3; display: block; }
+    .prog > .sticker { position: absolute; top: -14px; right: 16px; --rot: 5deg; padding: 6px 11px; font-size: calc(11px * var(--fs-scale)); }
+    .empty { padding: 40px 24px; text-align: center; border: var(--line) dashed var(--ink); border-radius: var(--r-lg); color: var(--text-2); }
+
+    /* ---------- Лаборатории: бенто ---------- */
+    .labs { display: grid; gap: 18px; grid-template-columns: 1fr; }
+    @media (min-width: 700px) { .labs { grid-template-columns: 1fr 1fr; } }
+    @media (min-width: 1024px) { .labs { grid-template-columns: 1.4fr 1fr 1fr; } .lab--big { grid-row: span 2; } }
+    .lab { position: relative; display: flex; flex-direction: column; min-height: 240px; border: var(--line) solid var(--ink); border-radius: var(--r-lg); overflow: hidden; background: var(--surface); transition: transform .2s var(--ease), box-shadow .2s; }
+    .lab:hover { transform: translate(-3px, -3px); box-shadow: var(--shadow-md); }
+    .lab img { width: 100%; height: 150px; object-fit: cover; border-bottom: var(--line) solid var(--ink); }
+    .lab--big img { height: auto; flex: 1; min-height: 260px; }
+    .lab__body { padding: 16px 18px 18px; display: flex; flex-direction: column; gap: 6px; }
+    .lab__body p { font-size: var(--fs-sm); color: var(--text-2); }
+    .lab .card__footer { margin-top: 6px; }
+    .lab--big .card__title { font: 800 var(--fs-2xl)/1.1 var(--font-display); }
+    .lab--txt { background: var(--lime-soft); justify-content: space-between; }
+    .lab--txt .big { font: 800 calc(clamp(56px, 7vw, 96px) * var(--fs-scale))/.9 var(--font-display); letter-spacing: -.04em; padding: 18px 18px 0; color: transparent; -webkit-text-stroke: 2px var(--ink); }
+    .lab .sticker { position: absolute; top: 14px; left: 14px; z-index: 2; --rot: -4deg; }
+
+    /* ---------- Преподаватели ---------- */
+    .people-tools { display: flex; flex-wrap: wrap; gap: 12px; align-items: end; margin-bottom: 24px; }
+    .people-tools .field { flex: 1 1 280px; max-width: 420px; }
+    .people { display: grid; gap: 16px; grid-template-columns: repeat(auto-fill, minmax(min(100%, 270px), 1fr)); }
+    .person { gap: 14px; }
+    .person__head { display: flex; gap: 14px; align-items: center; }
+    .person .avatar { width: 56px; height: 56px; font: 800 var(--fs-md) var(--font-display); border: var(--line) solid var(--ink); }
+    .person:nth-child(odd) .avatar { transform: rotate(var(--rot)); --rot: -6deg; }
+    .person .avatar.v1 { background: var(--lime); color: #14141a; }
+    .person .avatar.v2 { background: var(--brand); color: var(--on-brand); }
+    .person .avatar.v3 { background: var(--accent-soft); color: var(--text); }
+    .person .avatar.v4 { background: var(--accent); color: #fff; }
+    .person .avatar.v5 { background: var(--brand-soft); color: var(--text); }
+    .person .avatar.v6 { background: var(--surface); color: var(--text); }
+    .person__name { font-weight: 700; line-height: 1.25; }
+    .person__pos { font-size: var(--fs-xs); color: var(--text-3); line-height: 1.35; margin-top: 2px; }
+    .person .cluster { gap: 6px; }
+
+    /* ---------- Студенческая жизнь: клубы-записки + чёрная афиша ---------- */
+    .life-grid { display: grid; gap: 32px; grid-template-columns: 1fr; }
+    .life-grid > * { min-width: 0; }
+    @media (min-width: 1024px) { .life-grid { grid-template-columns: 1.3fr 1fr; } }
+    .clubs { display: grid; gap: 16px; grid-template-columns: repeat(auto-fill, minmax(min(100%, 230px), 1fr)); }
+    .club { flex-direction: row; align-items: flex-start; gap: 14px; padding: 18px; transform: rotate(var(--rot)); }
+    .club:nth-child(3n+1) { --rot: -1deg; } .club:nth-child(3n+2) { --rot: .8deg; background: var(--lime-soft); } .club:nth-child(3n) { --rot: -.4deg; border-style: dashed; }
+    .club .icon-tile { width: 44px; height: 44px; }
+    .afisha { background: #14141a; color: #f3eee3; border: var(--line) solid var(--ink); border-radius: var(--r-xl); padding: clamp(20px, 3vw, 32px); box-shadow: var(--shadow-lg); }
+    .afisha h3 { color: #d7ff3d; }
+    .afisha .arrow-link { color: #f3eee3; }
+    .event { display: flex; gap: 16px; padding: 14px 0; border-bottom: 1.5px dashed #4a4752; align-items: center; }
+    .event:last-child { border: none; padding-bottom: 0; }
+    .event__date { flex: none; width: calc(62px * var(--fs-scale)); padding: 8px 0; border-radius: 8px; background: #d7ff3d; color: #14141a; display: flex; flex-direction: column; align-items: center; justify-content: center; line-height: 1.05; }
+    .event:nth-child(even) .event__date { transform: rotate(var(--rot)); --rot: 3deg; }
+    .event__date b { font: 800 calc(24px * var(--fs-scale)) var(--font-display); }
+    .event__date span { font-size: calc(11px * var(--fs-scale)); font-weight: 700; text-transform: uppercase; }
+    .event a { color: #f3eee3; }
+    .event .muted { color: #b9b4c4; }
+    .event a:hover strong { color: #d7ff3d; }
+    .hack-band { margin-top: 22px; }
+    .life-photo { height: 220px; margin: 28px 0 0 auto; max-width: 340px; --rot: 3deg; }
+    .life-photo img { height: calc(100% - 34px); }
+    @media (max-width: 1023px) { .life-photo { display: none; } }
+
+    /* ---------- Новости ---------- */
+    .news-grid { display: grid; gap: 20px; grid-template-columns: 1fr; }
+    @media (min-width: 900px) { .news-grid { grid-template-columns: 1.3fr 1fr; } .news-grid > :first-child { grid-row: span 2; } }
+    .news-card { display: flex; flex-direction: column; gap: 10px; }
+    .news-card .photo--flat { height: 160px; }
+    .news-card .photo--flat img { height: 100%; }
+    .news-grid > :first-child .photo--flat { height: auto; flex: 1; min-height: 260px; }
+    .news-grid > :first-child .card__title { font: 800 var(--fs-xl)/1.15 var(--font-display); }
+    @media (min-width: 900px) { .news-grid > :not(:first-child) { flex-direction: row; align-items: center; } .news-grid > :not(:first-child) .photo--flat { flex: none; width: 150px; height: 120px; } }
+
+    /* ---------- Контакты ---------- */
+    .contacts { display: grid; gap: 24px; grid-template-columns: 1fr; }
+    @media (min-width: 900px) { .contacts { grid-template-columns: 1fr 1.1fr; } }
+    .contact-list { display: flex; flex-direction: column; }
+    .contact-row { display: flex; gap: 14px; padding: 16px 0; border-bottom: 1.5px dashed var(--border); align-items: flex-start; }
+    .contact-row:last-child { border: none; }
+    .contact-row .icon-tile { width: 40px; height: 40px; }
+    .contact-row .icon-tile .i { width: 20px; height: 20px; }
+    .contact-row a { color: var(--brand); font-weight: 650; }
+    .minimap { position: relative; padding: 0; overflow: hidden; min-height: 320px; }
+    .minimap > svg { width: 100%; height: 100%; min-height: 320px; }
+    .minimap__cap { position: absolute; left: 16px; right: 16px; bottom: 16px; display: flex; gap: 12px; align-items: center; justify-content: space-between; flex-wrap: wrap;
+      padding: 14px 16px; border-radius: var(--r-md); background: var(--surface); border: var(--line) solid var(--ink); box-shadow: var(--shadow-sm); }
+    .minimap .sticker { position: absolute; top: 16px; right: 16px; --rot: 6deg; }
+
+    /* ---------- Версия для слабовидящих ---------- */
+    html[data-a11y] :is(.why .card, .partner, .club, .person .avatar, .event__date) { transform: none !important; margin-top: 0 !important; }
+    html[data-a11y] .collage { height: auto; display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 200px), 1fr)); gap: 16px; padding: 0; }
+    html[data-a11y] .collage .photo { position: relative; inset: auto; width: auto; height: auto; }
+    html[data-a11y] .collage .photo img { height: 200px; }
+    html[data-a11y] .collage :is(.s1, .s2), html[data-a11y] :is(.lab, .minimap) .sticker { position: static; justify-self: start; align-self: flex-start; width: auto; height: auto; border-radius: 10px; }
+    html[data-a11y] .lab .sticker { margin: 12px 18px 0; }
+    html[data-a11y] .minimap .sticker { display: none; }
+    html[data-a11y] :is(.why .card::before, .lab--txt .big) { -webkit-text-stroke: 0; color: var(--text); }
+    html[data-a11y] .inst-stats > div:nth-child(even) b { color: var(--text); }
+    html[data-a11y] .lab--big img, html[data-a11y] .news-grid > :first-child .photo--flat { min-height: 0; flex: none; height: 220px; }
+    html[data-a11y] .news-grid > :not(:first-child) { flex-direction: column; align-items: stretch; }
+    html[data-a11y] .news-grid > :not(:first-child) .photo--flat { width: auto; }
+    html[data-a11y] .minimap__cap { position: static; margin: 12px; }
+  </style>
+</head>
+<body data-page="about">
+  <div id="site-header"></div>
+
+  <main id="main">
+    <!-- Герой -->
+    <section class="page-hero page-hero--tinted inst-hero">
+      <div class="container">
+        <nav class="crumbs" aria-label="Хлебные крошки"><a href="index.html">Главная</a><i data-icon="chevron-right"></i><a href="institutes.html">Институты</a><i data-icon="chevron-right"></i><span>ИРИТ-РтФ</span></nav>
+        <div class="inst-hero__grid">
+          <div>
+            <span class="sticker sticker--blue">Институт УрФУ · радиофак с 1952 года</span>
+            <h1 style="margin-top:20px">
+              <span class="inst-abbr" aria-hidden="true">ИРИТ<span>-</span>РтФ</span>
+              <span class="sr-only">ИРИТ-РтФ — </span>
+              <span class="inst-name">Институт <span class="u-hand">радиоэлектроники</span> и информационных технологий</span>
+            </h1>
+            <span class="hand">он же «радиофак» — так нас и зови</span>
+            <p class="lead">Учим создавать софт, связь и электронику — от мобильных приложений до спутниковых антенн. Здесь собраны программы, лаборатории, люди и всё, что нужно, чтобы стать частью «радиофака».</p>
+            <div class="cluster">
+              <a class="btn btn--accent btn--lg" href="programs.html"><i data-icon="graduation"></i> Программы института</a>
+              <a class="btn btn--ghost btn--lg" href="news.html#events"><i data-icon="calendar"></i> День открытых дверей · 12 октября</a>
+            </div>
+            <div class="inst-stats">
+              <div><b>5 200</b><span>студентов, из них 640 иностранных</span></div>
+              <div><b>38</b><span>программ: от бакалавриата до аспирантуры</span></div>
+              <div><b>27</b><span>лабораторий и учебных центров</span></div>
+              <div><b>60+</b><span>компаний-партнёров для практики</span></div>
+            </div>
+            <p class="demo-note" style="margin-top:10px">Цифры демонстрационные</p>
+          </div>
+          <div class="collage" aria-hidden="true">
+            <figure class="photo tape p1"><img src="assets/img/robotics.jpg" alt="" loading="eager"><figcaption>лаба, 2 курс</figcaption></figure>
+            <figure class="photo p2"><img src="assets/img/laptop.jpg" alt="" loading="eager"><figcaption>хакатон до утра</figcaption></figure>
+            <figure class="photo tape--corner p3"><img src="assets/img/selfie.jpg" alt="" loading="eager"><figcaption>наша группа</figcaption></figure>
+            <span class="sticker sticker--round sticker--coral s1">новый кампус</span>
+            <span class="sticker sticker--paper s2">5G-полигон</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Навигация по разделам -->
+    <nav class="subnav" aria-label="Разделы страницы института">
+      <div class="container">
+        <div class="tabs-line" id="subnav-list">
+          <a class="tab" href="#about" aria-current="true">Об институте</a>
+          <a class="tab" href="#programs">Программы</a>
+          <a class="tab" href="#labs">Лаборатории</a>
+          <a class="tab" href="#people">Преподаватели</a>
+          <a class="tab" href="#life">Студенческая жизнь</a>
+          <a class="tab" href="#news">Новости</a>
+          <a class="tab" href="#contacts">Контакты</a>
+        </div>
+      </div>
+    </nav>
+
+    <!-- Об институте -->
+    <section class="section inst-section" id="about">
+      <div class="container about-grid">
+        <div>
+          <h2 class="h2" style="margin:0 0 20px">Инженеры цифрового мира — с уральским характером</h2>
+          <div class="prose muted">
+            <p>ИРИТ-РтФ вырос из радиотехнического факультета, который готовил специалистов для радиозаводов Урала. Сегодня это один из крупнейших IT-институтов страны: программная инженерия, кибербезопасность, связь, радиоэлектроника и искусственный интеллект.</p>
+            <p>Учёба построена вокруг проектов: с первого курса ты работаешь в команде над реальными задачами компаний-партнёров, а лучшие проекты превращаются в стартапы и выпускные работы.</p>
+          </div>
+          <div class="partners" aria-label="Компании-партнёры (вымышленные названия)">
+            <div class="partner"><b>ТУ</b>ТехноУрал</div>
+            <div class="partner"><b>СС</b>СигналСофт</div>
+            <div class="partner"><b>УР</b>Уралрадиосеть</div>
+            <div class="partner"><b>КЛ</b>КиберЛаб</div>
+            <div class="partner"><b>ДТ</b>ДатаТрек</div>
+            <div class="partner"><b>АЭ</b>АэроЭфир</div>
+          </div>
+          <p class="demo-note" style="margin-top:10px">Названия партнёров вымышленные</p>
+        </div>
+        <div class="why">
+          <div class="card card--flat"><h3 class="h4">Проекты с 1 курса</h3><p class="small muted">Каждый семестр — командный проект по заказу компании, а не учебная «задачка».</p></div>
+          <div class="card card--flat"><h3 class="h4">Работа до диплома</h3><p class="small muted">87% выпускников трудоустроены по профессии в течение полугода.</p></div>
+          <div class="card card--flat"><h3 class="h4">Своё оборудование</h3><p class="small muted">Безэховая камера, 5G-полигон, суперкомпьютерный кластер для студентов.</p></div>
+          <div class="card card--flat"><h3 class="h4">Обмен и английский</h3><p class="small muted">6 программ на английском и семестры обмена в вузах-партнёрах.</p></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Программы -->
+    <section class="section section--surface inst-section" id="programs">
+      <div class="container">
+        <div class="s-head">
+          <div><h2 class="h2">Выбери свою траекторию</h2><span class="hand">все дороги ведут в IT</span><p>6 самых популярных программ института. Полный список и подбор по баллам — в каталоге.</p></div>
+          <a class="arrow-link" href="programs.html">Все 38 программ <i data-icon="arrow-right"></i></a>
+        </div>
+        <div class="cluster" data-chip-group id="prog-filter" role="group" aria-label="Уровень образования" style="margin-bottom:24px">
+          <button class="chip" aria-pressed="true" data-level="all">Все <span class="count">6</span></button>
+          <button class="chip" aria-pressed="false" data-level="bachelor">Бакалавриат <span class="count">3</span></button>
+          <button class="chip" aria-pressed="false" data-level="specialist">Специалитет <span class="count">1</span></button>
+          <button class="chip" aria-pressed="false" data-level="master">Магистратура <span class="count">1</span></button>
+          <button class="chip" aria-pressed="false" data-level="phd">Аспирантура <span class="count">1</span></button>
+        </div>
+        <div class="prog-grid" id="prog-grid">
+          <a class="card card--hover prog" href="program.html" data-level="bachelor">
+            <span class="sticker sticker--coral" aria-hidden="true">бюджет есть!</span>
+            <div class="card__meta"><span class="tag tag--brand">Бакалавриат</span><span>09.03.04 · очно · 4 года</span></div>
+            <h3 class="card__title">Программная инженерия</h3>
+            <p class="small muted">Backend, мобильная разработка и DevOps. Командные проекты с IT-компаниями с первого курса.</p>
+            <div class="prog__facts"><div><b>262</b><span>проходной балл</span></div><div><b>75</b><span>бюджетных мест</span></div><div><b>ЕГЭ</b><span>мат · инф · рус</span></div></div>
+            <span class="card__footer"><span class="arrow-link">Подробнее о программе</span><i data-icon="arrow-up-right"></i></span>
+          </a>
+          <a class="card card--hover prog" href="program.html" data-level="bachelor">
+            <div class="card__meta"><span class="tag tag--brand">Бакалавриат</span><span>11.03.01 · очно · 4 года</span></div>
+            <h3 class="card__title">Радиотехника</h3>
+            <p class="small muted">Проектирование радаров, антенн и систем связи. Практика на радиозаводах Урала.</p>
+            <div class="prog__facts"><div><b>214</b><span>проходной балл</span></div><div><b>90</b><span>бюджетных мест</span></div><div><b>ЕГЭ</b><span>мат · физ/инф · рус</span></div></div>
+            <span class="card__footer"><span class="arrow-link">Подробнее о программе</span><i data-icon="arrow-up-right"></i></span>
+          </a>
+          <a class="card card--hover prog" href="program.html" data-level="bachelor">
+            <div class="card__meta"><span class="tag tag--brand">Бакалавриат</span><span>11.03.02 · очно · 4 года</span></div>
+            <h3 class="card__title">Инфокоммуникационные технологии и системы связи</h3>
+            <p class="small muted">Сети 5G, интернет вещей и облачная инфраструктура операторов связи.</p>
+            <div class="prog__facts"><div><b>228</b><span>проходной балл</span></div><div><b>60</b><span>бюджетных мест</span></div><div><b>ЕГЭ</b><span>мат · физ/инф · рус</span></div></div>
+            <span class="card__footer"><span class="arrow-link">Подробнее о программе</span><i data-icon="arrow-up-right"></i></span>
+          </a>
+          <a class="card card--hover prog" href="program.html" data-level="specialist">
+            <div class="card__meta"><span class="tag tag--applicant">Специалитет</span><span>10.05.02 · очно · 5,5 лет</span></div>
+            <h3 class="card__title">Информационная безопасность телекоммуникационных систем</h3>
+            <p class="small muted">Защита сетей, криптография и расследование инцидентов. Свой киберполигон.</p>
+            <div class="prog__facts"><div><b>251</b><span>проходной балл</span></div><div><b>40</b><span>бюджетных мест</span></div><div><b>ЕГЭ</b><span>мат · инф · рус</span></div></div>
+            <span class="card__footer"><span class="arrow-link">Подробнее о программе</span><i data-icon="arrow-up-right"></i></span>
+          </a>
+          <a class="card card--hover prog" href="program.html" data-level="master">
+            <div class="card__meta"><span class="tag tag--staff">Магистратура</span><span>09.04.01 · очно · 2 года</span></div>
+            <h3 class="card__title">Искусственный интеллект в инженерных системах</h3>
+            <p class="small muted">Компьютерное зрение, предиктивная аналитика и ИИ для промышленных предприятий.</p>
+            <div class="prog__facts"><div><b>78</b><span>балл экзамена из 100</span></div><div><b>35</b><span>бюджетных мест</span></div><div><b>Экз.</b><span>+ портфолио</span></div></div>
+            <span class="card__footer"><span class="arrow-link">Подробнее о программе</span><i data-icon="arrow-up-right"></i></span>
+          </a>
+          <a class="card card--hover prog" href="program.html" data-level="phd">
+            <div class="card__meta"><span class="tag tag--partner">Аспирантура</span><span>2.2.15 · очно · 4 года</span></div>
+            <h3 class="card__title">Системы, сети и устройства телекоммуникаций</h3>
+            <p class="small muted">Исследования в лабораториях института под руководством действующих учёных.</p>
+            <div class="prog__facts"><div><b>82</b><span>балл экзамена из 100</span></div><div><b>12</b><span>бюджетных мест</span></div><div><b>Экз.</b><span>+ реферат</span></div></div>
+            <span class="card__footer"><span class="arrow-link">Подробнее о программе</span><i data-icon="arrow-up-right"></i></span>
+          </a>
+        </div>
+        <div class="empty" id="prog-empty" hidden>На этом уровне пока нет программ в подборке. <a class="link" href="programs.html">Открыть полный каталог</a></div>
+        <p class="demo-note" style="margin-top:16px">Проходные баллы и число мест — демонстрационные данные приёма-2026</p>
+      </div>
+    </section>
+
+    <!-- Лаборатории -->
+    <section class="section inst-section" id="labs">
+      <div class="container">
+        <div class="s-head">
+          <div><h2 class="h2">Где ты будешь пробовать руками</h2><p>Студенты работают в лабораториях с 2 курса — на стипендии проектов и грантов.</p></div>
+          <a class="arrow-link" href="science.html#labs">Каталог лабораторий УрФУ <i data-icon="arrow-right"></i></a>
+        </div>
+        <div class="labs">
+          <a class="lab lab--big" href="science.html#labs">
+            <span class="sticker sticker--paper" aria-hidden="true">берут студентов</span>
+            <img src="assets/img/robotics.jpg" alt="Трое исследователей склонились над прибором в лаборатории" loading="lazy">
+            <div class="lab__body"><h3 class="card__title">Компьютерное зрение и ИИ</h3><p>Нейросети для контроля качества на заводах и анализа снимков.</p><span class="card__footer"><span class="tag tag--ok">Берут студентов</span><i data-icon="arrow-up-right"></i></span></div>
+          </a>
+          <a class="lab lab--txt" href="science.html#labs">
+            <span class="big" aria-hidden="true">5G</span>
+            <div class="lab__body"><h3 class="card__title">Полигон сетей 5G/6G</h3><p>Тестируем базовые станции и протоколы связи нового поколения.</p><span class="card__footer"><span class="tag tag--ok">Берут студентов</span><i data-icon="arrow-up-right"></i></span></div>
+          </a>
+          <a class="lab" href="science.html#labs">
+            <img src="assets/img/lab.jpg" alt="Исследователь у микроскопа в лаборатории" loading="lazy">
+            <div class="lab__body"><h3 class="card__title">Антенны и безэховая камера</h3><p>Измерения антенн для спутников, дронов и автомобилей.</p><span class="card__footer"><span class="tag">Набор весной</span><i data-icon="arrow-up-right"></i></span></div>
+          </a>
+          <a class="lab" href="science.html#labs">
+            <img src="assets/img/laptop.jpg" alt="Студенты смеются над ноутбуками в библиотеке" loading="lazy">
+            <div class="lab__body"><h3 class="card__title">Киберполигон</h3><p>Учебные атаки и защита инфраструктуры в изолированной среде.</p><span class="card__footer"><span class="tag tag--ok">Берут студентов</span><i data-icon="arrow-up-right"></i></span></div>
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <!-- Преподаватели -->
+    <section class="section section--surface inst-section" id="people">
+      <div class="container">
+        <div class="s-head">
+          <div><h2 class="h2">Люди, у которых ты будешь учиться</h2><p>Найди научного руководителя по теме — например, «ИИ», «антенны» или «безопасность».</p></div>
+        </div>
+        <div class="people-tools">
+          <div class="field">
+            <label for="people-q">Поиск по имени или теме</label>
+            <div class="input-icon"><i data-icon="search"></i><input class="input" id="people-q" type="search" placeholder="Например, нейросети" autocomplete="off"></div>
+          </div>
+          <div class="cluster" role="group" aria-label="Быстрые темы">
+            <button class="chip" type="button" data-topic="ИИ">ИИ</button>
+            <button class="chip" type="button" data-topic="связь">Связь</button>
+            <button class="chip" type="button" data-topic="безопасность">Безопасность</button>
+            <button class="chip" type="button" data-topic="электроника">Электроника</button>
+          </div>
+        </div>
+        <p class="small muted" id="people-count" aria-live="polite" style="margin-bottom:16px">Показаны все 8 преподавателей</p>
+        <div class="people" id="people-grid">
+          <article class="card person" data-text="Анна Ветрова доцент информационных технологий машинное обучение компьютерное зрение ИИ">
+            <div class="person__head"><span class="avatar v1" aria-hidden="true">АВ</span><div><div class="person__name">Анна Ветрова</div><div class="person__pos">Доцент, кафедра информационных технологий</div></div></div>
+            <div class="cluster"><span class="tag">Машинное обучение</span><span class="tag">Компьютерное зрение</span><span class="tag">ИИ</span></div>
+          </article>
+          <article class="card person" data-text="Дмитрий Карпов профессор радиоэлектроники телекоммуникаций антенны 5G связь">
+            <div class="person__head"><span class="avatar v2" aria-hidden="true">ДК</span><div><div class="person__name">Дмитрий Карпов</div><div class="person__pos">Профессор, кафедра радиоэлектроники и телекоммуникаций</div></div></div>
+            <div class="cluster"><span class="tag">Антенны</span><span class="tag">Сети 5G</span><span class="tag">Связь</span></div>
+          </article>
+          <article class="card person" data-text="Мария Лебедева старший преподаватель веб-разработка UX интерфейсы">
+            <div class="person__head"><span class="avatar v3" aria-hidden="true">МЛ</span><div><div class="person__name">Мария Лебедева</div><div class="person__pos">Старший преподаватель, школа бакалавриата</div></div></div>
+            <div class="cluster"><span class="tag">Веб-разработка</span><span class="tag">UX-дизайн</span></div>
+          </article>
+          <article class="card person" data-text="Никита Орлов доцент информационной безопасности криптография IoT безопасность">
+            <div class="person__head"><span class="avatar v4" aria-hidden="true">НО</span><div><div class="person__name">Никита Орлов</div><div class="person__pos">Доцент, кафедра информационной безопасности</div></div></div>
+            <div class="cluster"><span class="tag">Криптография</span><span class="tag">Безопасность IoT</span></div>
+          </article>
+          <article class="card person" data-text="Лейла Сафина доцент обработка сигналов медицинская электроника">
+            <div class="person__head"><span class="avatar v5" aria-hidden="true">ЛС</span><div><div class="person__name">Лейла Сафина</div><div class="person__pos">Доцент, кафедра радиоэлектроники</div></div></div>
+            <div class="cluster"><span class="tag">Обработка сигналов</span><span class="tag">Медицинская электроника</span></div>
+          </article>
+          <article class="card person" data-text="Павел Громов профессор радиолокация беспилотники дроны связь электроника">
+            <div class="person__head"><span class="avatar v6" aria-hidden="true">ПГ</span><div><div class="person__name">Павел Громов</div><div class="person__pos">Профессор, кафедра радиолокации</div></div></div>
+            <div class="cluster"><span class="tag">Радиолокация</span><span class="tag">Беспилотники</span></div>
+          </article>
+          <article class="card person" data-text="Елена Ким доцент базы данных анализ данных ИИ">
+            <div class="person__head"><span class="avatar v1" aria-hidden="true">ЕК</span><div><div class="person__name">Елена Ким</div><div class="person__pos">Доцент, кафедра информационных технологий</div></div></div>
+            <div class="cluster"><span class="tag">Базы данных</span><span class="tag">Анализ данных</span></div>
+          </article>
+          <article class="card person" data-text="Артём Белов ассистент аспирант робототехника встраиваемые системы электроника">
+            <div class="person__head"><span class="avatar v2" aria-hidden="true">АБ</span><div><div class="person__name">Артём Белов</div><div class="person__pos">Ассистент, аспирант 3 года</div></div></div>
+            <div class="cluster"><span class="tag">Робототехника</span><span class="tag">Встраиваемые системы</span></div>
+          </article>
+        </div>
+        <div class="empty" id="people-empty" hidden>Никого не нашли. Попробуй другую тему или <button class="btn btn--sm btn--soft" type="button" id="people-reset">сбрось поиск</button></div>
+        <p class="demo-note" style="margin-top:16px">Имена и должности вымышленные</p>
+      </div>
+    </section>
+
+    <!-- Студенческая жизнь -->
+    <section class="section inst-section" id="life">
+      <div class="container">
+        <div class="s-head">
+          <div><h2 class="h2">Не только учёба</h2><span class="hand">тут весело, проверено</span><p>Клубы, хакатоны и традиции радиофака — от «Дня радио» до ночных кодинг-марафонов.</p></div>
+          <a class="arrow-link" href="campus.html#life">Все сообщества УрФУ <i data-icon="arrow-right"></i></a>
+        </div>
+        <div class="life-grid">
+          <div class="clubs">
+            <div class="card club"><span class="icon-tile"><i data-icon="cpu"></i></span><div><h3 class="h4">RTF Hack</h3><p class="small muted">Команды для хакатонов: ищем дизайнеров, бэкендеров и аналитиков.</p></div></div>
+            <div class="card club"><span class="icon-tile"><i data-icon="wifi"></i></span><div><h3 class="h4">Радиоклуб «Эфир»</h3><p class="small muted">Собственная радиостанция и связь с полярниками.</p></div></div>
+            <div class="card club"><span class="icon-tile"><i data-icon="users"></i></span><div><h3 class="h4">Студсовет института</h3><p class="small muted">Посвящение, «День радио» и защита интересов студентов.</p></div></div>
+            <div class="card club"><span class="icon-tile"><i data-icon="trophy"></i></span><div><h3 class="h4">Киберспорт РтФ</h3><p class="small muted">Сборные по Dota 2 и CS2, тренировки дважды в неделю.</p></div></div>
+            <div class="card club"><span class="icon-tile"><i data-icon="zap"></i></span><div><h3 class="h4">Робототехника</h3><p class="small muted">Собираем дронов и роботов для соревнований.</p></div></div>
+            <div class="card club"><span class="icon-tile"><i data-icon="music"></i></span><div><h3 class="h4">Медиа «Частота»</h3><p class="small muted">Подкаст, телеграм-канал и фото с событий института.</p></div></div>
+          </div>
+          <div>
+          <div class="afisha">
+            <div class="row between"><h3 class="h4">Ближайшие хакатоны и события</h3><a class="arrow-link small" href="news.html#events">Календарь</a></div>
+            <div>
+              <div class="event"><div class="event__date"><b>12</b><span>окт</span></div><a href="news.html#events"><strong>День открытых дверей ИРИТ-РтФ</strong><div class="xs muted">Новый кампус · 12:00 · экскурсии по лабораториям</div></a></div>
+              <div class="event"><div class="event__date"><b>25</b><span>окт</span></div><a href="news.html#events"><strong>Хакатон «Умный завод»</strong><div class="xs muted">48 часов · призовой фонд 300 000 ₽</div></a></div>
+              <div class="event"><div class="event__date"><b>7</b><span>ноя</span></div><a href="news.html#events"><strong>Турнир по спортивному программированию</strong><div class="xs muted">Командный, для 1–4 курсов</div></a></div>
+              <div class="event"><div class="event__date"><b>21</b><span>ноя</span></div><a href="news.html#events"><strong>CTF по кибербезопасности</strong><div class="xs muted">Онлайн · можно без опыта</div></a></div>
+            </div>
+            <button class="btn btn--soft btn--block hack-band" type="button" data-toast="Подписали на анонсы хакатонов (демо)"><i data-icon="bell"></i> Сообщать о новых хакатонах</button>
+          </div>
+          <figure class="photo tape life-photo"><img src="assets/img/concert.jpg" alt="Студенческий концерт" loading="lazy"><figcaption>«День радио» — это громко</figcaption></figure>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Новости -->
+    <section class="section section--surface inst-section" id="news">
+      <div class="container">
+        <div class="s-head">
+          <div><h2 class="h2">Что нового на радиофаке</h2></div>
+          <a class="arrow-link" href="news.html">Все новости <i data-icon="arrow-right"></i></a>
+        </div>
+        <div class="news-grid">
+          <a class="card card--hover news-card" href="article.html">
+            <figure class="photo photo--flat"><img src="assets/img/selfie.jpg" alt="Селфи студентов в аудитории" loading="lazy"></figure>
+            <div><div class="card__meta"><span class="tag tag--student">Студентам</span><span><i data-icon="clock"></i>8 октября</span></div>
+            <h3 class="card__title">Команда ИРИТ-РтФ взяла первое место на всероссийском хакатоне по ИИ</h3></div>
+          </a>
+          <a class="card card--hover news-card" href="article.html">
+            <figure class="photo photo--flat"><img src="assets/img/lecture.jpg" alt="Студенты болтают в аудитории перед парой" loading="lazy"></figure>
+            <div><div class="card__meta"><span class="tag tag--brand">Наука</span><span><i data-icon="clock"></i>4 октября</span></div>
+            <h3 class="card__title">На 5G-полигоне института протестировали связь для беспилотного транспорта</h3></div>
+          </a>
+          <a class="card card--hover news-card" href="article.html">
+            <figure class="photo photo--flat"><img src="assets/img/applicant.jpg" alt="Абитуриентка с книгой" loading="lazy"></figure>
+            <div><div class="card__meta"><span class="tag tag--applicant">Абитуриентам</span><span><i data-icon="clock"></i>1 октября</span></div>
+            <h3 class="card__title">Открыта запись на подготовительные курсы по информатике для 11 классов</h3></div>
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <!-- Контакты -->
+    <section class="section inst-section" id="contacts">
+      <div class="container">
+        <div class="s-head">
+          <div><h2 class="h2">Как с нами связаться</h2></div>
+          <a class="arrow-link" href="help.html#contacts">Справочник всех подразделений <i data-icon="arrow-right"></i></a>
+        </div>
+        <div class="contacts">
+          <div class="card">
+            <div class="contact-list">
+              <div class="contact-row"><span class="icon-tile"><i data-icon="map-pin"></i></span><div><strong>ул. 100-летия Уральского университета, 5</strong><div class="small muted">Кампус УрФУ · рядом общежития НВК · до ГУКа на автобусе 56</div></div></div>
+              <div class="contact-row"><span class="icon-tile"><i data-icon="phone"></i></span><div><a href="tel:+73433754700">+7 (343) 375-47-00</a><div class="small muted">Учебный офис института · Пн–Пт 9:00–17:00</div></div></div>
+              <div class="contact-row"><span class="icon-tile"><i data-icon="mail"></i></span><div><a href="mailto:irit-rtf@urfu.ru">irit-rtf@urfu.ru</a><div class="small muted">Ответим в течение рабочего дня</div></div></div>
+              <div class="contact-row"><span class="icon-tile"><i data-icon="graduation"></i></span><div><strong>Отборочная комиссия</strong><div class="small muted">Ауд. Р-131 · в период приёма ежедневно 10:00–18:00</div></div></div>
+            </div>
+            <div class="cluster" style="margin-top:8px">
+              <a class="btn" href="help.html#chat"><i data-icon="message"></i> Задать вопрос в чате</a>
+              <button class="btn btn--ghost" type="button" data-copy="ул. 100-летия Уральского университета, 5, Екатеринбург"><i data-icon="copy"></i> Скопировать адрес</button>
+            </div>
+            <p class="demo-note">Телефон и почта — демонстрационные</p>
+          </div>
+          <a class="card minimap" href="campus.html?place=nk-irit#map" aria-label="Открыть ИРИТ-РтФ на карте кампуса">
+            <span class="sticker sticker--coral" aria-hidden="true">с января 2026</span>
+            <svg viewBox="0 0 520 360" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+              <rect width="520" height="360" fill="var(--surface-2)"/>
+              <rect x="30" y="30" width="150" height="110" rx="18" fill="var(--role-student-bg)"/>
+              <path d="M0 210 H520" stroke="var(--border)" stroke-width="26"/>
+              <path d="M0 210 H520" stroke="var(--surface)" stroke-width="20"/>
+              <path d="M300 0 V360" stroke="var(--border)" stroke-width="26"/>
+              <path d="M300 0 V360" stroke="var(--surface)" stroke-width="20"/>
+              <path d="M110 360 V210" stroke="var(--border)" stroke-width="16"/>
+              <path d="M110 360 V210" stroke="var(--surface)" stroke-width="11"/>
+              <text x="318" y="40" font-size="13" font-weight="700" fill="var(--text-3)" font-family="Onest, sans-serif">Новокольцовский</text>
+              <text x="20" y="200" font-size="13" font-weight="700" fill="var(--text-3)" font-family="Onest, sans-serif">к общежитиям НВК</text>
+              <rect x="150" y="60" width="120" height="120" rx="14" fill="var(--brand)"/>
+              <text x="210" y="116" text-anchor="middle" font-size="18" font-weight="800" fill="var(--on-brand)" font-family="Onest, sans-serif">ИРИТ-РтФ</text>
+              <text x="210" y="138" text-anchor="middle" font-size="13" fill="var(--on-brand)" font-family="Onest, sans-serif">Новый кампус</text>
+              <rect x="330" y="50" width="110" height="80" rx="12" fill="var(--brand-soft)" stroke="var(--border)"/>
+              <rect x="330" y="236" width="150" height="80" rx="12" fill="var(--brand-soft)" stroke="var(--border)"/>
+              <rect x="150" y="236" width="120" height="70" rx="12" fill="var(--role-staff-bg)" stroke="var(--border)"/>
+              <circle cx="300" cy="210" r="9" fill="var(--accent)"/>
+              <circle cx="300" cy="210" r="16" fill="none" stroke="var(--accent)" stroke-width="3" opacity=".4"/>
+            </svg>
+            <div class="minimap__cap"><span><strong>ИРИТ-РтФ на карте кампуса</strong><span class="xs muted" style="display:block">Новый кампус · рядом с общежитиями НВК</span></span><span class="btn btn--sm">Открыть карту <i data-icon="map-pin"></i></span></div>
+          </a>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <div id="site-footer"></div>
+
+  <script src="assets/js/app.js"></script>
+  <script>
+    (function () {
+      'use strict';
+      const plural = (n, f) => f[(n % 10 === 1 && n % 100 !== 11) ? 0 : (n % 10 >= 2 && n % 10 <= 4 && (n % 100 < 10 || n % 100 >= 20)) ? 1 : 2];
+
+      /* ---------- Фильтр программ по уровню ---------- */
+      const progFilter = document.getElementById('prog-filter');
+      const progCards = [...document.querySelectorAll('#prog-grid .prog')];
+      progFilter.addEventListener('chipchange', () => {
+        const lvl = progFilter.querySelector('[aria-pressed="true"]').dataset.level;
+        let shown = 0;
+        progCards.forEach((c) => { const ok = lvl === 'all' || c.dataset.level === lvl; c.hidden = !ok; if (ok) shown++; });
+        document.getElementById('prog-empty').hidden = shown > 0;
+      });
+
+      /* ---------- Поиск преподавателей ---------- */
+      const q = document.getElementById('people-q');
+      const people = [...document.querySelectorAll('#people-grid .person')];
+      const countEl = document.getElementById('people-count');
+      function filterPeople() {
+        const v = q.value.trim().toLowerCase();
+        let n = 0;
+        people.forEach((p) => { const ok = !v || p.dataset.text.toLowerCase().includes(v); p.hidden = !ok; if (ok) n++; });
+        document.getElementById('people-empty').hidden = n > 0;
+        countEl.textContent = v ? `Найдено: ${n} ${plural(n, ['преподаватель', 'преподавателя', 'преподавателей'])}` : 'Показаны все 8 преподавателей';
+        document.querySelectorAll('[data-topic]').forEach((c) => c.setAttribute('aria-pressed', String(c.dataset.topic.toLowerCase() === v)));
+      }
+      q.addEventListener('input', filterPeople);
+      document.querySelectorAll('[data-topic]').forEach((c) => {
+        c.setAttribute('aria-pressed', 'false');
+        c.addEventListener('click', () => { q.value = c.getAttribute('aria-pressed') === 'true' ? '' : c.dataset.topic; filterPeople(); });
+      });
+      document.getElementById('people-reset').addEventListener('click', () => { q.value = ''; filterPeople(); q.focus(); });
+
+      /* ---------- Копирование адреса ---------- */
+      document.querySelectorAll('[data-copy]').forEach((b) => b.addEventListener('click', async () => {
+        try { await navigator.clipboard.writeText(b.dataset.copy); UI.toast('Адрес скопирован'); }
+        catch (e) { UI.toast('Адрес: ' + b.dataset.copy); }
+      }));
+
+      /* ---------- Липкая навигация: отступ под шапку и подсветка раздела ---------- */
+      const subnav = document.querySelector('.subnav');
+      const list = document.getElementById('subnav-list');
+      const links = [...list.querySelectorAll('.tab')];
+      const sections = links.map((a) => document.querySelector(a.getAttribute('href')));
+      function layout() {
+        const header = document.getElementById('header');
+        const h = header ? header.offsetHeight : 0;
+        document.documentElement.style.setProperty('--subnav-top', h + 'px');
+        document.documentElement.style.scrollPaddingTop = (h + subnav.offsetHeight + 12) + 'px';
+      }
+      let current = null;
+      function spy() {
+        const line = subnav.getBoundingClientRect().bottom + 24;
+        let idx = 0;
+        sections.forEach((s, i) => { if (s.getBoundingClientRect().top <= line) idx = i; });
+        if ((window.innerHeight + window.scrollY) >= document.body.scrollHeight - 4) idx = sections.length - 1;
+        if (idx === current) return;
+        current = idx;
+        links.forEach((a, i) => { if (i === idx) a.setAttribute('aria-current', 'true'); else a.removeAttribute('aria-current'); });
+        const a = links[idx];
+        list.scrollTo({ left: a.offsetLeft - list.clientWidth / 2 + a.offsetWidth / 2, behavior: 'smooth' });
+      }
+      let ticking = false;
+      window.addEventListener('scroll', () => { if (!ticking) { ticking = true; requestAnimationFrame(() => { spy(); ticking = false; }); } }, { passive: true });
+      window.addEventListener('resize', () => { layout(); spy(); });
+      document.addEventListener('appready', () => { layout(); spy(); });
+      window.addEventListener('load', () => { layout(); spy(); });
+      /* ---------- Переход по якорю: повторяем после отрисовки шапки и загрузки шрифтов ---------- */
+      let touched = false; // если пользователь уже листает — не дёргаем страницу
+      ['wheel', 'touchstart', 'keydown', 'mousedown'].forEach((ev) => window.addEventListener(ev, () => { touched = true; }, { once: true, passive: true }));
+      const landOnHash = () => {
+        const id = decodeURIComponent(location.hash.slice(1));
+        const t = id && document.getElementById(id);
+        if (t && !touched) t.scrollIntoView({ block: 'start', behavior: 'instant' });
+      };
+      window.addEventListener('load', landOnHash);
+      if (document.fonts && document.fonts.ready) document.fonts.ready.then(landOnHash);
+    })();
+  </script>
+</body>
+</html>

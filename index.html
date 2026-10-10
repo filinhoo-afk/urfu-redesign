@@ -1,0 +1,795 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>УрФУ — Уральский федеральный университет</title>
+  <meta name="description" content="Концепт редизайна сайта УрФУ: одна навигация, сценарии по ролям, понятный язык.">
+  <link rel="icon" href="assets/logo/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="assets/css/tokens.css">
+  <link rel="stylesheet" href="assets/css/components.css">
+  <style>
+    /* ---------- Герой-коллаж ---------- */
+    .hero { padding: clamp(28px, 4vw, 56px) 0 clamp(40px, 5vw, 72px); position: relative; overflow: hidden; }
+    .hero__grid { display: grid; gap: 40px; grid-template-columns: 1fr; align-items: center; }
+    @media (min-width: 1024px) { .hero__grid { grid-template-columns: 1.05fr .95fr; } }
+    .hero__stickers { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 22px; }
+    .hero h1 { margin-bottom: 22px; }
+    .hero .lead { max-width: 520px; color: var(--text-2); }
+    .hero-search { margin-top: 28px; max-width: 560px; }
+    .hero-search .input { cursor: text; text-align: left; color: var(--text-3); display: flex; align-items: center; background: var(--surface); }
+    .hero-chips { margin-top: 14px; }
+    .hero-chips .chip { min-height: 36px; font-size: var(--fs-xs); }
+    .hero-chips .hand { font-size: 22px; color: var(--text-2); margin-right: 4px; }
+
+    .collage { position: relative; height: 560px; }
+    .collage .photo { position: absolute; }
+    .collage .p1 { left: 4%; top: 30px; width: 62%; height: 330px; --rot: -3deg; z-index: 2; }
+    .collage .p2 { right: 0; top: 0; width: 40%; height: 250px; --rot: 5deg; z-index: 1; }
+    .collage .p3 { right: 6%; bottom: 10px; width: 52%; height: 240px; --rot: -1.5deg; z-index: 3; }
+    .collage .photo img { height: calc(100% - 34px); }
+    .collage .s1 { position: absolute; left: 0; bottom: 70px; z-index: 4; --rot: -10deg; }
+    .collage .s2 { position: absolute; right: -2%; top: 272px; z-index: 4; --rot: 8deg; }
+    .collage .note { position: absolute; left: 0; bottom: 0; z-index: 4; display: flex; align-items: flex-end; gap: 4px; transform: rotate(-4deg); }
+    .collage .note .scribble { position: static; width: 70px; height: 54px; }
+    @media (max-width: 1023px) {
+      .collage { height: auto; display: grid; grid-template-columns: 1.3fr 1fr; gap: 14px; padding: 16px 4px 8px; }
+      .collage .photo { position: relative; inset: auto; width: auto; height: auto; }
+      .collage .photo img { height: 176px; }
+      .collage .p1 img { height: 226px; }
+      .collage .p1 { grid-column: 1 / -1; }
+      .collage .s1, .collage .s2 { position: absolute; }
+      .collage .s1 { left: auto; right: -6px; bottom: auto; top: 84px; }
+      .collage .s2 { right: -4px; top: 0; }
+      .collage .note { display: none; }
+    }
+
+    /* ---------- Быстрые действия: билеты ---------- */
+    .qa-head { display: flex; align-items: end; gap: 16px; flex-wrap: wrap; margin-bottom: 24px; }
+    .qa-head .hand { transform: rotate(-3deg); }
+    .tickets { display: grid; gap: 14px; grid-template-columns: 1fr; }
+    @media (min-width: 768px) { .tickets { grid-template-columns: 1.25fr 1fr; } .tickets a:nth-child(4n+2), .tickets a:nth-child(4n+3) { } }
+    .ticket { position: relative; display: grid; grid-template-columns: auto 1fr auto; align-items: center; gap: 18px; padding: 20px 22px; border: var(--line) solid var(--ink); border-radius: var(--r-lg); background: var(--surface); transition: transform .2s var(--ease), box-shadow .2s var(--ease), background .2s; }
+    .ticket:hover { transform: translate(-3px, -3px); box-shadow: var(--shadow-md); background: var(--role-bg, var(--lime-soft)); }
+    .ticket__n { font: 800 28px/1 var(--font-display); color: var(--text-3); min-width: 44px; white-space: nowrap; }
+    .ticket strong { display: block; font-size: var(--fs-lg); font-weight: 700; line-height: 1.2; }
+    .ticket small { color: var(--text-3); font-size: var(--fs-sm); }
+    .ticket__arrow { width: 44px; height: 44px; border-radius: 50%; border: var(--line) solid var(--ink); display: grid; place-items: center; background: var(--surface); transition: transform .2s var(--ease); }
+    .ticket:hover .ticket__arrow { transform: rotate(-45deg); background: var(--ink); color: var(--bg); }
+    .ticket::before, .ticket::after { content: ""; position: absolute; left: 64px; width: 18px; height: 18px; border-radius: 50%; background: var(--bg); border: var(--line) solid var(--ink); }
+    .ticket::before { top: -10px; clip-path: inset(50% 0 0 0); }
+    .ticket::after { bottom: -10px; clip-path: inset(0 0 50% 0); }
+    .tickets a:first-child { background: var(--lime); }
+    .tickets a:first-child .ticket__n, .tickets a:first-child small { color: #45434d; }
+    .tickets a:first-child, .tickets a:first-child strong { color: #14141a; }
+
+    /* ---------- Поступление ---------- */
+    .admit { position: relative; border: var(--line) solid var(--ink); border-radius: var(--r-xl); box-shadow: var(--shadow-lg); background: #2747ff; color: #fff; padding: clamp(24px, 4vw, 56px); display: grid; gap: 40px; grid-template-columns: 1fr; }
+    @media (min-width: 1024px) { .admit { grid-template-columns: 1fr 420px; } }
+    .admit h2 { color: #fff; max-width: 14ch; }
+    .admit .lead { color: #e3e8ff; margin-top: 16px; max-width: 520px; }
+    .admit .photo { position: absolute; right: 470px; top: -34px; width: 190px; height: 230px; --rot: 6deg; }
+    .admit .photo img { height: calc(100% - 30px); }
+    @media (max-width: 1279px) { .admit .photo { display: none; } }
+    .tear { display: flex; gap: 14px; margin-top: 32px; flex-wrap: wrap; }
+    .tear__day { width: 112px; background: #fffdf8; color: #14141a; border: var(--line) solid #14141a; border-radius: 10px; overflow: hidden; text-align: center; box-shadow: 3px 3px 0 #14141a; }
+    .tear__day:nth-child(2) { transform: rotate(2deg); } .tear__day:nth-child(3) { transform: rotate(-2deg); }
+    .tear__day b { display: block; background: #ff5a36; color: #fff; font: 700 12px/1 var(--font-display); text-transform: uppercase; padding: 7px 0; }
+    .tear__day strong { display: block; font: 800 40px/1 var(--font-display); padding: 10px 0 2px; }
+    .tear__day span { display: block; font-size: 12px; padding: 0 8px 10px; color: #45434d; line-height: 1.2; }
+    .admit .cta { margin-top: 30px; display: flex; gap: 12px; flex-wrap: wrap; }
+    .calc { position: relative; background: var(--surface); color: var(--text); border: var(--line) solid var(--ink); border-radius: var(--r-lg); padding: 26px; display: flex; flex-direction: column; gap: 16px; transform: rotate(1.2deg); box-shadow: var(--shadow-md); }
+    .calc .sticker { position: absolute; top: -18px; right: 18px; --rot: 6deg; }
+    .calc__row { display: flex; justify-content: space-between; align-items: baseline; }
+    .calc__score { font: 800 52px/1 var(--font-display); letter-spacing: -.03em; }
+    .calc__result { padding: 16px; border-radius: var(--r-md); background: var(--lime-soft); border: var(--line) dashed var(--ink); }
+    .calc__result strong { font: 800 var(--fs-xl) var(--font-display); }
+
+    /* ---------- Новости: журнал + афиша ---------- */
+    .mag { display: grid; gap: 28px; grid-template-columns: 1fr; }
+    @media (min-width: 1024px) { .mag { grid-template-columns: 1.4fr 1fr; } }
+    .lead-story { display: block; }
+    .lead-story .photo { --rot: -1deg; height: 380px; }
+    .lead-story .photo img { height: calc(100% - 4px); }
+    .lead-story h3 { font-size: calc(clamp(22px, 2.4vw, 32px) * var(--fs-scale)); margin: 22px 0 10px; line-height: 1.12; }
+    .lead-story:hover h3 { text-decoration: underline; text-decoration-color: var(--accent); text-decoration-thickness: 3px; }
+    .story { display: grid; grid-template-columns: 96px 1fr; gap: 16px; padding: 18px 0; border-bottom: var(--line) solid var(--ink); align-items: center; }
+    .story:first-child { padding-top: 0; }
+    .story img { width: 96px; height: 96px; object-fit: cover; border: var(--line) solid var(--ink); border-radius: 12px; }
+    .story strong { font-size: var(--fs-md); line-height: 1.3; display: block; margin-top: 6px; }
+    .story:hover strong { color: var(--brand); }
+    .afisha { margin-top: 48px; background: #14141a; color: #f3eee3; border-radius: var(--r-xl); padding: clamp(22px, 3vw, 40px); border: var(--line) solid var(--ink); }
+    .afisha h3 { color: #d7ff3d; }
+    .afisha__list { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 240px), 1fr)); gap: 0; margin-top: 20px; }
+    .afisha__item { display: block; padding: 18px 18px 18px 0; border-top: 1px solid rgba(255, 255, 255, .18); }
+    .afisha__item b { font: 800 56px/1 var(--font-display); color: #fff; letter-spacing: -.03em; }
+    .afisha__item b small { font-size: 16px; color: #d7ff3d; margin-left: 6px; letter-spacing: 0; text-transform: uppercase; }
+    .afisha__item strong { display: block; margin-top: 10px; font-size: var(--fs-md); line-height: 1.3; }
+    .afisha__item span { display: block; font-size: var(--fs-xs); color: #b8b1a4; margin-top: 4px; }
+    .afisha__item:hover strong { color: #d7ff3d; }
+
+    /* ---------- Цифры + наука ---------- */
+    .nums { display: grid; gap: 8px 32px; grid-template-columns: repeat(auto-fit, minmax(min(100%, 260px), 1fr)); }
+    .num { padding: 18px 0; border-top: var(--line) solid var(--ink); }
+    .num .big-num { display: block; }
+    @media (min-width: 1024px) { .nums .big-num { font-size: min(96px, 6.6vw); } }
+    .num:nth-child(even) .big-num { color: transparent; -webkit-text-stroke: 2px var(--ink); }
+    .num .hand { display: block; margin-top: 6px; color: var(--text-2); font-size: 24px; }
+    .sci { display: grid; gap: 20px; grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr)); margin-top: 56px; }
+    .sci a { position: relative; display: block; border: var(--line) solid var(--ink); border-radius: var(--r-lg); overflow: hidden; min-height: 300px; color: #fff; transition: transform .2s var(--ease), box-shadow .2s; }
+    .sci a:hover { transform: translate(-3px, -3px); box-shadow: var(--shadow-md); }
+    .sci img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+    .sci a::after { content: ""; position: absolute; inset: 0; background: linear-gradient(180deg, transparent 35%, rgba(10, 10, 14, .82)); }
+    .sci .cap { position: absolute; left: 20px; right: 20px; bottom: 18px; z-index: 2; }
+    .sci .cap strong { display: block; font: 700 var(--fs-xl)/1.1 var(--font-display); }
+    .sci .cap span { font-size: var(--fs-sm); opacity: .9; }
+    .sci .sticker { position: absolute; top: 14px; left: 14px; z-index: 2; --rot: -4deg; }
+
+    /* ---------- Кампус-коллаж ---------- */
+    .life { display: grid; gap: 26px; grid-template-columns: repeat(2, 1fr); }
+    @media (min-width: 900px) { .life { grid-template-columns: repeat(4, 1fr); } }
+    .life .photo { height: 280px; }
+    .life .photo img { height: calc(100% - 38px); }
+    .life a:nth-child(1) .photo { --rot: -3deg; } .life a:nth-child(2) .photo { --rot: 2deg; margin-top: 24px; }
+    .life a:nth-child(3) .photo { --rot: -1deg; } .life a:nth-child(4) .photo { --rot: 3deg; margin-top: 18px; }
+    @media (max-width: 899px) { .life .photo { height: 220px; } }
+    .map-strip { margin-top: 44px; display: grid; gap: 24px; grid-template-columns: 1fr; align-items: center; border: var(--line) solid var(--ink); border-radius: var(--r-xl); padding: clamp(20px, 3vw, 36px); background: var(--surface); }
+    @media (min-width: 900px) { .map-strip { grid-template-columns: 1fr 1.2fr; } }
+    .room-finder > * { min-width: 0; }
+    .rf-form { display: flex; gap: 10px; }
+    .rf-form .input { flex: 1; min-width: 0; font: 700 var(--fs-lg) var(--font-display); text-transform: uppercase; letter-spacing: .02em; }
+    .rf-ex { gap: 8px; align-items: center; }
+    .rf-ex .hand, .rf-rule { font-size: 22px; color: var(--text-2); }
+    .rf-rule { margin: 0; transform: rotate(-2deg); }
+    .rf-ticket { position: relative; display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 18px 24px; padding: clamp(18px, 2.5vw, 28px); border: var(--line) solid var(--ink); border-radius: var(--r-lg); background: var(--lime-soft); color: var(--text); box-shadow: var(--shadow-md); }
+    .rf-ticket::before, .rf-ticket::after { content: ""; position: absolute; top: 50%; width: 22px; height: 22px; margin-top: -11px; border: var(--line) solid var(--ink); border-radius: 50%; background: var(--surface); }
+    .rf-ticket::before { left: -12px; clip-path: inset(0 0 0 50%); } .rf-ticket::after { right: -12px; clip-path: inset(0 50% 0 0); }
+    .rf-code { grid-column: 1 / -1; font: 800 clamp(44px, 6vw, 72px)/1 var(--font-display); letter-spacing: -.03em; }
+    .rf-code--long { font-size: clamp(30px, 4vw, 48px); }
+    .rf-ticket dl { margin: 0; display: grid; gap: 10px; align-content: start; }
+    .rf-ticket dt { font-size: var(--fs-xs); text-transform: uppercase; letter-spacing: .08em; color: var(--text-2); }
+    .rf-ticket dd { margin: 0; font-weight: 700; font-size: var(--fs-md); }
+    .rf-floors { display: flex; flex-direction: column-reverse; gap: 5px; width: 120px; align-self: end; }
+    .rf-floors span { height: 22px; border: var(--line) solid var(--ink); border-radius: 4px; background: var(--surface); font: 700 11px/18px var(--font-display); text-align: center; color: var(--text-2); }
+    .rf-floors span.is-here { background: var(--accent); color: #fff; height: 30px; line-height: 26px; font-size: 12px; }
+    .rf-floors--tall { gap: 3px; } .rf-floors--tall span:not(.is-here) { height: 12px; font-size: 0; }
+    @media (max-width: 479px) { .rf-ticket { column-gap: 14px; } .rf-floors { width: 76px; } .rf-ticket dd { hyphens: auto; } }
+    .rf-tip { grid-column: 1 / -1; margin: 0; padding-top: 14px; border-top: var(--line) dashed var(--ink); font-size: var(--fs-sm); }
+    .rf-ticket .btn { grid-column: 1 / -1; justify-self: start; }
+    .rf-miss { padding: 24px; border: var(--line) dashed var(--ink); border-radius: var(--r-lg); background: var(--surface-2); }
+
+    /* ---------- Помощь ---------- */
+    .help-band { position: relative; border: var(--line) solid var(--ink); border-radius: var(--r-xl); box-shadow: var(--shadow-lg); background: #ff5a36; color: #fff; padding: clamp(26px, 4vw, 52px); display: grid; gap: 32px; grid-template-columns: 1fr; align-items: center; }
+    @media (min-width: 900px) { .help-band { grid-template-columns: 1.2fr 1fr; } }
+    .help-band h2 { color: #fff; }
+    .help-band p { color: #fff1ec; }
+    .help-band .sticker { position: absolute; top: -22px; right: 28px; --rot: 8deg; }
+    @media (max-width: 899px) { .help-band { padding-top: 84px; } .help-band .sticker { top: -42px; right: 12px; transform: rotate(8deg) scale(.82); } }
+    .help-links a { display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 14px 18px; border-radius: var(--r-md); background: #fffdf8; color: #14141a; font-weight: 600; margin-bottom: 10px; border: var(--line) solid #14141a; transition: transform .2s var(--ease); }
+    .help-links a:hover { transform: translateX(6px); }
+    .section-title { margin-bottom: 32px; display: flex; align-items: end; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
+    .section-title .hand { display: block; margin-top: 8px; color: var(--text-2); }
+
+    /* ---------- Главная под роль: акцент, порядок, переходы ---------- */
+    body { --role-pop: #d7ff3d; }
+    body[data-role="student"] { --role-pop: #7ef0b8; }
+    body[data-role="staff"] { --role-pop: #c9b5ff; }
+    body[data-role="partner"] { --role-pop: #ffc45c; }
+    body[data-role="intl"] { --role-pop: #ff9cc6; }
+    .tickets a:first-child { background: var(--role-pop); }
+    .marquee { background: var(--role-pop); }
+    .sec-line { border-block: var(--line) solid var(--ink); }
+    .sec-line + .sec-line { border-top: 0; }
+    [data-block="quick"] + .section:not(.sec-line) { padding-top: 0; }
+    .role-hint { font-size: 22px; color: var(--text-2); margin: 0 0 14px; }
+    .role-hint b { font-weight: 700; color: var(--text); }
+    .hero-chips .chip[hidden] { display: none; }
+    ::view-transition-old(root), ::view-transition-new(root) { animation-duration: .35s; }
+
+    /* Студент: твой день */
+    .today { display: grid; gap: 22px; grid-template-columns: 1fr; border: var(--line) solid var(--ink); border-radius: var(--r-xl); background: var(--surface); box-shadow: var(--shadow-lg); padding: clamp(20px, 3vw, 36px); }
+    @media (min-width: 1024px) { .today { grid-template-columns: 1fr 1.6fr 1fr; align-items: start; } }
+    .today__head { display: flex; gap: 18px; align-items: center; }
+    .today__head .h2 { margin: 0; }
+    .today__date { flex: none; transform: rotate(-3deg); }
+    .today__status { margin: 8px 0 0; font-size: 24px; }
+    .pairs { list-style: none; margin: 0; padding: 0; display: grid; gap: 10px; }
+    .pair { display: grid; grid-template-columns: 64px 1fr auto; gap: 14px; align-items: center; padding: 12px 14px; border: var(--line) solid var(--ink); border-radius: var(--r-md); background: var(--bg); }
+    .pair time { font: 700 var(--fs-md)/1.1 var(--font-display); }
+    .pair time small { display: block; font: 500 var(--fs-xs) var(--font); color: var(--text-3); margin-top: 3px; }
+    .pair strong { display: block; font-size: var(--fs-md); line-height: 1.25; }
+    .pair span small { color: var(--text-3); font-size: var(--fs-xs); }
+    .pair.is-now { background: var(--role-pop); color: #14141a; box-shadow: var(--shadow-sm); }
+    .pair.is-now time small, .pair.is-now span small { color: #45434d; }
+    .pair.is-past { opacity: .55; }
+    .room-chip { min-height: 40px; padding: 0 12px; border: var(--line) solid var(--ink); border-radius: 10px; background: var(--surface); color: var(--text); font: 700 var(--fs-sm) var(--font-display); cursor: pointer; box-shadow: var(--shadow-sm); }
+    .room-chip:hover { background: var(--ink); color: var(--bg); }
+    .today__side { display: grid; gap: 10px; }
+    .due { display: grid; grid-template-columns: 40px 1fr; gap: 12px; align-items: center; padding: 10px 12px; border: var(--line) dashed var(--ink); border-radius: var(--r-md); }
+    .due > .i { width: 40px; height: 40px; padding: 9px; border-radius: 50%; background: var(--lime-soft); border: var(--line) solid var(--ink); }
+    .due strong { display: block; font-size: var(--fs-sm); } .due small { color: var(--text-3); font-size: var(--fs-xs); }
+    .due:hover { border-style: solid; }
+    @media (max-width: 479px) { .pair { grid-template-columns: 1fr auto; } .pair time { grid-column: 1 / -1; display: flex; gap: 8px; align-items: baseline; } .pair time small { margin: 0; } }
+
+    /* Сотрудник: рабочий стол */
+    .desk { display: grid; gap: 14px; grid-template-columns: repeat(2, 1fr); }
+    @media (min-width: 900px) { .desk { grid-template-columns: repeat(4, 1fr); } .desk__tile--main { grid-row: span 2; grid-column: span 2; } }
+    @media (max-width: 899px) { .desk__tile--main { grid-column: 1 / -1; } }
+    .desk__tile { position: relative; display: flex; flex-direction: column; gap: 6px; padding: 18px; min-height: 150px; border: var(--line) solid var(--ink); border-radius: var(--r-lg); background: var(--surface); transition: transform .2s var(--ease), box-shadow .2s var(--ease); }
+    .desk__tile:hover { transform: translate(-3px, -3px); box-shadow: var(--shadow-md); }
+    .desk__tile > .i { width: 28px; height: 28px; margin-bottom: auto; }
+    .desk__tile strong { font: 700 var(--fs-md)/1.2 var(--font-display); margin-top: 18px; }
+    .desk__tile small { color: var(--text-3); font-size: var(--fs-xs); }
+    .desk__tile--main { background: #7c4dff; color: #fff; justify-content: flex-end; min-height: 220px; }
+    .desk__tile--main strong { font-size: var(--fs-2xl); } .desk__tile--main small { color: #ece6ff; font-size: var(--fs-md); max-width: 38ch; }
+    .desk__tile--main > .i { width: 44px; height: 44px; }
+    .desk__tile--main .sticker { position: absolute; top: -14px; right: 18px; --rot: 5deg; }
+    .desk__tile--lime { background: var(--lime); color: #14141a; } .desk__tile--lime small { color: #45434d; }
+
+    /* Партнёр: как работаем */
+    .biz { display: grid; gap: 36px; grid-template-columns: 1fr; border: var(--line) solid var(--ink); border-radius: var(--r-xl); background: #14141a; color: #f3eee3; box-shadow: var(--shadow-lg); padding: clamp(24px, 4vw, 56px); }
+    @media (min-width: 1024px) { .biz { grid-template-columns: 1.2fr 1fr; align-items: center; } }
+    .biz h2 { color: #fff; max-width: 15ch; } .biz .lead { color: #c9c2b4; margin-top: 16px; max-width: 520px; }
+    .biz__fields { margin-top: 22px; gap: 8px; } .biz__fields .chip { background: transparent; color: #f3eee3; border-color: #f3eee3; cursor: default; }
+    .biz__steps { list-style: none; margin: 0; padding: 0; display: grid; gap: 14px; }
+    .biz__steps li { display: grid; grid-template-columns: 64px 1fr; gap: 16px; align-items: center; padding: 18px; border-radius: var(--r-lg); background: #fffdf8; color: #14141a; border: var(--line) solid #f3eee3; }
+    .biz__steps li:nth-child(2) { background: #ffc45c; transform: rotate(-1.5deg); } .biz__steps li:nth-child(3) { background: #d7ff3d; transform: rotate(1deg); }
+    .biz__steps b { font: 800 38px/1 var(--font-display); }
+    .biz__steps strong { display: block; font-size: var(--fs-lg); } .biz__steps small { color: #45434d; font-size: var(--fs-sm); }
+
+    /* International */
+    .why { display: grid; gap: 16px; grid-template-columns: repeat(auto-fit, minmax(min(100%, 230px), 1fr)); }
+    .why__card { display: flex; flex-direction: column; gap: 6px; padding: 22px; border: var(--line) solid var(--ink); border-radius: var(--r-lg); background: var(--surface); min-height: 190px; }
+    .why__card:nth-child(odd) { transform: rotate(-1deg); } .why__card:nth-child(even) { transform: rotate(1.2deg); }
+    .why__card > .i { width: 36px; height: 36px; margin-bottom: auto; }
+    .why__card .big-num { font-size: calc(64px * var(--fs-scale)); margin-bottom: auto; }
+    .why__card strong { font: 700 var(--fs-lg)/1.2 var(--font-display); margin-top: 14px; } .why__card small { color: var(--text-3); font-size: var(--fs-sm); }
+    .why__card--pink { background: #ff9cc6; color: #14141a; } .why__card--pink small { color: #45434d; }
+    .why__card--ink { background: #14141a; color: #f3eee3; } .why__card--ink small { color: #c9c2b4; }
+    .path { list-style: none; margin: 28px 0 0; padding: 0; display: grid; gap: 10px; grid-template-columns: repeat(auto-fit, minmax(min(100%, 200px), 1fr)); counter-reset: none; }
+    .path li { display: flex; align-items: center; gap: 12px; padding: 12px 16px; border: var(--line) dashed var(--ink); border-radius: var(--r-pill); font-weight: 700; }
+    /* Версия для слабовидящих: коллаж — простой сеткой, подписи на фото — на плашке */
+    html[data-a11y] :is(.calc, .today__date, .why__card, .biz__steps li, .qa-head .hand, .rf-rule, .help-band .sticker) { transform: none !important; }
+    html[data-a11y] .collage { height: auto; display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 200px), 1fr)); gap: 16px; }
+    html[data-a11y] .collage .photo { position: relative; inset: auto; width: auto; height: auto; }
+    html[data-a11y] .collage .photo img { height: 200px; }
+    html[data-a11y] .collage :is(.s1, .s2) { position: static; justify-self: start; width: auto; height: auto; border-radius: 10px; }
+    html[data-a11y] .admit .photo { display: none; }
+    html[data-a11y] .sci a { display: flex; flex-direction: column; min-height: 0; color: var(--text); background: var(--surface); }
+    html[data-a11y] .sci img { position: static; height: 200px; }
+    html[data-a11y] .sci a::after { display: none; }
+    html[data-a11y] .sci .cap { position: static; padding: 16px 18px; }
+    html[data-a11y] .sci .cap span { opacity: 1; }
+    html[data-a11y] .help-band { padding-top: clamp(26px, 4vw, 52px); }
+    html[data-a11y] .help-band .sticker { position: static; justify-self: start; width: auto; height: auto; border-radius: 10px; }
+    html[data-a11y] .desk__tile--main .sticker { position: static; align-self: flex-start; }
+    html[data-a11y] .ticket::before, html[data-a11y] .ticket::after { display: none; }
+    .path b { flex: none; width: 34px; height: 34px; border-radius: 50%; display: grid; place-items: center; background: var(--ink); color: var(--bg); font-family: var(--font-display); }
+  </style>
+</head>
+<body data-page="home">
+  <div id="site-header"></div>
+
+  <main id="main">
+    <!-- 1. Герой-коллаж: заголовок меняется по роли -->
+    <section class="hero" data-block="hero">
+      <div class="container hero__grid">
+        <div>
+          <p class="hand role-hint" id="role-hint">выбери вверху, кто ты, — главная перестроится ↑</p>
+          <div class="hero__stickers" id="hero-stickers">
+            <span class="sticker" style="--rot:-3deg">Приём-2027 открыт</span>
+            <span class="sticker sticker--paper" style="--rot:2deg">400+ программ</span>
+          </div>
+          <div data-for-role="applicant">
+            <h1 class="display">Твой Урал <span class="u-hand">начинается</span> здесь</h1>
+            <p class="lead">Подберём программу по твоим баллам, покажем шансы на бюджет и проведём через подачу документов — без беготни.</p>
+          </div>
+          <div data-for-role="student" hidden>
+            <h1 class="display">Учёба без <span class="u-hand">беготни</span></h1>
+            <p class="lead">Расписание, справки, стипендии и все сервисы — в одном месте, в два клика.</p>
+          </div>
+          <div data-for-role="staff" hidden>
+            <h1 class="display">Работать в УрФУ — <span class="u-hand">удобно</span></h1>
+            <p class="lead">Документы, HR-сервисы, гранты и внутренние новости в одном рабочем пространстве.</p>
+          </div>
+          <div data-for-role="partner" hidden>
+            <h1 class="display">Наука, которая <span class="u-hand">решает</span> задачи</h1>
+            <p class="lead">R&amp;D-заказы, кадры для вашей компании, совместные лаборатории и технологии для лицензирования.</p>
+          </div>
+          <div data-for-role="intl" hidden>
+            <h1 class="display">Study in the <span class="u-hand">Urals</span></h1>
+            <p class="lead">Programs in English, visa support and a community from 100+ countries.</p>
+          </div>
+
+          <div class="hero-search search-xl input-icon">
+            <i data-icon="search"></i>
+            <button class="input" id="hero-q" data-search-open aria-label="Открыть поиск">Что ищешь? Например, «общежитие»</button>
+          </div>
+          <div class="cluster hero-chips" id="hero-chips">
+            <span class="hand">часто ищут →</span>
+            <button class="chip" data-search-open data-search-query="Проходные">Проходные баллы</button>
+            <button class="chip" data-search-open data-search-query="Расписание">Расписание</button>
+            <button class="chip" data-search-open data-search-query="общежитие">Общежитие</button>
+            <button class="chip" data-search-open data-search-query="Стипендии">Стипендии</button>
+          </div>
+        </div>
+
+        <div class="collage" id="collage">
+          <figure class="photo tape p1"><img src="assets/img/friends.jpg" alt="Студенты смеются за столом" loading="eager"><figcaption>первая сессия — сдали!</figcaption></figure>
+          <figure class="photo p2"><img src="assets/img/selfie.jpg" alt="Селфи студентов в аудитории"><figcaption>поточка, 9:00</figcaption></figure>
+          <figure class="photo tape tape--corner p3"><img src="assets/img/bench.jpg" alt="Студенты отдыхают у корпуса"><figcaption>после пар у ГУКа</figcaption></figure>
+          <span class="sticker sticker--round sticker--coral s1">35 000 студентов</span>
+          <span class="sticker sticker--blue s2"><i data-icon="sparkles"></i>бюджет есть!</span>
+          <div class="note" aria-hidden="true">
+            <svg class="scribble" viewBox="0 0 70 54"><path d="M62 6 C 40 4, 18 18, 14 44"/><path d="M6 34 L14 46 L24 36"/></svg>
+            <span class="hand" id="hero-note">это ты через год</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 2. Бегущая строка -->
+    <div class="marquee" aria-hidden="true" data-block="marquee">
+      <div class="marquee__track">
+        <span>Приём-2027</span><span>400+ программ</span><span>100+ стран</span><span>14 общежитий</span><span>60 бесплатных секций</span><span>120 лабораторий</span><span>с 1920 года</span>
+        <span>Приём-2027</span><span>400+ программ</span><span>100+ стран</span><span>14 общежитий</span><span>60 бесплатных секций</span><span>120 лабораторий</span><span>с 1920 года</span>
+      </div>
+    </div>
+
+    <!-- 3. Быстрые действия по роли -->
+    <section class="section" data-block="quick">
+      <div class="container">
+        <div class="qa-head"><h2 class="h2" id="qa-title">Что нужно сегодня?</h2><span class="hand" id="role-tag"></span></div>
+
+        <div class="tickets" data-for-role="applicant" data-role-key="applicant">
+          <a class="ticket" href="programs.html#calc"><span class="ticket__n">01</span><span><strong>Подобрать программу по баллам</strong><small>покажем, куда проходишь на бюджет</small></span><span class="ticket__arrow"><i data-icon="arrow-right"></i></span></a>
+          <a class="ticket" href="admission.html#steps"><span class="ticket__n">02</span><span><strong>Как поступить</strong><small>3 шага и сроки</small></span><span class="ticket__arrow"><i data-icon="arrow-right"></i></span></a>
+          <a class="ticket" href="admission.html#lists"><span class="ticket__n">03</span><span><strong>Найти себя в списках</strong><small>обновляются каждый час</small></span><span class="ticket__arrow"><i data-icon="arrow-right"></i></span></a>
+          <a class="ticket" href="campus.html#dorms"><span class="ticket__n">04</span><span><strong>Общежития</strong><small>14 корпусов рядом с учёбой</small></span><span class="ticket__arrow"><i data-icon="arrow-right"></i></span></a>
+        </div>
+        <div class="tickets" data-for-role="student" data-role-key="student" hidden>
+          <a class="ticket" href="schedule.html"><span class="ticket__n">01</span><span><strong>Расписание</strong><small>сегодня 3 пары, первая в 10:15</small></span><span class="ticket__arrow"><i data-icon="arrow-right"></i></span></a>
+          <a class="ticket" href="student.html#requests"><span class="ticket__n">02</span><span><strong>Заказать справку</strong><small>готово за 1 день</small></span><span class="ticket__arrow"><i data-icon="arrow-right"></i></span></a>
+          <a class="ticket" href="student.html#money"><span class="ticket__n">03</span><span><strong>Стипендии</strong><small>выплата 25-го</small></span><span class="ticket__arrow"><i data-icon="arrow-right"></i></span></a>
+          <a class="ticket" href="student.html#career"><span class="ticket__n">04</span><span><strong>Практика и работа</strong><small>120 вакансий</small></span><span class="ticket__arrow"><i data-icon="arrow-right"></i></span></a>
+        </div>
+        <div class="tickets" data-for-role="staff" data-role-key="staff" hidden>
+          <a class="ticket" href="science.html#grants"><span class="ticket__n">01</span><span><strong>Гранты и конкурсы</strong><small>12 открытых</small></span><span class="ticket__arrow"><i data-icon="arrow-right"></i></span></a>
+          <a class="ticket" href="help.html#docs"><span class="ticket__n">02</span><span><strong>Документы и приказы</strong><small>база знаний</small></span><span class="ticket__arrow"><i data-icon="arrow-right"></i></span></a>
+          <a class="ticket" href="help.html#it"><span class="ticket__n">03</span><span><strong>IT-поддержка</strong><small>Wi‑Fi, почта, доступы</small></span><span class="ticket__arrow"><i data-icon="arrow-right"></i></span></a>
+          <a class="ticket" href="help.html#jobs"><span class="ticket__n">04</span><span><strong>HR-сервисы</strong><small>отпуск, справки</small></span><span class="ticket__arrow"><i data-icon="arrow-right"></i></span></a>
+        </div>
+        <div class="tickets" data-for-role="partner" data-role-key="partner" hidden>
+          <a class="ticket" href="science.html#business"><span class="ticket__n">01</span><span><strong>Заказать исследование</strong><small>ответ за 3 дня</small></span><span class="ticket__arrow"><i data-icon="arrow-right"></i></span></a>
+          <a class="ticket" href="student.html#career"><span class="ticket__n">02</span><span><strong>Найти сотрудников</strong><small>стажировки и выпускники</small></span><span class="ticket__arrow"><i data-icon="arrow-right"></i></span></a>
+          <a class="ticket" href="science.html#startups"><span class="ticket__n">03</span><span><strong>Технологии и стартапы</strong><small>каталог разработок</small></span><span class="ticket__arrow"><i data-icon="arrow-right"></i></span></a>
+          <a class="ticket" href="help.html#endowment"><span class="ticket__n">04</span><span><strong>Поддержать университет</strong><small>эндаумент-фонд</small></span><span class="ticket__arrow"><i data-icon="arrow-right"></i></span></a>
+        </div>
+        <div class="tickets" data-for-role="intl" data-role-key="intl" hidden>
+          <a class="ticket" href="programs.html?lang=en"><span class="ticket__n">01</span><span><strong>Programs in English</strong><small>40+ programs</small></span><span class="ticket__arrow"><i data-icon="arrow-right"></i></span></a>
+          <a class="ticket" href="admission.html#apply"><span class="ticket__n">02</span><span><strong>How to apply</strong><small>online, step by step</small></span><span class="ticket__arrow"><i data-icon="arrow-right"></i></span></a>
+          <a class="ticket" href="help.html#visa"><span class="ticket__n">03</span><span><strong>Visa &amp; migration</strong><small>we help with documents</small></span><span class="ticket__arrow"><i data-icon="arrow-right"></i></span></a>
+          <a class="ticket" href="campus.html#dorms"><span class="ticket__n">04</span><span><strong>Housing</strong><small>dorms from 1 500 ₽/mo</small></span><span class="ticket__arrow"><i data-icon="arrow-right"></i></span></a>
+        </div>
+      </div>
+    </section>
+
+    <!-- 3a. Студент: твой день -->
+    <section class="section" data-block="today" data-for-role="student" hidden>
+      <div class="container">
+        <div class="today">
+          <div class="today__head">
+            <div class="tear__day today__date" aria-hidden="true"><b id="td-month">октябрь</b><strong id="td-num">9</strong><span id="td-wd">четверг</span></div>
+            <div>
+              <h2 class="h2">Твой день</h2>
+              <p class="hand today__status" id="td-status">три пары, первая в 10:15</p>
+            </div>
+          </div>
+          <ol class="pairs" id="td-pairs">
+            <li class="pair" data-from="10:15" data-to="11:45"><time>10:15<small>11:45</small></time><span><strong>Алгоритмы и структуры данных</strong><small>лекция · Морозова О. А.</small></span><button class="room-chip" type="button" data-room="D-204" data-goto-room aria-label="Где аудитория D-204">D-204</button></li>
+            <li class="pair" data-from="12:00" data-to="13:30"><time>12:00<small>13:30</small></time><span><strong>Базы данных и SQL</strong><small>практика · Лебедев С. Н.</small></span><button class="room-chip" type="button" data-room="G-302" data-goto-room aria-label="Где аудитория G-302">G-302</button></li>
+            <li class="pair" data-from="14:15" data-to="15:45"><time>14:15<small>15:45</small></time><span><strong>Английский язык</strong><small>практика · Кузнецова Е. В.</small></span><button class="room-chip" type="button" data-room="H-302" data-goto-room aria-label="Где аудитория H-302">H-302</button></li>
+          </ol>
+          <div class="today__side">
+            <a class="due" href="student.html#money"><i data-icon="coins"></i><span><strong>Стипендия</strong><small>придёт 25 октября</small></span></a>
+            <a class="due" href="campus.html#dorms"><i data-icon="bed"></i><span><strong>Продление общежития</strong><small>заявка до 15 октября</small></span></a>
+            <a class="due" href="student.html#requests"><i data-icon="file"></i><span><strong>Справка об обучении</strong><small>готова, PDF на почте</small></span></a>
+            <a class="arrow-link" href="schedule.html">Расписание на неделю</a>
+          </div>
+        </div>
+        <p class="demo-note">Демо-расписание группы РИ-250915 · нажми на аудиторию — покажем, где она</p>
+      </div>
+    </section>
+
+    <!-- 3b. Сотрудник: рабочий стол -->
+    <section class="section" data-block="work" data-for-role="staff" hidden>
+      <div class="container">
+        <div class="section-title">
+          <div><h2 class="h2">Рабочий стол</h2><span class="hand">всё, что раньше жило на десятке поддоменов</span></div>
+          <a class="arrow-link" href="help.html#docs">Все сервисы</a>
+        </div>
+        <div class="desk">
+          <a class="desk__tile desk__tile--main" href="help.html#docs"><span class="sticker sticker--coral">3 ждут тебя</span><i data-icon="file"></i><strong>Документы на подпись</strong><small>Согласование онлайн: служебки, договоры, приказы — без бегунка по корпусам</small></a>
+          <a class="desk__tile" href="help.html#it"><i data-icon="mail"></i><strong>Почта и календарь</strong><small>2 встречи сегодня</small></a>
+          <a class="desk__tile" href="help.html#it"><i data-icon="wifi"></i><strong>IT-заявка</strong><small>доступы, Wi‑Fi, техника</small></a>
+          <a class="desk__tile" href="campus.html#map"><i data-icon="calendar"></i><strong>Забронировать аудиторию</strong><small>свободные на сегодня</small></a>
+          <a class="desk__tile" href="help.html#jobs"><i data-icon="briefcase"></i><strong>Отпуск и справки</strong><small>HR-сервисы онлайн</small></a>
+          <a class="desk__tile desk__tile--lime" href="science.html#grants"><i data-icon="trophy"></i><strong>Гранты и конкурсы</strong><small>12 открытых · ближайший дедлайн 20 октября</small></a>
+          <a class="desk__tile" href="help.html#docs"><i data-icon="book"></i><strong>Повышение квалификации</strong><small>курсы для преподавателей</small></a>
+        </div>
+        <p class="demo-note">Счётчики и сроки — демонстрационные</p>
+      </div>
+    </section>
+
+    <!-- 3c. Партнёр: как работаем с бизнесом -->
+    <section class="section" data-block="biz" data-for-role="partner" hidden>
+      <div class="container">
+        <div class="biz">
+          <div>
+            <span class="eyebrow">Для бизнеса</span>
+            <h2 class="h1" style="margin-top:16px">Принесите задачу — соберём команду</h2>
+            <p class="lead">Не нужно писать ТЗ и искать нужную кафедру. Опишите проблему своими словами — мы найдём лабораторию и учёных под неё.</p>
+            <div class="cluster biz__fields"><span class="chip">Энергетика</span><span class="chip">Металлургия</span><span class="chip">ИИ и данные</span><span class="chip">Химия</span><span class="chip">Строительство</span></div>
+            <div class="cluster" style="margin-top:26px">
+              <a class="btn btn--accent btn--lg" href="science.html#business">Оставить задачу <i data-icon="arrow-right"></i></a>
+              <a class="btn btn--white btn--lg" href="science.html#startups">Каталог технологий</a>
+            </div>
+          </div>
+          <ol class="biz__steps">
+            <li><b>01</b><span><strong>Заявка за 5 минут</strong><small>форма без ТЗ и бюрократии</small></span></li>
+            <li><b>02</b><span><strong>Команда за 3 дня</strong><small>подберём лабораторию и руководителя проекта</small></span></li>
+            <li><b>03</b><span><strong>Договор под формат</strong><small>НИОКР, лицензия, совместная лаборатория или стажировки</small></span></li>
+          </ol>
+        </div>
+      </div>
+    </section>
+
+    <!-- 3d. International: учёба на английском -->
+    <section class="section" data-block="intl" data-for-role="intl" lang="en" hidden>
+      <div class="container">
+        <div class="section-title">
+          <div><h2 class="h2">Why UrFU</h2><span class="hand">friends from 100+ countries</span></div>
+          <a class="arrow-link" href="programs.html?lang=en">All programs</a>
+        </div>
+        <div class="why">
+          <div class="why__card"><span class="big-num">40+</span><strong>programs in English</strong><small>Bachelor’s, Master’s and PhD</small></div>
+          <div class="why__card why__card--pink"><i data-icon="book"></i><strong>Russian from zero</strong><small>a preparatory year before your degree</small></div>
+          <div class="why__card"><i data-icon="file"></i><strong>Visa support</strong><small>invitation, registration and insurance — we guide you</small></div>
+          <div class="why__card why__card--ink"><i data-icon="users"></i><strong>A buddy on arrival</strong><small>a student meets you and helps you settle in</small></div>
+        </div>
+        <ol class="path">
+          <li><b>1</b>Choose a program</li><li><b>2</b>Apply online</li><li><b>3</b>Get an invitation</li><li><b>4</b>Fly to Yekaterinburg</li>
+        </ol>
+        <div class="cluster" style="margin-top:28px">
+          <a class="btn btn--accent btn--lg" href="admission.html#apply">Apply online <i data-icon="arrow-right"></i></a>
+          <a class="btn btn--ghost btn--lg" href="help.html#contacts">Ask us a question</a>
+        </div>
+      </div>
+    </section>
+
+    <!-- 4. Поступление + калькулятор -->
+    <section class="section" data-block="admit" data-for-role="applicant">
+      <div class="container">
+        <div class="admit">
+          <figure class="photo tape"><img src="assets/img/applicant.jpg" alt="Абитуриентка с книгой"><figcaption>это ты в сентябре</figcaption></figure>
+          <div>
+            <span class="eyebrow">Поступление-2027</span>
+            <h2 class="h1" style="margin-top:16px">Узнай шансы до подачи документов</h2>
+            <p class="lead">Введи сумму баллов — покажем программы, куда ты проходил бы в прошлом году, и сколько там бюджетных мест.</p>
+            <div class="tear">
+              <div class="tear__day"><b>июнь</b><strong>20</strong><span>старт приёма</span></div>
+              <div class="tear__day"><b>июль</b><strong>25</strong><span>последний день подачи</span></div>
+              <div class="tear__day"><b>август</b><strong>3</strong><span>зачисление на бюджет</span></div>
+            </div>
+            <div class="cta">
+              <a class="btn btn--white btn--lg" href="admission.html">Как поступить <i data-icon="arrow-right"></i></a>
+              <a class="btn btn--soft btn--lg" href="admission.html#school">Я ещё в школе</a>
+            </div>
+          </div>
+          <div class="calc" id="calc">
+            <span class="sticker">считаем за 5 сек</span>
+            <div class="calc__row"><label for="score" class="label">Сумма баллов за 3 ЕГЭ</label><span class="calc__score" id="score-out">240</span></div>
+            <input type="range" id="score" min="150" max="310" value="240" step="1" aria-describedby="calc-res">
+            <div class="cluster" data-chip-group id="calc-area">
+              <button class="chip" aria-pressed="true" data-area="all">Все</button>
+              <button class="chip" aria-pressed="false" data-area="it">IT</button>
+              <button class="chip" aria-pressed="false" data-area="eng">Инженерия</button>
+              <button class="chip" aria-pressed="false" data-area="hum">Гуманитарные</button>
+            </div>
+            <div class="calc__result" id="calc-res" aria-live="polite"><strong>86 программ</strong><div class="small muted">с проходным баллом ниже твоего</div></div>
+            <a class="btn btn--accent btn--block" href="programs.html#calc">Показать программы <i data-icon="arrow-right"></i></a>
+            <p class="demo-note">Расчёт по демонстрационным данным</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 5. Новости: журнал + афиша -->
+    <section class="section section--surface sec-line" data-block="news" data-for-role="applicant student staff partner">
+      <div class="container">
+        <div class="section-title">
+          <div><h2 class="h2">Что нового</h2><span class="hand">свежее за неделю</span></div>
+          <a class="arrow-link" href="news.html">Все новости</a>
+        </div>
+        <div class="mag">
+          <a class="lead-story" href="article.html">
+            <figure class="photo tape"><img src="assets/img/lab.jpg" alt="Исследователь у микроскопа в лаборатории"></figure>
+            <div class="cluster" style="margin-top:22px"><span class="tag tag--brand">Наука</span><span class="xs muted">7 октября · 4 мин</span></div>
+            <h3>Учёные УрФУ создали материал для батарей, которые работают при −40 °C</h3>
+            <p class="muted">Разработка может удвоить запас хода электротранспорта в уральскую зиму.</p>
+          </a>
+          <div>
+            <a class="story" href="article.html"><img src="assets/img/graduation.jpg" alt=""><span><span class="tag tag--student">Студентам</span><strong>Открыт приём заявок на семестр обмена в 2027 году</strong></span></a>
+            <a class="story" href="article.html"><img src="assets/img/city.jpg" alt=""><span><span class="tag tag--accent">Кампус</span><strong>Новый кампус: каким будет общественное пространство</strong></span></a>
+            <a class="story" href="article.html"><img src="assets/img/robotics.jpg" alt=""><span><span class="tag">Университет</span><strong>УрФУ — в топ-10 вузов по востребованности выпускников</strong></span></a>
+          </div>
+        </div>
+
+        <div class="afisha">
+          <div class="row between" style="flex-wrap:wrap"><h3 class="h3">Афиша</h3><a class="arrow-link" style="color:#f3eee3" href="news.html#events">Весь календарь</a></div>
+          <div class="afisha__list">
+            <a class="afisha__item" href="news.html#events"><b>12<small>окт</small></b><strong>День открытых дверей ИРИТ-РтФ</strong><span>Новый кампус · 12:00 · абитуриентам</span></a>
+            <a class="afisha__item" href="news.html#events"><b>15<small>окт</small></b><strong>Ярмарка вакансий «Карьера-2027»</strong><span>Главный корпус · 10:00</span></a>
+            <a class="afisha__item" href="news.html#events"><b>19<small>окт</small></b><strong>Лекция: как ИИ меняет инженерию</strong><span>Онлайн · 18:30</span></a>
+            <a class="afisha__item" href="news.html#events"><b>24<small>окт</small></b><strong>Киберспортивный турнир УрФУ Cup</strong><span>Студенческий центр · 16:00</span></a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 6. Цифры + наука -->
+    <section class="section" data-block="sci" data-for-role="applicant staff partner">
+      <div class="container">
+        <div class="nums">
+          <div class="num"><span class="big-num">35k</span><span class="hand">студентов — целый город</span></div>
+          <div class="num"><span class="big-num">100+</span><span class="hand">стран: однокурсники со всего мира</span></div>
+          <div class="num"><span class="big-num">120</span><span class="hand">лабораторий, куда пускают студентов</span></div>
+          <div class="num"><span class="big-num">1920</span><span class="hand">год основания. Нам 106 лет</span></div>
+        </div>
+        <div class="sci">
+          <a href="science.html#labs"><img src="assets/img/lab.jpg" alt="" loading="lazy"><span class="sticker">14 лабораторий</span><span class="cap"><strong>Энергетика будущего</strong><span>водород, накопители, умные сети</span></span></a>
+          <a href="science.html#labs"><img src="assets/img/robotics.jpg" alt="" loading="lazy"><span class="sticker sticker--paper">17 лабораторий</span><span class="cap"><strong>ИИ и роботы</strong><span>компьютерное зрение, цифровые двойники</span></span></a>
+          <a href="science.html#business"><img src="assets/img/winter.jpg" alt="" loading="lazy"><span class="sticker sticker--coral">для бизнеса</span><span class="cap"><strong>Экология Урала</strong><span>мониторинг, переработка, зелёная химия</span></span></a>
+        </div>
+      </div>
+    </section>
+
+    <!-- 7. Кампус-коллаж -->
+    <section class="section grid-paper sec-line" data-block="life" data-for-role="applicant student intl">
+      <div class="container">
+        <div class="section-title">
+          <div><h2 class="h2">Жизнь после пар</h2><span class="hand">кампус в самом центре Екатеринбурга</span></div>
+          <a class="arrow-link" href="campus.html">Весь кампус</a>
+        </div>
+        <div class="life">
+          <a href="campus.html#dorms"><figure class="photo tape"><img src="assets/img/dorm.jpg" alt="Комната в общежитии" loading="lazy"><figcaption>общага — 5 мин до пар</figcaption></figure></a>
+          <a href="campus.html#sport"><figure class="photo"><img src="assets/img/sport.jpg" alt="Студенты играют в баскетбол" loading="lazy"><figcaption>60 секций бесплатно</figcaption></figure></a>
+          <a href="campus.html#life"><figure class="photo tape tape--corner"><img src="assets/img/concert.jpg" alt="Студенческий концерт" loading="lazy"><figcaption>фестивали каждый месяц</figcaption></figure></a>
+          <a href="campus.html#food"><figure class="photo"><img src="assets/img/library.jpg" alt="Студенты в библиотеке" loading="lazy"><figcaption>библиотека до 22:00</figcaption></figure></a>
+        </div>
+        <div class="map-strip room-finder" id="room-finder">
+          <div class="stack">
+            <span class="eyebrow">Навигация по кампусу</span>
+            <h3 class="h3">Где эта аудитория?</h3>
+            <p class="muted">Набери код из расписания — скажем корпус, адрес и этаж. Первокурсники больше не ищут «Х» в ГУКе.</p>
+            <form class="rf-form" id="rf-form" role="search" autocomplete="off">
+              <label for="rf-q" class="sr-only">Код аудитории</label>
+              <input class="input" id="rf-q" value="Х-420" spellcheck="false" placeholder="Например, E-203" aria-describedby="rf-rule">
+              <button class="btn" type="submit">Найти <i data-icon="search"></i></button>
+            </form>
+            <div class="cluster rf-ex"><span class="hand">попробуй:</span>
+              <button class="chip" type="button" data-room="ГУК-300">ГУК-300</button>
+              <button class="chip" type="button" data-room="E-203">E-203</button>
+              <button class="chip" type="button" data-room="И-311">И-311</button>
+              <button class="chip" type="button" data-room="Фт-212">Фт-212</button>
+              <button class="chip" type="button" data-room="Т-1011">Т-1011</button>
+              <button class="chip" type="button" data-room="новый кампус">Новый кампус</button>
+            </div>
+            <p class="hand rf-rule" id="rf-rule">буква — корпус или блок, первая цифра — этаж (в «Т» — первые две)</p>
+          </div>
+          <div class="rf-out" id="rf-out" aria-live="polite"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 8. Помощь -->
+    <section class="section" data-block="help">
+      <div class="container">
+        <div class="help-band">
+          <span class="sticker sticker--round">ответ за 15 минут</span>
+          <div>
+            <h2 class="h2" style="margin-bottom:16px">Не нашёл ответ? Спроси нас</h2>
+            <p>Один вход для всех вопросов: от поступления до справки. Без поиска нужного телефона.</p>
+            <div class="cluster" style="margin-top:24px">
+              <a class="btn btn--white btn--lg" href="help.html#chat"><i data-icon="message"></i> Написать в чат</a>
+              <a class="btn btn--lg" style="background:#14141a;color:#fff;border-color:#14141a" href="tel:88001005044"><i data-icon="phone"></i> 8-800-100-50-44</a>
+            </div>
+          </div>
+          <div class="help-links">
+            <a href="help.html#transfer">Как перевестись из другого вуза <i data-icon="arrow-right"></i></a>
+            <a href="help.html#it">Не работает корпоративная почта <i data-icon="arrow-right"></i></a>
+            <a href="help.html#access">Поддержка студентов с ОВЗ <i data-icon="arrow-right"></i></a>
+            <a href="help.html">Все вопросы и ответы <i data-icon="arrow-right"></i></a>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <div id="site-footer"></div>
+
+  <script src="assets/js/app.js"></script>
+  <script>
+    /* ---------- Главная под роль: порядок секций, герой, бегущая строка ---------- */
+    const HOME = {
+      applicant: {
+        order: ['hero', 'marquee', 'quick', 'admit', 'news', 'sci', 'life', 'help'],
+        note: 'для тех, кто поступает', qa: 'Что нужно сегодня?',
+        stickers: ['Приём-2027 открыт', '400+ программ'],
+        photos: [['friends', 'Студенты смеются за столом', 'первая сессия — сдали!'], ['selfie', 'Селфи студентов в аудитории', 'поточка, 9:00'], ['bench', 'Студенты отдыхают у корпуса', 'после пар у ГУКа']],
+        s1: '35 000 студентов', s2: 'бюджет есть!', hand: 'это ты через год',
+        marquee: ['Приём-2027', '400+ программ', '100+ стран', '14 общежитий', '60 бесплатных секций', '120 лабораторий', 'с 1920 года'],
+        chips: [['Проходные баллы', 'Проходные'], ['Общежитие', 'общежитие'], ['Каталог программ', 'программ'], ['Приёмная комиссия', 'Приёмная']],
+        q: 'Что ищешь? Например, «общежитие»', often: 'часто ищут →'
+      },
+      student: {
+        order: ['hero', 'marquee', 'quick', 'today', 'life', 'news', 'help'],
+        note: 'для студентов', qa: 'Что нужно сегодня?',
+        stickers: ['Осенний семестр', 'Сессия — в январе'],
+        photos: [['lecture', 'Лекция в большой аудитории', 'пара в 10:15 — успел'], ['library', 'Студенты в библиотеке', 'библиотека до 22:00'], ['sport', 'Студенты играют в баскетбол', 'после пар — баскет']],
+        s1: '60 секций бесплатно', s2: 'стипендия 25-го', hand: 'это ты на перемене',
+        marquee: ['Расписание в 1 клик', 'Справки онлайн', 'Стипендия 25-го', 'Где аудитория — подскажем', 'Wi‑Fi во всех корпусах', 'Библиотека до 22:00'],
+        chips: [['Расписание', 'Расписание'], ['Справки', 'справку'], ['Стипендии', 'Стипендии'], ['Wi‑Fi', 'Wi']],
+        q: 'Что ищешь? Например, «справка»', often: 'часто ищут →'
+      },
+      staff: {
+        order: ['hero', 'marquee', 'quick', 'work', 'news', 'sci', 'help'],
+        note: 'для сотрудников', qa: 'Что нужно сегодня?',
+        stickers: ['Один вход', '12 грантов открыто'],
+        photos: [['laptop', 'Ноутбук на рабочем столе', 'заявка за 2 минуты'], ['lecture', 'Лекция в большой аудитории', 'лекция без бумажек'], ['lab', 'Исследователь у микроскопа', 'грант — в работе']],
+        s1: 'всё в одном окне', s2: 'без бегунков', hand: 'это ваш рабочий день',
+        marquee: ['Один вход — все сервисы', 'Документы без бегунков', '12 грантов открыто', 'IT-заявка за 2 минуты', 'Бронирование аудиторий', 'Курсы для преподавателей'],
+        chips: [['Wi‑Fi и почта', 'Wi'], ['Документы', 'Сведения'], ['Наука', 'Наука'], ['Контакт-центр', 'Контакт']],
+        q: 'Что ищете? Например, «Wi‑Fi»', often: 'часто ищут →'
+      },
+      partner: {
+        order: ['hero', 'marquee', 'quick', 'biz', 'sci', 'news', 'help'],
+        note: 'для партнёров', qa: 'С чего начнём?',
+        stickers: ['R&D для бизнеса', '120 лабораторий'],
+        photos: [['lab', 'Исследователь у микроскопа в лаборатории', 'лаборатория под задачу'], ['robotics', 'Студенты собирают робота', 'цифровой двойник цеха'], ['winter', 'Зимний кампус', 'испытания при −40 °C']],
+        s1: 'ответ за 3 дня', s2: 'кадры для вас', hand: 'здесь ваша задача',
+        marquee: ['120 лабораторий', 'НИОКР под задачу', 'Ответ за 3 дня', 'Кадры для компаний', 'Технологии для лицензирования', 'с 1920 года'],
+        chips: [['Наука и лаборатории', 'Наука'], ['Институты', 'Институты'], ['Контакты', 'Контакт']],
+        q: 'Что ищете? Например, «лаборатории»', often: 'часто ищут →'
+      },
+      intl: {
+        order: ['hero', 'marquee', 'quick', 'intl', 'life', 'help'],
+        note: 'for international students', qa: 'What do you need?',
+        stickers: ['Admission 2027', '40+ English programs'],
+        photos: [['city', 'Екатеринбург с высоты', 'Yekaterinburg, hi!'], ['friends', 'Студенты смеются за столом', 'friends from 100+ countries'], ['graduation', 'Выпускники в мантиях', 'your diploma']],
+        s1: '100+ countries', s2: 'visa support', hand: 'you, next year',
+        marquee: ['100+ countries', '40+ English programs', 'Visa support', 'Russian from zero', 'Buddy program', 'Yekaterinburg'],
+        chips: [['Programs', 'программ'], ['Housing', 'общежитие'], ['Contacts', 'Контакт']],
+        q: 'Search, e.g. “housing”', often: 'popular →'
+      }
+    };
+    (() => {
+      const main = document.getElementById('main');
+      const blocks = Object.fromEntries([...main.querySelectorAll(':scope > [data-block]')].map((el) => [el.dataset.block, el]));
+      const $ = (id) => document.getElementById(id);
+      const reduce = () => matchMedia('(prefers-reduced-motion: reduce)').matches || document.documentElement.hasAttribute('data-a11y');
+      let first = true;
+      function apply(role) {
+        const h = HOME[role] || HOME.applicant;
+        // порядок секций: нужные — по сценарию, остальные (скрытые) — в конец
+        h.order.forEach((k) => blocks[k] && main.appendChild(blocks[k]));
+        Object.keys(blocks).filter((k) => !h.order.includes(k)).forEach((k) => main.appendChild(blocks[k]));
+        $('role-tag').textContent = '← ' + h.note;
+        $('qa-title').textContent = h.qa;
+        $('hero-stickers').querySelectorAll('.sticker').forEach((el, i) => { el.textContent = h.stickers[i] || ''; });
+        $('collage').querySelectorAll('.photo').forEach((fig, i) => {
+          const [src, alt, cap] = h.photos[i];
+          const img = fig.querySelector('img');
+          img.src = `assets/img/${src}.jpg`; img.alt = alt;
+          fig.querySelector('figcaption').textContent = cap;
+        });
+        $('collage').querySelector('.s1').textContent = h.s1;
+        $('collage').querySelector('.s2').innerHTML = UI.icon('sparkles') + h.s2;
+        $('hero-note').textContent = h.hand;
+        const track = blocks.marquee.querySelector('.marquee__track');
+        const line = h.marquee.map((t) => `<span>${t}</span>`).join('');
+        track.innerHTML = line + line;
+        $('hero-q').textContent = h.q;
+        const chips = $('hero-chips');
+        chips.querySelector('.hand').textContent = h.often;
+        chips.querySelectorAll('.chip').forEach((c) => c.remove());
+        h.chips.forEach(([label, query]) => {
+          const b = document.createElement('button');
+          b.className = 'chip'; b.dataset.searchQuery = query; b.textContent = label;
+          b.addEventListener('click', () => UI.openSearch(query));
+          chips.appendChild(b);
+        });
+        if (role === 'student') renderToday();
+      }
+      document.addEventListener('rolechange', (e) => {
+        const role = e.detail;
+        if (first || reduce() || !document.startViewTransition) apply(role);
+        else { const vt = document.startViewTransition(() => apply(role)); vt.ready.catch(() => {}); vt.finished.catch(() => {}); }
+        if (!first) {
+          window.scrollTo({ top: 0, behavior: 'instant' });
+          setTimeout(() => UI.toast(role === 'intl' ? 'The home page is rebuilt for you' : 'Главная перестроена под тебя'), 0);
+        }
+        first = false;
+      });
+
+      // Студент: «сейчас идёт / следующая через N минут» по демо-расписанию
+      const MONTHS = ['январь', 'февраль', 'март', 'апрель', 'май', 'июнь', 'июль', 'август', 'сентябрь', 'октябрь', 'ноябрь', 'декабрь'];
+      const DAYS = ['воскресенье', 'понедельник', 'вторник', 'среда', 'четверг', 'пятница', 'суббота'];
+      const mins = (t) => { const [hh, mm] = t.split(':'); return +hh * 60 + +mm; };
+      function renderToday() {
+        const d = new Date(), now = d.getHours() * 60 + d.getMinutes();
+        $('td-month').textContent = MONTHS[d.getMonth()]; $('td-num').textContent = d.getDate(); $('td-wd').textContent = DAYS[d.getDay()];
+        const pairs = [...document.querySelectorAll('#td-pairs .pair')];
+        let status = '';
+        if (d.getDay() === 0) status = 'воскресенье — пар нет, отдыхай';
+        pairs.forEach((p) => {
+          const from = mins(p.dataset.from), to = mins(p.dataset.to);
+          p.classList.toggle('is-now', !status && now >= from && now < to);
+          p.classList.toggle('is-past', !status && now >= to);
+          if (status) return;
+          if (now >= from && now < to) status = `сейчас пара, до конца ${to - now} мин`;
+          else if (now < from) status = from - now <= 90 ? `следующая пара через ${from - now} мин` : `${pairs.length} пары, первая в ${pairs[0].dataset.from}`;
+        });
+        $('td-status').textContent = status || 'пары закончились — можно выдохнуть';
+      }
+      setInterval(() => { if (document.body.dataset.role === 'student') renderToday(); }, 60000);
+      // Клик по аудитории в «Твоём дне» — показываем её в «Где эта аудитория?»
+      document.querySelectorAll('[data-goto-room]').forEach((b) => b.addEventListener('click', () => {
+        document.getElementById('room-finder').scrollIntoView({ behavior: reduce() ? 'instant' : 'smooth', block: 'center' });
+      }));
+    })();
+
+    // Мини-калькулятор: демонстрационная модель проходных баллов
+    const PROGRAMS = { all: 140, it: 34, eng: 52, hum: 41 };
+    const range = document.getElementById('score');
+    const out = document.getElementById('score-out');
+    const res = document.getElementById('calc-res');
+    const plural = (n, f) => f[(n % 10 === 1 && n % 100 !== 11) ? 0 : (n % 10 >= 2 && n % 10 <= 4 && (n % 100 < 10 || n % 100 >= 20)) ? 1 : 2];
+    function calc() {
+      const s = +range.value;
+      const area = document.querySelector('#calc-area [aria-pressed="true"]').dataset.area;
+      const share = Math.max(0, Math.min(1, (s - 150) / 140));
+      const n = Math.round(PROGRAMS[area] * Math.pow(share, 1.4));
+      const seats = n * 24 + (n ? 12 : 0);
+      out.textContent = s;
+      res.innerHTML = n
+        ? `<strong>${n} ${plural(n, ['программа', 'программы', 'программ'])}</strong><div class="small muted">с проходным баллом ниже твоего · ${seats.toLocaleString('ru-RU')} бюджетных мест</div>`
+        : `<strong>Пока мало вариантов</strong><div class="small muted">Посмотри платные места и колледж УрФУ</div>`;
+    }
+    range.addEventListener('input', calc);
+    document.getElementById('calc-area').addEventListener('chipchange', calc);
+    calc();
+  </script>
+  <script>
+    /* Где аудитория: код из расписания → корпус, адрес, этаж (данные — UI.findRoom в app.js) */
+    (() => {
+      const form = document.getElementById('rf-form'), q = document.getElementById('rf-q'), out = document.getElementById('rf-out');
+      const esc = (t) => String(t).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c]);
+      const floors = (f, max) => { const top = max || Math.max(f + 1, 5); let h = ''; for (let i = 1; i <= top; i++) h += `<span${i === f ? ' class="is-here"' : ''}>${i === f ? 'ты тут' : i}</span>`; return `<div class="rf-floors${top > 9 ? ' rf-floors--tall' : ''}" aria-hidden="true">${h}</div>`; };
+      function show(v) {
+        const r = UI.findRoom(v);
+        if (!r) { out.innerHTML = `<div class="rf-miss"><strong>Не похоже на код аудитории</strong><p class="muted small" style="margin:6px 0 0">Код выглядит так: буква корпуса, дефис и номер — «E-203», «ГУК-300».</p></div>`; return; }
+        if (r.unknown) { out.innerHTML = `<div class="rf-miss"><strong>Корпус «${esc(r.letter)}» мы пока не знаем</strong><p class="muted small" style="margin:6px 0 12px">Найди его на карте по названию института.</p><a class="btn btn--sm" href="campus.html#map">Открыть карту ${UI.icon('map-pin')}</a></div>`; return; }
+        out.innerHTML = `<div class="rf-ticket"><div class="rf-code${r.code.length > 7 ? ' rf-code--long' : ''}">${esc(r.code)}</div>
+          <dl><div><dt>Корпус</dt><dd>${esc(r.n)}</dd></div><div><dt>Адрес</dt><dd>${esc(r.a)}</dd></div>${r.floor ? `<div><dt>Этаж</dt><dd>${r.floor}-й</dd></div>` : ''}</dl>
+          ${r.floor ? floors(r.floor, r.floors) : '<span></span>'}
+          <p class="rf-tip">${esc(r.tip)}</p>
+          ${r.map ? `<a class="btn btn--accent" href="campus.html?room=${encodeURIComponent(r.code)}">Показать на карте ${UI.icon('map-pin')}</a>` : ''}</div>`;
+      }
+      form.addEventListener('submit', (e) => { e.preventDefault(); show(q.value); });
+      document.querySelectorAll('[data-room]').forEach((b) => b.addEventListener('click', () => { q.value = b.dataset.room; show(b.dataset.room); }));
+      show(q.value);
+    })();
+  </script>
+</body>
+</html>
