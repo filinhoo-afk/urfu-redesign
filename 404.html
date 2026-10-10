@@ -4,6 +4,8 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Страница не найдена — УрФУ</title>
+  <script>/* GitHub Pages отдаёт 404 на любом пути — относительные ссылки считаем от корня сайта */
+    if (location.hostname.endsWith('github.io')) document.write('<base href="/' + location.pathname.split('/')[1] + '/">');</script>
   <link rel="icon" href="assets/logo/favicon.svg" type="image/svg+xml">
   <link rel="stylesheet" href="assets/css/tokens.css">
   <link rel="stylesheet" href="assets/css/components.css">
